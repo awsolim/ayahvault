@@ -230,9 +230,9 @@ function MemoBuddy() {
         <div>
           <p className="font-medium text-sm text-gray-700 mb-1 flex items-center gap-2">
             Preview Amount
-            <span className="hidden sm:inline-flex items-center space-x-1 text-xs text-gray-500">
+            <span className="hidden sm:flex items-center space-x-1 text-xs text-gray-500">
                 <kbd className="px-1 py-0.5 border bg-gray-100 rounded font-mono">Spacebar</kbd>
-                <span>to toggle</span>
+                <span>to togglee</span>
             </span>
           </p>
           <div className="flex items-center space-x-4">
