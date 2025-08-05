@@ -119,7 +119,7 @@ function MemoBuddy() {
 
         <button
         onClick={() => navigate('/')}
-        className="absolute top-4 left-4 bg-white border border-slate-300 rounded-full px-3 py-2 text-sm font-medium shadow hover:bg-emerald-50 transition"
+        className="fixed top-4 left-4 bg-white border border-slate-300 rounded-full px-3 py-2 text-sm font-medium shadow hover:bg-emerald-50 transition"
         >
         ← Home
         </button>
@@ -228,7 +228,13 @@ function MemoBuddy() {
 
       <div className="mt-6 space-y-4">
         <div>
-          <p className="font-medium text-sm text-gray-700 mb-1">Preview Amount</p>
+          <p className="font-medium text-sm text-gray-700 mb-1 ">
+            Preview Amount  
+            <span className="ml-4 text-xs text-gray-400">
+                <kbd className="px-1 py-0.5 bg-gray-100 rounded text-xs border border-gray-300 mr-1"> Spacebar </kbd> to toggle 
+            </span>
+            
+            </p>
           <div className="flex items-center space-x-4">
             <label className="flex items-center space-x-2">
               <input
@@ -247,17 +253,27 @@ function MemoBuddy() {
               <span>Partial Preview</span>
             </label>
             {partialMode && (
-              <input
-                type="number"
-                min={1}
-                value={partialWordCount}
-                onChange={(e) => {
-                  const val = Number(e.target.value);
-                  if (val >= 1) setPartialWordCount(val);
-                }}
-                className="border px-2 py-1 rounded w-24"
-              />
-            )}
+  <div className="flex items-center space-x-2 mt-2">
+    <input
+      type="number"
+      min={1}
+      value={partialWordCount}
+      onChange={(e) => {
+        const val = Number(e.target.value);
+        if (val >= 1) setPartialWordCount(val);
+      }}
+      className="border px-2 py-1 rounded w-24"
+    />
+
+    {/* Instruction beside the box */}
+    <p className="text-xs text-gray-500 flex items-center space-x-1 ml-2">
+      <kbd className="px-1.5 py-0.5 border rounded bg-gray-100 text-xs font-mono">↑</kbd>
+      <kbd className="px-1.5 py-0.5 border rounded bg-gray-100 text-xs font-mono">↓</kbd>
+      <span>to change</span>
+    </p>
+  </div>
+)}
+
           </div>
         </div>
 
