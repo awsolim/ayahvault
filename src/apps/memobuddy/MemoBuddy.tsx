@@ -252,27 +252,28 @@ function MemoBuddy() {
               />
               <span>Partial Preview</span>
             </label>
+            
             {partialMode && (
-  <div className="flex items-center space-x-2 mt-2">
-    <input
-      type="number"
-      min={1}
-      value={partialWordCount}
-      onChange={(e) => {
-        const val = Number(e.target.value);
-        if (val >= 1) setPartialWordCount(val);
-      }}
-      className="border px-2 py-1 rounded w-24"
-    />
+                <div className="flex items-center space-x-2 mt-2">
+                    <input
+                    type="number"
+                    min={1}
+                    value={partialWordCount}
+                    onChange={(e) => {
+                        const val = Number(e.target.value);
+                        if (val >= 1) setPartialWordCount(val);
+                    }}
+                    className="border px-2 py-1 rounded w-24"
+                    />
 
-    {/* Instruction beside the box */}
-    <p className="text-xs text-gray-500 flex items-center space-x-1 ml-2">
-      <kbd className="px-1.5 py-0.5 border rounded bg-gray-100 text-xs font-mono">↑</kbd>
-      <kbd className="px-1.5 py-0.5 border rounded bg-gray-100 text-xs font-mono">↓</kbd>
-      <span>to change</span>
-    </p>
-  </div>
-)}
+                    {/* Instruction beside the box */}
+                    <p className="hidden sm:flex text-xs text-gray-500 flex items-center space-x-1 ml-2">
+                    <kbd className="px-1.5 py-0.5 border rounded bg-gray-100 text-xs font-mono">↑</kbd>
+                    <kbd className="px-1.5 py-0.5 border rounded bg-gray-100 text-xs font-mono">↓</kbd>
+                    <span>to change</span>
+                    </p>
+                </div>
+                )}
 
           </div>
         </div>
