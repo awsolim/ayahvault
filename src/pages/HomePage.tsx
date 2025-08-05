@@ -1,6 +1,5 @@
 // src/pages/HomePage.tsx
 import { Link } from "react-router-dom";
-import React from "react";
 
 const apps = [
   {
