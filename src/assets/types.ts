@@ -8,3 +8,4 @@ export interface Verse {
   ayahInSurah: number;
   juz: number;
 }
+

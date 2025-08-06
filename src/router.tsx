@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import RootLayout from './root';          // our layout file
 import HomePage from './pages/HomePage';
 import MemoBuddy from './apps/memobuddy/MemoBuddy';
+import TriviaBuddy from './apps/triviabuddy/TriviaBuddy';
 
 export const router = createBrowserRouter([
   {
@@ -9,6 +10,7 @@ export const router = createBrowserRouter([
     children: [
       { path: '/', element: <HomePage /> },
       { path: '/memobuddy', element: <MemoBuddy /> },
+      { path: '/triviaBuddy', element: <TriviaBuddy />}
     ],
   },
 ]);
