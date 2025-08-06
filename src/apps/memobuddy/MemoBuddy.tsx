@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import quran from '../../assets/quran.json';
 import surahNames from '../../utils/surahnames';
+import Footer from '../../components/Footer';
 
 interface Verse {
   ayah: number;
@@ -305,7 +306,9 @@ function MemoBuddy() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
+    
   );
 }
 
