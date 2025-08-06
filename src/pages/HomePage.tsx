@@ -1,6 +1,6 @@
 // src/pages/HomePage.tsx
 import { Link } from "react-router-dom";
-import Footer from "../components/Footer";
+import Footer from "../components/layout/Footer";
 
 const apps = [
   {
