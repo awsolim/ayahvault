@@ -2,13 +2,47 @@
 import { Link } from "react-router-dom";
 import Footer from "../components/layout/Footer";
 
-const apps = [
+/**
+ * Define your theme‐to‐class mapping.
+ */
+const themeClasses = {
+  emerald: {
+    title: "text-emerald-700",
+    button: "text-emerald-700",
+  },
+  blue: {
+    title: "text-blue-700",
+    button: "text-blue-700",
+  },
+} as const;
+
+/** Extract the valid theme keys from themeClasses */
+type ThemeColor = keyof typeof themeClasses;
+
+/** Shape of each app card in the grid */
+interface AppConfig {
+  title: string;
+  desc: string;
+  link: string;
+  image: string;
+  themeColor: ThemeColor;
+}
+
+const apps: AppConfig[] = [
   {
     title: "MemoBuddy",
     desc: "Practice Quran memorization with randomly selected verses.",
     link: "/memobuddy",
+    image: "/memobuddy.png",
+    themeColor: "emerald",   // ← Known key of themeClasses
   },
-  // Add more apps here in future...
+  {
+    title: "TriviaBuddy",
+    desc: "Test your Islamic knowledge with Jeopardy-style questions.",
+    link: "/triviabuddy",
+    image: "/triviabuddy.png",
+    themeColor: "blue",      // ← Also validated as keyof themeClasses
+  },
 ];
 
 export default function HomePage() {
@@ -25,29 +59,38 @@ export default function HomePage() {
       </p>
 
       {/* App Cards Grid */}
-      <div className="w-full max-w-4xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-12">
-        {apps.map((app) => (
-          <Link
-            key={app.title}
-            to={app.link}
-            className="bg-white hover:bg-emerald-50 hover:shadow-lg transition border border-slate-200 rounded-lg p-6 aspect-square flex flex-col"
-          >
-            <h2 className="text-xl font-bold text-emerald-700 mb-2">{app.title}</h2>
-            <p className="text-gray-600 flex-1">{app.desc}</p>
+      <div className="w-full max-w-4xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-12 items-stretch">
+        {apps.map((app) => {
+          const theme = themeClasses[app.themeColor];  // now strongly typed
+          return (
+            <Link
+              key={app.title}
+              to={app.link}
+              className="bg-white hover:bg-emerald-50 hover:shadow-lg transition border border-slate-200 rounded-lg p-6 h-96 flex flex-col"
+            >
+              {/* Card Title */}
+              <h2 className={`text-xl font-bold ${theme.title} mb-2`}>
+                {app.title}
+              </h2>
 
-             {/* App Preview Image */}
-            <img
-                src="/memobuddy.png"
+              <p className="text-gray-600 flex-1">{app.desc}</p>
+
+              {/* Preview Image */}
+              <img
+                src={app.image}
                 alt={`${app.title} preview`}
-                className="mx-auto my-4 rounded-lg shadow-sm border border-gray-200"
-            />
+                className="w-full h-40 object-contain mx-auto my-4 rounded-lg shadow-sm border border-gray-200"
+              />
 
-            <span className="mt-4 text-sm font-medium text-emerald-700">
-              Open →
-            </span>
-          </Link>
-        ))}
+              {/* Open Button Text */}
+              <span className={`mt-4 text-sm font-medium ${theme.button}`}>
+                Open →
+              </span>
+            </Link>
+          );
+        })}
       </div>
+
       <Footer />
     </div>
   );
