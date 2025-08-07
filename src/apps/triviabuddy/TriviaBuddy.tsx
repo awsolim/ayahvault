@@ -1,169 +1,191 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '../../lib/supabaseClient';
+import { useParams } from 'react-router-dom';
 import Footer from '../../components/layout/Footer';
+import Spinner from '../../components/ui/Spinner';
 import { FlashcardModal } from './components/FlashcardModal';
 import { useModal } from './hooks/useModal';
 import type { Clue } from './types';
 
-export function TriviaBuddy() {
-  const [clues, setClues] = useState<Clue[]>([]);
+interface Game {
+  id: string;
+  name: string;
+  teams: string[];
+  categories: string[];
+  board: Record<string, Record<number, Clue>>;
+}
+
+export default function TriviaBuddy() {
+  const { gameId } = useParams<{ gameId: string }>();
+  const [game, setGame] = useState<Game | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   const [selectedClue, setSelectedClue] = useState<Clue | null>(null);
   const [isModalOpen, openModal, closeModal] = useModal();
-
-  // Persisted asked set
-  const [askedClues, setAskedClues] = useState<Set<string>>(new Set());
-  // History list
+  const [asked, setAsked] = useState<Set<string>>(new Set());
   const [history, setHistory] = useState<Clue[]>([]);
+  const [scores, setScores] = useState<number[]>([]);
 
-  // Hydrate asked from localStorage
+  // load game
   useEffect(() => {
-    const stored = localStorage.getItem('trivia-asked');
-    if (stored) setAskedClues(new Set(JSON.parse(stored)));
-  }, []);
-
-  // Persist asked to localStorage
-  useEffect(() => {
-    localStorage.setItem('trivia-asked', JSON.stringify(Array.from(askedClues)));
-  }, [askedClues]);
-
-  // Load clues
-  useEffect(() => {
-    async function loadClues() {
-      setLoading(true);
-      setError(null);
-      const { data, error: fetchError } = await supabase.from('triviabuddy').select('*');
-      if (fetchError) {
-        console.error(fetchError);
-        setError(fetchError.message);
-      } else if (!data || data.length === 0) {
-        setError('No clues found in the database.');
-      } else {
-        setClues(data as Clue[]);
-      }
-      setLoading(false);
+    const raw = localStorage.getItem(`trivia-game-${gameId}`);
+    if (raw) {
+      const g = JSON.parse(raw) as Game;
+      setGame(g);
+      setScores(g.teams.map(() => 0));
+      const stored = localStorage.getItem(`trivia-asked-${g.id}`);
+      if (stored) setAsked(new Set(JSON.parse(stored)));
     }
-    loadClues();
-  }, []);
+    setLoading(false);
+  }, [gameId]);
 
-  const categories = Array.from(new Set(clues.map(c => c.category)));
-  const pointsTiers = [100, 200, 300, 400, 500];
-  const clueKey = (c: Clue) => `${c.category}-${c.points}`;
+  useEffect(() => {
+    if (game) {
+      localStorage.setItem(
+        `trivia-asked-${game.id}`,
+        JSON.stringify(Array.from(asked))
+      );
+    }
+  }, [asked, game]);
 
-  // Idempotent asked handler
-  const handleAsked = (clue: Clue) => {
-    const key = clueKey(clue);
-    setAskedClues(prev => {
-      if (prev.has(key)) return prev;
-      const next = new Set(prev);
-      next.add(key);
+  if (loading) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
+  if (!game) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <p className="text-red-600">Game not found.</p>
+      </div>
+    );
+  }
+
+  const markAsked = (c: Clue) => {
+    const key = `${c.category}-${c.points}`;
+    setAsked(s => new Set(s).add(key));
+    setHistory(h => (h.some(x => `${x.category}-${x.points}` === key) ? h : [c, ...h]));
+    setSelectedClue(null);
+  };
+
+  const adjustScore = (i: number, delta: number) =>
+    setScores(s => {
+      const next = [...s];
+      next[i] += delta;   // allow negatives
       return next;
     });
-    setHistory(prev => {
-      if (prev.find(c => clueKey(c) === key)) return prev;
-      return [clue, ...prev];
-    });
-  };
+
+  const { name, categories, board, teams } = game;
+  const tiers = [100, 200, 300, 400, 500];
 
   return (
     <div className="min-h-screen px-4 py-8 flex flex-col items-center">
-      <h1 className="text-3xl font-bold mb-6">TriviaBuddy</h1>
+      <h1 className="text-3xl font-bold mb-6">{name}</h1>
 
+      {/* Modal */}
       {selectedClue && (
         <FlashcardModal
-          key={clueKey(selectedClue)}
+          key={`${selectedClue.category}-${selectedClue.points}`}
           clue={selectedClue}
           isOpen={isModalOpen}
           onClose={closeModal}
-          onAsk={handleAsked}
+          onAsk={markAsked}
         />
       )}
 
-      {loading && (
-        <div className="flex-1 flex items-center justify-center">
-          <p className="text-gray-600">Loading…</p>
-        </div>
-      )}
+      {/* Grid */}
+      <div
+        className="w-full max-w-4xl grid gap-4 mb-6"
+        style={{ gridTemplateColumns: `repeat(${categories.length},1fr)` }}
+      >
+        {categories.map(cat => (
+          <div key={cat} className="text-center font-semibold">
+            {cat}
+          </div>
+        ))}
+        {tiers.map(pts =>
+          categories.map(cat => {
+            const clue = board[cat][pts];
+            const key = `${cat}-${pts}`;
+            return asked.has(key) ? (
+              <div key={key} className="h-20 bg-blue-300 rounded" />
+            ) : (
+              <button
+                key={key}
+                className="h-20 bg-blue-600 text-white font-bold rounded hover:bg-blue-700 transition"
+                onClick={() => {
+                  setSelectedClue(clue);
+                  openModal();
+                }}
+              >
+                {pts}
+              </button>
+            );
+          })
+        )}
+      </div>
 
-      {!loading && error && (
-        <div className="flex-1 flex items-center justify-center">
-          <p className="text-red-600 font-medium">{error}</p>
-        </div>
-      )}
-
-      {!loading && !error && (
-        <div className="flex-1 w-full max-w-4xl grid grid-cols-5 gap-4 mb-8">
-          {categories.map(cat => (
-            <div key={cat} className="text-center font-semibold">
-              {cat}
+      {/* Teams: flex to match grid width */}
+      <div className="w-full max-w-4xl flex gap-4 mb-8">
+        {teams.map((t, i) => (
+          <div
+            key={i}
+            className="flex-1 border rounded-lg p-4 flex flex-col items-center space-y-2"
+          >
+            <h3 className="font-medium">{t || `Team ${i + 1}`}</h3>
+            <p className="text-3xl font-bold">{scores[i]}</p>
+            <div className="flex space-x-2">
+              <button
+                onClick={() => adjustScore(i, 100)}
+                className="px-4 py-2 bg-green-100 text-green-800 rounded hover:bg-green-200 transition"
+              >
+                +100
+              </button>
+              <button
+                onClick={() => adjustScore(i, -100)}
+                className="px-4 py-2 bg-red-100 text-red-800 rounded hover:bg-red-200 transition"
+              >
+                −100
+              </button>
             </div>
-          ))}
+          </div>
+        ))}
+      </div>
 
-          {pointsTiers.map(points =>
-            categories.map(cat => {
-              const clue = clues.find(c => c.category === cat && c.points === points)!;
-              const key = clueKey(clue);
-              const asked = askedClues.has(key);
-
-              return asked ? (
-                <div key={key} className="h-20 bg-blue-300 rounded" />
-              ) : (
-                <button
-                  key={key}
-                  className="h-20 bg-blue-600 text-white font-bold rounded hover:bg-blue-700 transition"
-                  onClick={() => {
-                    setSelectedClue(clue);
-                    openModal();
-                  }}
-                >
-                  {points}
-                </button>
-              );
-            })
-          )}
-        </div>
-      )}
-
-      {/* Questions History */}
-<section className="w-full max-w-4xl mt-12">
-  <h2 className="text-2xl font-semibold mb-4">Questions History</h2>
-
-  {history.length === 0 ? (
-    <p className="text-gray-500">No questions revealed yet.</p>
-  ) : (
-    <div className="overflow-x-auto">
-      <table className="min-w-full text-left border-collapse">
-        <colgroup>
-          <col style={{ width: '15%' }} />
-          <col style={{ width: '15%' }} />
-          <col style={{ width: '70%' }} />
-        </colgroup>
-        <thead>
-          <tr>
-            <th className="px-4 py-2 border-b">Category</th>
-            <th className="px-4 py-2 border-b">Points</th>
-            <th className="px-4 py-2 border-b">Question</th>
-          </tr>
-        </thead>
-        <tbody>
-          {history.map((clue, idx) => (
-            <tr key={`${clueKey(clue)}-${idx}`}>
-              <td className="px-4 py-2 border-b">{clue.category}</td>
-              <td className="px-4 py-2 border-b">{clue.points}</td>
-              <td className="px-4 py-2 border-b">{clue.question}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  )}
-</section>
+      {/* History */}
+      <section className="w-full max-w-4xl">
+        <h2 className="text-2xl font-semibold mb-4">Questions History</h2>
+        {history.length === 0 ? (
+          <p className="text-gray-500">No questions revealed yet.</p>
+        ) : (
+          <table className="min-w-full border-collapse text-left">
+            <colgroup>
+              <col style={{ width: '15%' }} />
+              <col style={{ width: '15%' }} />
+              <col style={{ width: '70%' }} />
+            </colgroup>
+            <thead>
+              <tr>
+                <th className="px-4 py-2 border-b">Category</th>
+                <th className="px-4 py-2 border-b">Points</th>
+                <th className="px-4 py-2 border-b">Question</th>
+              </tr>
+            </thead>
+            <tbody>
+              {history.map((c, idx) => (
+                <tr key={`${c.category}-${c.points}-${idx}`}>
+                  <td className="px-4 py-2 border-b">{c.category}</td>
+                  <td className="px-4 py-2 border-b">{c.points}</td>
+                  <td className="px-4 py-2 border-b">{c.question}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </section>
 
       <Footer />
     </div>
   );
 }
-
-export default TriviaBuddy;

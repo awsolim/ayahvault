@@ -39,7 +39,7 @@ const apps: AppConfig[] = [
   {
     title: "TriviaBuddy",
     desc: "Test your Islamic knowledge with Jeopardy-style questions.",
-    link: "/triviabuddy",
+    link: "/triviabuddy/setup",
     image: "/triviabuddy.png",
     themeColor: "blue",      // ← Also validated as keyof themeClasses
   },
