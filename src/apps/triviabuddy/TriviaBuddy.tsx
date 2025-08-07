@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import Footer from '../../components/layout/Footer';
-import { FlashcardModal } from './components/FlashCardModal';
+import { FlashcardModal } from './components/FlashcardModal.tsx'
 import { useModal } from './hooks/useModal';
 import type { Clue } from './types';
 
