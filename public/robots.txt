@@ -1,0 +1,8 @@
+# Allow Google to fetch pages and images (needed for favicon in Search)
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+Sitemap: https://yourdomain.com/sitemap.xml
