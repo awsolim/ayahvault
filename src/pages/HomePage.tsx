@@ -14,12 +14,14 @@ const themeClasses = {
     title: "text-blue-700",
     button: "text-blue-700",
   },
+  purple: { // NEW: purple theme for AraBuddy
+    title: "text-purple-700",
+    button: "text-purple-700",
+  },
 } as const;
 
-/** Extract the valid theme keys from themeClasses */
 type ThemeColor = keyof typeof themeClasses;
 
-/** Shape of each app card in the grid */
 interface AppConfig {
   title: string;
   desc: string;
@@ -34,22 +36,27 @@ const apps: AppConfig[] = [
     desc: "Practice Quran memorization with randomly selected verses.",
     link: "/memobuddy",
     image: "/memobuddy.png",
-    themeColor: "emerald",   // ← Known key of themeClasses
+    themeColor: "emerald",
   },
   {
     title: "TriviaBuddy",
     desc: "Test your Islamic knowledge with Jeopardy-style questions.",
     link: "/triviabuddy/setup",
     image: "/triviabuddy.png",
-    themeColor: "blue",      // ← Also validated as keyof themeClasses
+    themeColor: "blue",
+  },
+  {
+    title: "AraBuddy", // NEW
+    desc: "Match English–Arabic word pairs. Can you clear the board?",
+    link: "/arabuddy", // NEW
+    image: "/arabuddy.png", // TEMP: reuse an existing image; replace when you have a logo
+    themeColor: "purple", // NEW
   },
 ];
 
 export default function HomePage() {
   return (
     <div className="flex flex-col items-center justify-center text-center min-h-screen px-4 sm:px-6 lg:px-8">
-      
-      {/* Hero Section */}
       <h1 className="text-5xl sm:text-6xl md:text-7xl font-mozilla text-black mb-4">
         AyahVault
       </h1>
@@ -58,31 +65,27 @@ export default function HomePage() {
         build memorization, explore knowledge, and support your Islamic journey.
       </p>
 
-      {/* App Cards Grid */}
       <div className="w-full max-w-4xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-12 items-stretch">
         {apps.map((app) => {
-          const theme = themeClasses[app.themeColor];  // now strongly typed
+          const theme = themeClasses[app.themeColor];
           return (
             <Link
               key={app.title}
               to={app.link}
               className="bg-white hover:bg-emerald-50 hover:shadow-lg transition border border-slate-200 rounded-lg p-6 h-96 flex flex-col"
             >
-              {/* Card Title */}
               <h2 className={`text-xl font-bold ${theme.title} mb-2`}>
                 {app.title}
               </h2>
 
               <p className="text-gray-600 flex-1">{app.desc}</p>
 
-              {/* Preview Image */}
               <img
                 src={app.image}
                 alt={`${app.title} preview`}
                 className="w-full h-40 object-contain mx-auto my-4 rounded-lg shadow-sm border border-gray-200"
               />
 
-              {/* Open Button Text */}
               <span className={`mt-4 text-sm font-medium ${theme.button}`}>
                 Open →
               </span>
