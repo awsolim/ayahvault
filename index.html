@@ -1,31 +1,34 @@
 <!doctype html>
 <html lang="en">
-
   <head>
     <meta charset="UTF-8" />
 
-    <!-- PWA: manifest tells devices how to install & launch -->
-    <link rel="manifest" href="/site.webmanifest"> <!-- loads from /public -->
-
-    <!-- iOS: icon used when added to Home Screen -->
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
-
-    <!-- Theme color: status bar / splash background styling -->
-    <meta name="theme-color" content="#ffffff">
-
-    <!-- (Optional) Classic favicon for browsers -->
-    <link rel="icon" href="/favicon.ico" sizes="any">
-    <link rel="icon" type="image/png" href="/favicon-48.png" sizes="48x48">
-    <link rel="icon" type="image/png" href="/favicon-192.png" sizes="192x192">
-
+    <!-- Viewport for mobile -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AyahVault</title>
-    <meta name="description" content="Practice and memorize Quranic verses using AyahVault." />
-  </head>
 
+    <!-- Theme color for address bar/splash -->
+    <meta name="theme-color" content="#ffffff" />
+
+    <!-- Canonical: prefer apex (helps SEO + favicon fetching consistency) -->
+    <link rel="canonical" href="https://ayahvault.com/" /> <!-- NEW: declare preferred host -->
+
+    <!-- Manifest: makes the site installable as a PWA -->
+    <link rel="manifest" href="/site.webmanifest" /> <!-- loads from /public -->
+
+    <!-- Favicons (browsers + Google favicon fetcher) -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />          <!-- classic .ico at root -->
+    <link rel="shortcut icon" href="/favicon.ico" />             <!-- legacy agents (harmless extra) -->
+    <link rel="icon" type="image/png" sizes="48x48"  href="/favicon-48.png" />  <!-- explicit 48px -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" /><!-- high-res PNG -->
+
+    <!-- iOS home screen icon (Apple reads this tag, not the manifest) -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+    <title>AyahVault</title>
+    <meta name="description" content="Practice and memorize Quranic verses with MemoBuddy, TriviaBuddy, and AraBuddy." />
+  </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
-  
 </html>
