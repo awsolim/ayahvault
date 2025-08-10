@@ -309,7 +309,7 @@ export default function GameSetup() {
             teams.some(t => !t.trim()) ||
             selectedCats.length < 3
           }
-          className="inline-flex items-center bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700 disabled:opacity-50 transition"
+          className="inline-flex items-center bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50 transition"
         >
           {submittingPlay && <Spinner />}
           <span className="ml-2">Play a Game</span>
@@ -436,7 +436,7 @@ export default function GameSetup() {
             cat.qas.some(qa => !qa.question.trim() || !qa.answer.trim())
           )
         }
-        className="inline-flex items-center bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700 disabled:opacity-50 transition"
+        className="inline-flex items-center bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50 transition"
       >
         {submittingCreate && <Spinner />}
         <span className="ml-2">Create Game</span>
@@ -512,7 +512,7 @@ export default function GameSetup() {
       )}
       <button
         onClick={finalizeTeamsForSaved}
-        className="bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700 mt-4"
+        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mt-4"
       >
         Start Game
       </button>
@@ -525,15 +525,15 @@ export default function GameSetup() {
       <div className="flex gap-6 border-b pb-2">
         <button
           onClick={() => { setActiveTab('play'); setTeamSetupGame(null); }}
-          className={activeTab === 'play' ? 'font-bold text-emerald-600' : ''}
+          className={activeTab === 'play' ? 'font-bold text-blue-600' : ''}
         >Play a Game</button>
         <button
           onClick={() => { setActiveTab('create'); setTeamSetupGame(null); }}
-          className={activeTab === 'create' ? 'font-bold text-emerald-600' : ''}
+          className={activeTab === 'create' ? 'font-bold text-blue-600' : ''}
         >Create a Game</button>
         <button
           onClick={() => { setActiveTab('yourgames'); setTeamSetupGame(null); }}
-          className={activeTab === 'yourgames' ? 'font-bold text-emerald-600' : ''}
+          className={activeTab === 'yourgames' ? 'font-bold text-blue-600' : ''}
         >Your Games</button>
       </div>
 
