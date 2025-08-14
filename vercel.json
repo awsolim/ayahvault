@@ -1,4 +1,16 @@
 {
+  "redirects": [
+    {
+      "source": "http://ayahvault.com/:path*",
+      "destination": "https://ayahvault.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "https://www.ayahvault.com/:path*",
+      "destination": "https://ayahvault.com/:path*",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/(.*)",
