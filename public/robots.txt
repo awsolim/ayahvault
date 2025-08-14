@@ -8,4 +8,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://yourdomain.com/sitemap.xml
+Sitemap: https://ayahvault.com/sitemap.xml
