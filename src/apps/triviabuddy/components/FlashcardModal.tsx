@@ -81,15 +81,20 @@ export function FlashcardModal({
                 <p className="text-lg font-bold">{clue.question}</p>
               </div>
               {/* back */}
-              <div
-                className="absolute inset-0 bg-white rounded-lg shadow-lg p-4 flex items-center justify-center"
-                style={{
-                  backfaceVisibility: 'hidden',
-                  transform: 'rotateY(180deg)',
-                }}
-              >
-                <p className="text-lg">{clue.answer}</p>
-              </div>
+              {/* back */}
+<div
+  className="absolute inset-0 bg-white rounded-lg shadow-lg p-4"
+  style={{
+    backfaceVisibility: 'hidden',
+    transform: 'rotateY(180deg)',
+  }}
+>
+  {/* Scrollable container for long answers */}
+  <div className="overflow-y-auto max-h-full text-left">
+    <p className="text-lg whitespace-pre-line">{clue.answer}</p>
+  </div>
+</div>
+
             </div>
           </div>
 

@@ -101,6 +101,7 @@ export default function GameSetup() {
         const { data } = await supabase
           .from('triviabuddy')
           .select('*')
+          .eq('include', true)
           .eq('category', cat)
           .eq('points', pts);
         if (data?.length) {
