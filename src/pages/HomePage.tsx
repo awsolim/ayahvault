@@ -39,21 +39,21 @@ const apps: AppConfig[] = [
     title: "MemoBuddy",
     desc: "Practice Quran memorization with randomly selected verses.",
     link: "/memobuddy",
-    image: "/memobuddy.png",
+    image: "images/memobuddy.png",
     themeColor: "emerald",
   },
   {
     title: "TriviaBuddy",
     desc: "Test your Islamic knowledge with Jeopardy-style questions.",
     link: "/triviabuddy/setup",
-    image: "/triviabuddy.png",
+    image: "images/triviabuddy.png",
     themeColor: "blue",
   },
   {
     title: "AraBuddy",
     desc: "Match English–Arabic word pairs. Can you clear the board?",
     link: "/arabuddy",
-    image: "/arabuddy.png", // TODO: replace with AraBuddy preview when ready
+    image: "images/arabuddy.png", // TODO: replace with AraBuddy preview when ready
     themeColor: "purple",
   },
 ];

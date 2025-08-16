@@ -1,3 +1,4 @@
+// src/apps/triviabuddy/TriviaBuddy.tsx
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Footer from '../../components/layout/Footer';
@@ -33,6 +34,9 @@ export default function TriviaBuddy() {
   const [history, setHistory] = useState<Clue[]>([]);
   const [teamScores, setTeamScores] = useState<number[]>([]);
 
+  /* small “bump” animation flag for a team whose score just changed */
+  const [bumpedIdx, setBumpedIdx] = useState<number | null>(null);
+
   // Load & restore
   useEffect(() => {
     const raw = localStorage.getItem(`trivia-game-${gameId}`);
@@ -50,7 +54,7 @@ export default function TriviaBuddy() {
     setLoading(false);
   }, [gameId]);
 
-  // Persist asked‐set on the fly (optional)
+  // Persist asked set (optional)
   useEffect(() => {
     if (game) {
       localStorage.setItem(
@@ -60,7 +64,7 @@ export default function TriviaBuddy() {
     }
   }, [askedClues, game]);
 
-  // **Autosave full progress on unmount**
+  // Autosave full progress on unmount
   useEffect(() => {
     return () => {
       if (!game) return;
@@ -83,6 +87,7 @@ export default function TriviaBuddy() {
       </div>
     );
   }
+
   if (!game) {
     return (
       <div className="h-screen flex items-center justify-center">
@@ -98,12 +103,16 @@ export default function TriviaBuddy() {
     setAskedClues(prev => (prev.has(key) ? prev : new Set(prev).add(key)));
     setHistory(prev => (prev.some(x => keyFor(x) === key) ? prev : [clue, ...prev]));
   };
+
+  /* update score AND briefly mark which team to “bump” */
   const adjustScore = (i: number, delta: number) => {
     setTeamScores(prev => {
       const next = [...prev];
       next[i] += delta;
       return next;
     });
+    setBumpedIdx(i);
+    setTimeout(() => setBumpedIdx(null), 180);
   };
 
   const { name, categories, board, teams } = game;
@@ -122,60 +131,120 @@ export default function TriviaBuddy() {
         />
       )}
 
-      {/* Jeopardy Grid */}
-      <div
-        className="w-full max-w-4xl grid gap-4 mb-6"
-        style={{ gridTemplateColumns: `repeat(${categories.length},1fr)` }}
-      >
-        {categories.map(cat => (
-          <div key={cat} className="text-center font-semibold">{cat}</div>
-        ))}
-        {tiers.flatMap(pts =>
-          categories.map(cat => {
-            const clue = board[cat][pts];
-            const key = keyFor(clue);
-            const asked = askedClues.has(key);
-            return asked ? (
-              <div key={key} className="h-20 bg-blue-300 rounded" />
-            ) : (
-              <button
-                key={key}
-                className="h-20 bg-blue-600 text-white font-bold rounded hover:bg-blue-700 transition"
-                onClick={() => { setSelectedClue(clue); openModal(); }}
+      {/* ============== Jeopardy Grid ============== */}
+      <div className="w-full max-w-6xl mx-auto mb-8">
+        <div className="rounded-3xl bg-white/70 backdrop-blur-sm ring-1 ring-black/5 p-5">
+          <div
+            className="grid gap-4 justify-items-center"
+            style={{ gridTemplateColumns: `repeat(${categories.length}, minmax(8rem, 1fr))` }}
+          >
+            {categories.map(cat => (
+              <div
+                key={cat}
+                className="w-full text-center font-semibold uppercase tracking-wide text-blue-900/90
+                           bg-blue-50 ring-1 ring-blue-200 rounded-xl py-2"
               >
-                {pts}
-              </button>
-            );
-          })
-        )}
-      </div>
+                {cat}
+              </div>
+            ))}
 
-      {/* Team Scores */}
-      <div className="w-full max-w-4xl flex gap-4 mb-8">
-        {teams.map((t, i) => (
-          <div key={i} className="flex-1 border rounded-lg p-4 flex flex-col items-center space-y-2">
-            <h3 className="font-medium">{t}</h3>
-            <p className="text-3xl font-bold">{teamScores[i]}</p>
-            <div className="flex space-x-2">
-              <button
-                onClick={() => adjustScore(i, 100)}
-                className="px-4 py-2 bg-green-100 text-green-800 rounded hover:bg-green-200 transition"
-              >
-                +100
-              </button>
-              <button
-                onClick={() => adjustScore(i, -100)}
-                className="px-4 py-2 bg-red-100 text-red-800 rounded hover:bg-red-200 transition"
-              >
-                −100
-              </button>
-            </div>
+            {tiers.flatMap(pts =>
+              categories.map(cat => {
+                const clue = board[cat][pts];
+                const key = keyFor(clue);
+                const asked = askedClues.has(key);
+
+                return asked ? (
+                  <div
+                    key={key}
+                    className="w-full h-20 rounded-xl bg-blue-200/70 ring-1 ring-blue-200"
+                  />
+                ) : (
+                  <button
+                    key={key}
+                    onClick={() => { setSelectedClue(clue); openModal(); }}
+                    className="w-full h-20 rounded-xl
+                               bg-gradient-to-b from-indigo-500 to-blue-600
+                               text-white font-extrabold text-lg
+                               shadow-[0_8px_0_rgba(0,0,0,0.18)]
+                               ring-1 ring-white/20
+                               hover:translate-y-[-2px] active:translate-y-[1px]
+                               transition-transform"
+                  >
+                    {pts}
+                  </button>
+                );
+              })
+            )}
           </div>
-        ))}
+        </div>
       </div>
+      {/* ======================= /Jeopardy Grid ======================= */}
+
+      {/* =================== Team Scores (game-show scoreboard) =================== */}
+      {/* CHANGE 1: widen container & allow 5 cols on very wide screens; stretch items to column width */}
+      {/* Team Scores (force 5-up on laptops/desktops) */}
+<div
+  className="
+    w-full max-w-screen-2xl mx-auto
+    grid gap-5
+    grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5  /* CHANGED: was xl:grid-cols-4 2xl:grid-cols-5 */
+    place-items-stretch
+    mb-12
+  "
+>
+
+        {teams.map((rawName, i) => {
+          const displayName = rawName?.trim() || `Team ${i + 1}`;
+
+          return (
+            <div
+              key={i}
+              /* CHANGE 2: make the card width fluid so it fits the column (was w-[min(22rem,100%)]) */
+              className="w-full rounded-2xl p-4 text-white
+                         bg-gradient-to-b from-[#0b1e4b] via-[#0a205e] to-[#0a1540]
+                         shadow-xl ring-1 ring-white/10"
+            >
+              <div className="flex items-center justify-center">
+                <h3 className="text-base font-semibold tracking-wide text-center">{displayName}</h3>
+              </div>
+
+              <div
+                className={[
+                  "mt-1 text-center text-5xl font-extrabold font-mono tabular-nums drop-shadow",
+                  "transition-transform duration-200",
+                  bumpedIdx === i ? "scale-105" : "",
+                ].join(" ")}
+              >
+                {teamScores[i]}
+              </div>
+
+              <div className="mt-4 grid grid-cols-1 gap-3">
+                <button
+                  onClick={() => adjustScore(i, 100)}
+                  className="py-2 rounded-xl font-bold bg-emerald-500/90 hover:bg-emerald-500
+                             active:translate-y-[1px] shadow-[0_6px_0_rgba(0,0,0,0.2)] transition"
+                >
+                  +100
+                </button>
+                <button
+                  onClick={() => adjustScore(i, -100)}
+                  className="py-2 rounded-xl font-bold bg-rose-500/90 hover:bg-rose-500
+                             active:translate-y-[1px] shadow-[0_6px_0_rgba(0,0,0,0.2)] transition"
+                >
+                  −100
+                </button>
+              </div>
+
+              <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-white/10" />
+            </div>
+          );
+        })}
+      </div>
+      {/* =================== /Team Scores =================== */}
 
       {/* History */}
-      <section className="w-full max-w-4xl">
+      <section className="w-full max-w-4xl mx-auto">
         <h2 className="text-2xl font-semibold mb-4">Questions History</h2>
         {history.length === 0 ? (
           <p className="text-gray-500">No questions revealed yet.</p>

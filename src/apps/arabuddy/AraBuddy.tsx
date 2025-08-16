@@ -1,11 +1,11 @@
 // src/apps/arabuddy/AraBuddy.tsx
 import { useMemo, useState, useEffect } from "react";
-import { supabase } from "../../lib/supabaseClient"; // NOTE: adjust this relative path if your project differs
-import Spinner from "../../components/ui/Spinner";   // NEW: themed spinner
+import { useNavigate } from "react-router-dom"; // used by "Back to Home"
+import { supabase } from "../../lib/supabaseClient";
+import Spinner from "../../components/ui/Spinner";
 
 type Lang = "en" | "ar";
 
-// NEW: lowercase fields to match your Supabase schema exactly
 type VocabRow = {
   id: number;
   arabic: string;
@@ -17,7 +17,7 @@ type Card = {
   pairId: string;
   lang: Lang;
   label: string;
-  matched: boolean;
+  matched: boolean; // when true, the tile is invisible but keeps its space
 };
 
 /** Fisher–Yates shuffle */
@@ -38,22 +38,43 @@ export default function AraBuddy() {
   const [status, setStatus] = useState<"idle" | "correct" | "wrong" | "won" | "lost">("idle");
   const [round, setRound] = useState<number>(1);
 
-  // NEW: loading and error states to control spinner and message
   const [loading, setLoading] = useState<boolean>(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  // NEW: fetch a batch, then pick 8 random pairs client-side
+  const navigate = useNavigate();
+
+  // Timer state — start when round is ready, freeze when round ends
+  const [startTime, setStartTime] = useState<number | null>(null);
+  const [elapsedMs, setElapsedMs] = useState<number | null>(null);
+
+  // Audio cues (files expected in public/audio/)
+  const [correctSound] = useState<HTMLAudioElement>(() => {
+    const a = new Audio("/audio/correct.mp3"); // UPDATED: correct sound
+    a.preload = "auto";
+    return a;
+  });
+  const [wrongSound] = useState<HTMLAudioElement>(() => {
+    const a = new Audio("/audio/wrong.mp3"); // UPDATED: wrong sound
+    a.preload = "auto";
+    return a;
+  });
+
+  // Two-phase visual effect (flash green, then fade)
+  const [flashCorrectIds, setFlashCorrectIds] = useState<Set<string>>(new Set()); // step 1: green flash
+  const [fadingIds, setFadingIds] = useState<Set<string>>(new Set());            // step 2: fading opacity
+
+  // Build a round from Supabase
   useEffect(() => {
     let cancelled = false;
 
     (async () => {
-      setLoading(true);     // NEW: show spinner as soon as we start
+      setLoading(true);
       setLoadError(null);
 
       const { data, error } = await supabase
         .from("arabuddy")
-        .select("id, arabic, english") // IMPORTANT: lowercase column names
-        .limit(128);                   // small batch; randomized locally
+        .select("id, arabic, english")
+        .limit(128);
 
       if (cancelled) return;
 
@@ -64,7 +85,7 @@ export default function AraBuddy() {
         setLives(3);
         setStatus("idle");
         setLoadError("Could not load words. Please try again.");
-        setLoading(false);            // NEW: stop spinner on error
+        setLoading(false);
         return;
       }
 
@@ -74,7 +95,7 @@ export default function AraBuddy() {
         setLives(3);
         setStatus("idle");
         setLoadError("No words found. Add rows to the arabuddy table.");
-        setLoading(false);            // NEW: stop spinner when empty
+        setLoading(false);
         return;
       }
 
@@ -83,7 +104,7 @@ export default function AraBuddy() {
 
       // Make Arabic (top) and English (bottom) decks; shuffle within each lane
       const arCards: Card[] = shuffle(
-        sample.map(p => ({
+        sample.map((p): Card => ({
           id: `${p.id}-ar`,
           pairId: String(p.id),
           lang: "ar",
@@ -93,7 +114,7 @@ export default function AraBuddy() {
       );
 
       const enCards: Card[] = shuffle(
-        sample.map(p => ({
+        sample.map((p): Card => ({
           id: `${p.id}-en`,
           pairId: String(p.id),
           lang: "en",
@@ -106,19 +127,40 @@ export default function AraBuddy() {
       setSelectedByLang({});
       setLives(3);
       setStatus("idle");
-      setLoading(false);              // NEW: hide spinner once ready
+      setElapsedMs(null);
+      setStartTime(Date.now());
+      setFlashCorrectIds(new Set());
+      setFadingIds(new Set());
+      setLoading(false);
     })();
 
     return () => {
-      cancelled = true;               // avoid setState after unmount
+      cancelled = true;
     };
   }, [round]);
 
+  // Freeze timer once the round ends (win or loss)
+  useEffect(() => {
+    if ((status === "won" || status === "lost") && startTime && elapsedMs === null) {
+      setElapsedMs(Date.now() - startTime);
+    }
+  }, [status, startTime, elapsedMs]);
+
+  // mm:ss formatter
+  const fmtMs = (ms: number) => {
+    const s = Math.floor(ms / 1000);
+    const m = Math.floor(s / 60);
+    const rem = s % 60;
+    return `${m}:${String(rem).padStart(2, "0")}`;
+  };
+
+  // Derived
   const remaining = useMemo(() => cards.filter(c => !c.matched).length, [cards]);
+  const isOver = status === "won" || status === "lost";
 
   function toggleSelect(id: string) {
     const card = cards.find(c => c.id === id);
-    if (!card || card.matched || status === "won" || status === "lost") return;
+    if (!card || card.matched || isOver) return;
     setStatus("idle");
 
     setSelectedByLang(prev => {
@@ -135,7 +177,7 @@ export default function AraBuddy() {
 
   const enSel = selectedByLang.en ? cards.find(c => c.id === selectedByLang.en) : undefined;
   const arSel = selectedByLang.ar ? cards.find(c => c.id === selectedByLang.ar) : undefined;
-  const canMatch = Boolean(enSel && arSel) && status !== "won" && status !== "lost";
+  const canMatch = Boolean(enSel && arSel) && !isOver;
 
   // Enter key = match
   useEffect(() => {
@@ -150,20 +192,39 @@ export default function AraBuddy() {
     if (!enSel || !arSel) return;
 
     const isCorrect = enSel.pairId === arSel.pairId;
-    if (isCorrect) {
-      setCards(prev =>
-        prev.map(c => (c.id === enSel.id || c.id === arSel.id ? { ...c, matched: true } : c))
-      );
-      setSelectedByLang({});
-      setStatus("correct");
 
+    if (isCorrect) {
+      setStatus("correct");
+      correctSound.currentTime = 0;            // NEW: play correct sound
+      void correctSound.play().catch(() => {});
+
+      // PHASE 1: flash both cards green
+      const ids = [enSel.id, arSel.id];
+      setFlashCorrectIds(new Set(ids));
+      setSelectedByLang({});
+
+      // After a short flash, start the fade (but DO NOT remove from state)
       setTimeout(() => {
-        const left = cards.filter(c => !c.matched && c.id !== enSel.id && c.id !== arSel.id).length;
-        if (left === 0) setStatus("won");
-        else setStatus("idle");
-      }, 250);
+        setFlashCorrectIds(new Set());                 // stop flashing
+        setFadingIds(prev => new Set([...prev, ...ids])); // start fade
+
+        // After fade completes, just mark matched=true so they stay invisible in place
+        setTimeout(() => {
+          setCards(prev =>
+            prev.map(c => (ids.includes(c.id) ? { ...c, matched: true } : c))
+          );
+          setFadingIds(new Set());
+
+          // If all pairs matched, end the round
+          const left = prevRemainingAfterMark(cards, ids);
+          if (left <= 0) setStatus("won");
+          else setStatus("idle");
+        }, 450); // fade duration ms
+      }, 300);   // green flash duration ms
     } else {
       setStatus("wrong");
+      wrongSound.currentTime = 0;               // NEW: play wrong sound
+      void wrongSound.play().catch(() => {});
       setLives(prev => {
         const next = prev - 1;
         if (next <= 0) setTimeout(() => setStatus("lost"), 250);
@@ -173,8 +234,20 @@ export default function AraBuddy() {
     }
   }
 
+  // Helper: how many unmatched remain after marking ids matched
+  function prevRemainingAfterMark(list: Card[], matchedIds: string[]) {
+    const matchedSet = new Set(matchedIds);
+    let count = 0;
+    for (const c of list) {
+      if (matchedSet.has(c.id)) continue;
+      if (!c.matched) count++;
+    }
+    // subtract the two just matched (they weren't matched before this call)
+    return count;
+  }
+
   function newRound() {
-    setRound(r => r + 1);             // triggers a fresh fetch (spinner shows again)
+    setRound(r => r + 1);
   }
 
   return (
@@ -184,28 +257,29 @@ export default function AraBuddy() {
         <h1 className="text-center text-3xl font-bold text-purple-700">AraBuddy</h1>
       </div>
 
-      {/* Lives + New Round */}
-      <div className="mb-4 flex items-center justify-end gap-3">
-        <div className="text-2xl select-none" aria-label={`Lives: ${lives}`}>
-          {"❤️".repeat(lives)}
-          {"🤍".repeat(Math.max(0, 3 - lives))}
+      {/* Lives + New Round (HIDDEN when game is over) */}
+      {!isOver && (
+        <div className="mb-4 flex items-center justify-end gap-3">
+          <div className="text-2xl select-none" aria-label={`Lives: ${lives}`}>
+            {"❤️".repeat(lives)}
+            {"🤍".repeat(Math.max(0, 3 - lives))}
+          </div>
+          <button
+            onClick={newRound}
+            className="rounded-lg border border-purple-300 bg-white px-3 py-1.5 text-purple-700 hover:bg-purple-700 hover:text-white"
+            title="Start a new round"
+          >
+            New Round
+          </button>
         </div>
-        <button
-          onClick={newRound}
-          className="rounded-lg border border-purple-300 bg-white px-3 py-1.5 text-purple-700 hover:bg-purple-700 hover:text-white"
-          title="Start a new round"
-        >
-          New Round
-        </button>
-      </div>
+      )}
 
       {/* Themed loading & error panels */}
       {loading ? (
-        // NEW: Purple to match AraBuddy’s theme (see Home page theme map)
         <div className="flex h-64 items-center justify-center rounded-2xl border border-slate-200 bg-white">
           <Spinner
             message=""
-            colorClassName="text-purple-600"  // NEW: theme color for AraBuddy
+            colorClassName="text-purple-600"
             size={32}
             thickness={3}
           />
@@ -225,64 +299,112 @@ export default function AraBuddy() {
       ) : (
         // Board
         <div className="rounded-2xl bg-white p-4 shadow-sm border border-slate-200">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3" aria-label="Matching cards grid">
-            {cards.map(card => {
-              const isSelected =
-                (card.lang === "en" && selectedByLang.en === card.id) ||
-                (card.lang === "ar" && selectedByLang.ar === card.id);
-              const isGone = card.matched;
+          {isOver ? (
+            // End-of-round panel inside the game box
+            <div className="flex min-h-[12rem] flex-col items-center justify-center text-center">
+              {status === "won" ? (
+                <p className="text-2xl font-extrabold text-green-600">
+                  Congratulations, you passed this round.
+                </p>
+              ) : (
+                <p className="text-2xl font-extrabold text-rose-600">
+                  Round over.
+                </p>
+              )}
 
-              return (
+              {typeof elapsedMs === "number" && (
+                <p className="mt-2 text-slate-600">
+                  Time: <span className="font-semibold">{fmtMs(elapsedMs)}</span>
+                </p>
+              )}
+
+              <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
                 <button
-                  key={card.id}
-                  onClick={() => toggleSelect(card.id)}
-                  disabled={isGone || status === "won" || status === "lost"}
-                  className={[
-                    "relative h-24 rounded-xl border text-center transition flex items-center justify-center px-2",
-                    isGone ? "pointer-events-none opacity-0 scale-90 h-0 p-0 m-0 border-0" : "",
-                    isSelected
-                      ? "border-purple-600 bg-purple-600 text-white animate-vibrate"
-                      : "border-slate-200 hover:bg-purple-50",
-                    status === "wrong" && isSelected ? "bg-red-500 text-white" : "",
-                    status === "correct" && isSelected ? "animate-pop border-green-500" : "",
-                  ].join(" ")}
-                  aria-pressed={isSelected}
-                  aria-label={`${card.lang === "ar" ? "Arabic" : "English"} card`}
-                  dir={card.lang === "ar" ? "rtl" : "ltr"}
+                  onClick={newRound}
+                  className="rounded-lg bg-purple-600 px-4 py-2 font-semibold text-white hover:bg-purple-700"
                 >
-                  <span className="text-sm sm:text-base md:text-lg font-medium select-none">{card.label}</span>
-                  <span className="absolute right-2 top-2 text-[10px] text-purple-200">{card.lang.toUpperCase()}</span>
+                  New Game
                 </button>
-              );
-            })}
-          </div>
-
-          {/* Controls under grid */}
-          <div className="mt-6 flex items-center justify-between">
-            <div className="text-sm text-slate-600">
-              Remaining: <span className="font-semibold">{remaining}</span> · Selected:{" "}
-              <span className="font-semibold">{Number(Boolean(enSel)) + Number(Boolean(arSel))}</span>
+                <button
+                  onClick={() => navigate("/")}
+                  className="rounded-lg bg-slate-200 px-4 py-2 font-semibold text-slate-700 hover:bg-slate-300"
+                >
+                  Back to Home
+                </button>
+              </div>
             </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3" aria-label="Matching cards grid">
+                {cards.map(card => {
+                  const isSelected =
+                    (card.lang === "en" && selectedByLang.en === card.id) ||
+                    (card.lang === "ar" && selectedByLang.ar === card.id);
+                  const isFlashingCorrect = flashCorrectIds.has(card.id); // green phase
+                  const isFading = fadingIds.has(card.id);                 // fade phase
 
-            <button
-              onClick={handleMatch}
-              disabled={!canMatch}
-              className={[
-                "rounded-lg px-4 py-2 font-semibold transition",
-                canMatch ? "bg-purple-600 text-white hover:bg-purple-700" : "bg-slate-200 text-slate-500 cursor-not-allowed",
-              ].join(" ")}
-              title="Press Enter to match"
-            >
-              Match
-            </button>
-          </div>
+                  return (
+                    <button
+                      key={card.id}
+                      onClick={() => toggleSelect(card.id)}
+                      disabled={isFading || isOver || card.matched} // block clicks while fading or matched
+                      className={[
+                        "relative h-24 rounded-xl border text-center transition",
+                        "flex items-center justify-center px-2",
+                        // Keep space: when matched or fading, only change opacity (don't change size/margins)
+                        (isFading || card.matched)
+                          ? "opacity-0 transition-opacity duration-500 ease-out pointer-events-none border-transparent bg-transparent"
+                          : "opacity-100 transition-opacity duration-150",
+                        // Flash green on correct
+                        isFlashingCorrect
+                          ? "bg-green-500 text-white border-green-600"
+                          : isSelected
+                          ? "border-purple-600 bg-purple-600 text-white animate-vibrate"
+                          : "border-slate-200 hover:bg-purple-50",
+                        status === "wrong" && isSelected ? "bg-red-500 text-white" : "",
+                        status === "correct" && isSelected && !isFlashingCorrect
+                          ? "animate-pop border-green-500"
+                          : "",
+                      ].join(" ")}
+                      aria-pressed={isSelected}
+                      aria-label={`${card.lang === "ar" ? "Arabic" : "English"} card`}
+                      dir={card.lang === "ar" ? "rtl" : "ltr"}
+                    >
+                      <span className="text-sm sm:text-base md:text-lg font-medium select-none">
+                        {card.label}
+                      </span>
+                      <span className="absolute right-2 top-2 text-[10px] text-purple-200">
+                        {card.lang.toUpperCase()}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
 
-          {/* Status banners */}
-          {status === "won" && (
-            <div className="mt-4 rounded-md bg-green-50 p-3 text-green-700">🎉 Great job! You matched all pairs.</div>
-          )}
-          {status === "lost" && (
-            <div className="mt-4 rounded-md bg-red-50 p-3 text-red-700">💡 Out of lives. Try a new round!</div>
+              {/* Controls under grid */}
+              <div className="mt-6 flex items-center justify-between">
+                <div className="text-sm text-slate-600">
+                  Remaining: <span className="font-semibold">{remaining}</span> · Selected:{" "}
+                  <span className="font-semibold">
+                    {Number(Boolean(selectedByLang.en)) + Number(Boolean(selectedByLang.ar))}
+                  </span>
+                </div>
+
+                <button
+                  onClick={handleMatch}
+                  disabled={!canMatch}
+                  className={[
+                    "rounded-lg px-4 py-2 font-semibold transition",
+                    canMatch
+                      ? "bg-purple-600 text-white hover:bg-purple-700"
+                      : "bg-slate-200 text-slate-500 cursor-not-allowed",
+                  ].join(" ")}
+                  title="Press Enter to match"
+                >
+                  Match
+                </button>
+              </div>
+            </>
           )}
         </div>
       )}

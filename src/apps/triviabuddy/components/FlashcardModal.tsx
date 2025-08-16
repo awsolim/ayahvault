@@ -25,8 +25,8 @@ export function FlashcardModal({
   // Reveal handler: toggle flip, mark asked only on first flip
   const handleReveal = useCallback(() => {
     setFlipped(prev => {
-      if (!prev) {
-        onAsk?.(clue!); // mark as asked exactly once
+      if (!prev && clue) {
+        onAsk?.(clue); // NEW: guard + mark as asked exactly once when first flipping to the answer
       }
       return !prev;
     });
@@ -34,7 +34,7 @@ export function FlashcardModal({
 
   // Close handler
   const handleClose = useCallback(() => {
-    onClose();
+    onClose(); // unchanged
   }, [onClose]);
 
   // Keyboard shortcuts: Spacebar flips, Enter closes
@@ -44,10 +44,10 @@ export function FlashcardModal({
     const handler = (e: KeyboardEvent) => {
       if (e.key === ' ' || e.code === 'Space') {
         e.preventDefault();
-        handleReveal();
+        handleReveal(); // unchanged: space flips
       } else if (e.key === 'Enter') {
         e.preventDefault();
-        handleClose();
+        handleClose();  // unchanged: enter closes
       }
     };
     window.addEventListener('keydown', handler);
@@ -58,14 +58,14 @@ export function FlashcardModal({
 
   return createPortal(
     <>
-      {/* backdrop */}
-      <div className="fixed inset-0 z-40 bg-transparent backdrop-blur-sm backdrop-brightness-50" />
+      {/* Backdrop */}
+      <div className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm" />
 
-      {/* modal */}
+      {/* Modal container */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div onClick={e => e.stopPropagation()} className="bg-transparent text-center">
-          {/* card */}
-          <div className="w-80 h-48 mb-4" style={{ perspective: '1000px' }}>
+          {/* Card with perspective for flip */}
+          <div className="w-80 sm:w-96 h-48 sm:h-56 mb-4" style={{ perspective: '1000px' }}>
             <div
               className="w-full h-full relative transition-transform duration-500"
               style={{
@@ -73,32 +73,34 @@ export function FlashcardModal({
                 transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
               }}
             >
-              {/* front */}
+              {/* Front (Question) */}
               <div
                 className="absolute inset-0 bg-white rounded-lg shadow-lg p-4 flex items-center justify-center"
                 style={{ backfaceVisibility: 'hidden' }}
               >
-                <p className="text-lg font-bold">{clue.question}</p>
+                <p className="text-lg font-bold text-center">{clue.question}</p>
               </div>
-              {/* back */}
-              {/* back */}
-<div
-  className="absolute inset-0 bg-white rounded-lg shadow-lg p-4"
-  style={{
-    backfaceVisibility: 'hidden',
-    transform: 'rotateY(180deg)',
-  }}
->
-  {/* Scrollable container for long answers */}
-  <div className="overflow-y-auto max-h-full text-left">
-    <p className="text-lg whitespace-pre-line">{clue.answer}</p>
-  </div>
-</div>
 
+              {/* Back (Answer) */}
+              <div
+                className="absolute inset-0 bg-white rounded-lg shadow-lg p-4"
+                style={{
+                  backfaceVisibility: 'hidden',
+                  transform: 'rotateY(180deg)',
+                }}
+              >
+                {/* 
+                  NEW: grid + place-items-center centers short answers perfectly.
+                  overflow-y-auto keeps long answers scrollable without breaking layout.
+                */}
+                <div className="w-full h-full overflow-y-auto grid place-items-center">
+                  <p className="text-lg whitespace-pre-line text-center">{clue.answer}</p> {/* NEW: centered answer */}
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* buttons */}
+          {/* Actions */}
           <div className="flex justify-center space-x-4">
             <button
               type="button"
