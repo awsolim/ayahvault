@@ -9,6 +9,8 @@ export default defineConfig({
     tailwindcss(),
     react(),
     VitePWA({
+
+      
       // --- Service Worker registration behavior ---
       registerType: 'autoUpdate', // NEW: SW auto-updates in background when you deploy
 
@@ -18,7 +20,8 @@ export default defineConfig({
       // --- Workbox caching: what to precache in the app shell ---
       workbox: {
         // NEW: cache common asset types produced by Vite build
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,json}']
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,json}'],
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // NEW: allow up to ~5MB
       },
 
       // We already provided a manual /site.webmanifest, so don't autogenerate one.
