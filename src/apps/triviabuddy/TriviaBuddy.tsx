@@ -188,7 +188,7 @@ export default function TriviaBuddy() {
   className="
     w-full max-w-screen-2xl mx-auto
     grid gap-5
-    grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5  /* CHANGED: was xl:grid-cols-4 2xl:grid-cols-5 */
+    grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5  /* CHANGED: was 2xl:grid-cols-5 */
     place-items-stretch
     mb-12
   "
