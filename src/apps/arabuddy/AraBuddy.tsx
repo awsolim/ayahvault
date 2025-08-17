@@ -254,7 +254,7 @@ export default function AraBuddy() {
     <div className="mx-auto max-w-4xl">
       {/* Title */}
       <div className="mb-6">
-        <h1 className="text-center text-3xl font-bold text-purple-700">AraBuddy</h1>
+        <h1 className="text-center text-3xl font-bold text-purple-700">AraBuddy - Learn Quranic Arabic</h1>
       </div>
 
       {/* Lives + New Round (HIDDEN when game is over) */}
