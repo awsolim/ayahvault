@@ -1,6 +1,7 @@
 // src/pages/HomePage.tsx
 import { Link } from "react-router-dom";
 import Footer from "../components/layout/Footer";
+import ReviewsForm from "../components/layout/ReviewsForm";
 import Seo from "../lib/Seo";
 
 /**
@@ -119,6 +120,10 @@ export default function HomePage() {
             </Link>
           );
         })}
+      </div>
+
+      <div className="flex justify-center px-4">
+        <ReviewsForm /> {/* <-- new component */}
       </div>
 
       <Footer />

@@ -186,61 +186,66 @@ export default function TriviaBuddy() {
       {/* Team Scores (force 5-up on laptops/desktops) */}
 <div
   className="
-    w-full max-w-screen-2xl mx-auto
-    grid gap-5
-    grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5  /* CHANGED: was 2xl:grid-cols-5 */
-    place-items-stretch
+    w-full max-w-screen-2xl mx-auto             /* container stays centered */
+    flex flex-wrap justify-center items-start    /* NEW: center rows & allow wrap */
+    gap-5                                        /* spacing between cards */
     mb-12
   "
 >
+  {teams.map((rawName, i) => {
+    const displayName = rawName?.trim() || `Team ${i + 1}`;
 
-        {teams.map((rawName, i) => {
-          const displayName = rawName?.trim() || `Team ${i + 1}`;
+    return (
+      <div
+        key={i}
+        className="
+          relative                                  /* NEW: for the ring overlay */
+          w-[min(10rem,100%)]                       /* NEW: consistent card width, still responsive */
+          rounded-2xl p-4 text-white
+          bg-gradient-to-b from-[#0b1e4b] via-[#0a205e] to-[#0a1540]
+          shadow-xl ring-white/10
+        "
+      >
+        <div className="flex items-center justify-center">
+          <h3 className="text-base font-semibold tracking-wide text-center">
+            {displayName}
+          </h3>
+        </div>
 
-          return (
-            <div
-              key={i}
-              /* CHANGE 2: make the card width fluid so it fits the column (was w-[min(22rem,100%)]) */
-              className="w-full rounded-2xl p-4 text-white
-                         bg-gradient-to-b from-[#0b1e4b] via-[#0a205e] to-[#0a1540]
-                         shadow-xl ring-1 ring-white/10"
-            >
-              <div className="flex items-center justify-center">
-                <h3 className="text-base font-semibold tracking-wide text-center">{displayName}</h3>
-              </div>
+        <div
+          className={[
+            "mt-1 text-center text-5xl font-extrabold font-mono tabular-nums drop-shadow",
+            "transition-transform duration-200",
+            bumpedIdx === i ? "scale-105" : "",
+          ].join(" ")}
+        >
+          {teamScores[i]}
+        </div>
 
-              <div
-                className={[
-                  "mt-1 text-center text-5xl font-extrabold font-mono tabular-nums drop-shadow",
-                  "transition-transform duration-200",
-                  bumpedIdx === i ? "scale-105" : "",
-                ].join(" ")}
-              >
-                {teamScores[i]}
-              </div>
+        <div className="mt-4 grid grid-cols-1 gap-3">
+          <button
+            onClick={() => adjustScore(i, 100)}
+            className="py-2 rounded-xl font-bold bg-emerald-500/90 hover:bg-emerald-500
+                       active:translate-y-[1px] shadow-[0_6px_0_rgba(0,0,0,0.2)] transition"
+          >
+            +100
+          </button>
+          <button
+            onClick={() => adjustScore(i, -100)}
+            className="py-2 rounded-xl font-bold bg-rose-500/90 hover:bg-rose-500
+                       active:translate-y-[1px] shadow-[0_6px_0_rgba(0,0,0,0.2)] transition"
+          >
+            −100
+          </button>
+        </div>
 
-              <div className="mt-4 grid grid-cols-1 gap-3">
-                <button
-                  onClick={() => adjustScore(i, 100)}
-                  className="py-2 rounded-xl font-bold bg-emerald-500/90 hover:bg-emerald-500
-                             active:translate-y-[1px] shadow-[0_6px_0_rgba(0,0,0,0.2)] transition"
-                >
-                  +100
-                </button>
-                <button
-                  onClick={() => adjustScore(i, -100)}
-                  className="py-2 rounded-xl font-bold bg-rose-500/90 hover:bg-rose-500
-                             active:translate-y-[1px] shadow-[0_6px_0_rgba(0,0,0,0.2)] transition"
-                >
-                  −100
-                </button>
-              </div>
-
-              <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-white/10" />
-            </div>
-          );
-        })}
+        {/* ring overlay needs a positioned parent (we set `relative` above) */}
+        <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-white/10" />
       </div>
+    );
+  })}
+</div>
+
       {/* =================== /Team Scores =================== */}
 
       {/* History */}
