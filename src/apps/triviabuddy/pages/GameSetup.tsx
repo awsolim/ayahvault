@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../../lib/supabaseClient';
 import Spinner from '../../../components/ui/Spinner';
 import type { Clue } from '../types';
+import Seo from '../../../lib/Seo';
 
 type Tab = 'play' | 'create' | 'yourgames';
 
@@ -511,6 +512,16 @@ export default function GameSetup() {
 
   return (
     <main className="max-w-4xl mx-auto p-6 space-y-6">
+      <Seo
+        title="TriviaBuddy – Play Islamic Jeopardy or Create Trivia | AyahVault"
+        description="Play Islamic Jeopardy-style trivia or create your own categories and questions. Save games and resume anytime."
+        canonical="https://ayahvault.com/triviabuddy/setup"
+        ogTitle="TriviaBuddy – Islamic Jeopardy & Custom Trivia"
+        ogDescription="Pick categories, add teams, and play. Or build your own trivia set."
+        ogImage="https://ayahvault.com/og/triviabuddy.png"
+        ogUrl="https://ayahvault.com/triviabuddy/setup"
+        keywords="Islamic Jeopardy, Islamic trivia, create trivia, Muslim quiz"
+      />
       {/* NEW: Big blue page title above tabs */}
       <h1 className="text-3xl md:text-4xl font-extrabold text-center text-blue-700">
         TriviaBuddy — Play or Create a Game

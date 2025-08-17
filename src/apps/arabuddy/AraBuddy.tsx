@@ -3,6 +3,7 @@ import { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // used by "Back to Home"
 import { supabase } from "../../lib/supabaseClient";
 import Spinner from "../../components/ui/Spinner";
+import Seo from "../../lib/Seo";
 
 type Lang = "en" | "ar";
 
@@ -252,6 +253,16 @@ export default function AraBuddy() {
 
   return (
     <div className="mx-auto max-w-4xl">
+      <Seo
+        title="AraBuddy – Learn Quranic Arabic (Word Matching) | AyahVault"
+        description="Match Arabic–English word pairs from Quranic vocabulary. Timed rounds, limited lives, and satisfying effects to keep learning fun."
+        canonical="https://ayahvault.com/arabuddy"
+        ogTitle="AraBuddy – Learn Quranic Arabic"
+        ogDescription="Practice Quranic vocabulary with a simple matching game."
+        ogImage="https://ayahvault.com/og/arabuddy.png"
+        ogUrl="https://ayahvault.com/arabuddy"
+        keywords="learn Quranic Arabic, Arabic vocabulary, Arabic matching game"
+      />
       {/* Title */}
       <div className="mb-6">
         <h1 className="text-center text-3xl font-bold text-purple-700">AraBuddy - Learn Quranic Arabic</h1>

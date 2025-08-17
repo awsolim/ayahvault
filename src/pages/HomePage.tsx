@@ -1,6 +1,7 @@
 // src/pages/HomePage.tsx
 import { Link } from "react-router-dom";
 import Footer from "../components/layout/Footer";
+import Seo from "../lib/Seo";
 
 /**
  * Theme → classes mapping.
@@ -61,6 +62,16 @@ const apps: AppConfig[] = [
 export default function HomePage() {
   return (
     <div className="flex flex-col items-center justify-center text-center min-h-screen px-4 sm:px-6 lg:px-8">
+       <Seo
+        title="AyahVault – Quran tools for memorization, trivia, and Arabic"
+        description="AyahVault hosts simple tools for Muslims: random Quran verse generator (MemoBuddy), Islamic Jeopardy-style trivia (TriviaBuddy), and Quranic Arabic vocabulary matching (AraBuddy)."
+        canonical="https://ayahvault.com/"
+        ogTitle="AyahVault – Quran tools"
+        ogDescription="Random Quran verses, Islamic Jeopardy, and Quranic Arabic practice."
+        ogImage="https://ayahvault.com/og/ayahvault-home.png"
+        ogUrl="https://ayahvault.com/"
+        keywords="Quran verse generator, Islamic Jeopardy, Quranic Arabic, memorize Quran"
+      />
       {/* Title */}
       <h1 className="text-5xl sm:text-6xl md:text-7xl font-mozilla text-black mb-4">
         AyahVault

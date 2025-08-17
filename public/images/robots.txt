@@ -1,0 +1,11 @@
+# Allow Google to fetch pages and images (needed for favicon in Search)
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: *
+Allow: /
+
+Sitemap: https://ayahvault.com/sitemap.xml
