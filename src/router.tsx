@@ -6,7 +6,9 @@ import HomePage from './pages/HomePage';
 import MemoBuddy from './apps/memobuddy/MemoBuddy';
 import GameSetup from './apps/triviabuddy/pages/GameSetup';
 import TriviaBuddy from './apps/triviabuddy/TriviaBuddy';
-import AraBuddy from './apps/arabuddy/AraBuddy'; // NEW: import the new app
+import AraBuddy from './apps/arabuddy/AraBuddy';
+import HifzBuddy from './apps/hifzbuddy/HifzBuddy';
+//import NabiBuddy from './apps/nabibuddy/NabiBuddy'
 
 export const router = createBrowserRouter([
   {
@@ -17,8 +19,10 @@ export const router = createBrowserRouter([
       { path: 'memobuddy', element: <MemoBuddy /> },
       { path: 'triviabuddy/setup', element: <GameSetup /> },
       { path: 'triviabuddy/game/:gameId', element: <TriviaBuddy /> },
+      { path: 'arabuddy', element: <AraBuddy /> },
+      { path: 'hifzbuddy', element: <HifzBuddy /> },
+      //{ path: 'nabibuddy', element: <NabiBuddy /> },
 
-      { path: 'arabuddy', element: <AraBuddy /> }, // NEW: AraBuddy route at /arabuddy
     ],
   },
 ]);
