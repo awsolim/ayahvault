@@ -1,86 +1,92 @@
-import { useEffect, useMemo, useState } from "react";
+// src/apps/memobuddy/components/hooks/useIsTouchDevice.ts
+// NEW LOCATION: moved under components/hooks
+import { useEffect, useMemo, useRef, useState } from "react";
 
 /**
- * Robust touch detection that works on real devices AND in DevTools.
- * - Checks multiple signals: maxTouchPoints, ontouchstart, pointer/hover media queries.
- * - Reacts to environment changes (e.g., DevTools toggles) via matchMedia listeners.
- * - Supports a debug override with `localStorage.forceTouch = "1"` or URL `?touch=1`.
+ * Returns true when the device is effectively *touch-only*:
+ *  - Coarse pointer and no hover (phones/tablets)
+ *  - No detected mouse/pen pointer
+ * Notes:
+ *  - Ignores soft-keyboard keydown (iOS); relies on pointer/hover capabilities.
+ *  - Reacts to DevTools "Force touch" and to attaching/detaching a mouse.
+ *  - Debug overrides:
+ *      • localStorage.forceTouchOnly = "1"
+ *      • URL ?touchOnly=1
  */
 export function useIsTouchDevice(): boolean {
+  const hasMouseRef = useRef(false);
+
   const compute = () => {
-    // Debug override via URL: ?touch=1 or ?touch=true (only for your testing)
+    // Debug override via URL (for quick testing)  // NEW
     try {
-      if (typeof window !== "undefined") {
-        const urlHasTouch =
-          new URLSearchParams(window.location.search).get("touch");
-        if (urlHasTouch && urlHasTouch !== "0" && urlHasTouch !== "false") {
-          return true;
-        }
-      }
+      const sp = new URLSearchParams(window.location.search);
+      const ov = sp.get("touchOnly");
+      if (ov && ov !== "0" && ov !== "false") return true;
     } catch {}
 
-    // Debug override via localStorage: localStorage.forceTouch = "1"
+    // Debug override via localStorage               // NEW
     try {
-      if (typeof localStorage !== "undefined" && localStorage.getItem("forceTouch") === "1") {
-        return true;
-      }
+      if (localStorage.getItem("forceTouchOnly") === "1") return true;
     } catch {}
 
-    // 1) Navigator signals
-    const hasMaxTouch =
-      typeof navigator !== "undefined" &&
-      (navigator as any).maxTouchPoints > 0;
-
-    const hasMsMaxTouch =
-      typeof navigator !== "undefined" &&
-      (navigator as any).msMaxTouchPoints > 0;
-
-    // 2) Classic event feature detection
-    const hasOntouch =
-      typeof window !== "undefined" && "ontouchstart" in window;
-
-    // 3) Pointer & hover MQs – DevTools “Force enabled” typically satisfies these
     const mq = (q: string) =>
       typeof window !== "undefined" &&
       typeof window.matchMedia === "function" &&
       window.matchMedia(q).matches;
 
-    const pointerCoarse = mq("(pointer: coarse)") || mq("(any-pointer: coarse)");
-    const hoverNone = mq("(hover: none)") || mq("(any-hover: none)");
+    const anyFine   = mq("(any-pointer: fine)");
+    const anyHover  = mq("(any-hover: hover)");
+    const anyCoarse = mq("(any-pointer: coarse)");
+    const noHover   = mq("(hover: none)") || mq("(any-hover: none)");
 
-    return !!(hasMaxTouch || hasMsMaxTouch || hasOntouch || pointerCoarse || hoverNone);
+    // If we have an actual mouse/pen detected at runtime, treat as non-touch-only
+    const hasMouse = hasMouseRef.current || anyFine || anyHover;
+    if (hasMouse) return false;
+
+    // Otherwise, treat as touch-only if coarse and/or no hover, or classic touch signals
+    const maxTouch = (navigator as any)?.maxTouchPoints > 0 || (navigator as any)?.msMaxTouchPoints > 0;
+    const onTouch  = "ontouchstart" in window;
+
+    return !!(anyCoarse || noHover || maxTouch || onTouch);
   };
 
-  const [isTouch, setIsTouch] = useState<boolean>(() => compute());
+  const [isTouchOnly, setIsTouchOnly] = useState<boolean>(() => compute());
 
   useEffect(() => {
-    // Update on environment changes (e.g., DevTools toggles)
-    const mqs = [
-      "(pointer: coarse)",
+    // Detect a real mouse/pen pointer dynamically (covers iPad + trackpad)   // NEW
+    const onPointer = (e: PointerEvent) => {
+      if (e.pointerType === "mouse" || e.pointerType === "pen") {
+        if (!hasMouseRef.current) {
+          hasMouseRef.current = true;
+          setIsTouchOnly(compute());
+        }
+      }
+    };
+    window.addEventListener?.("pointermove", onPointer, { passive: true });
+    window.addEventListener?.("pointerdown", onPointer, { passive: true });
+
+    // React to media query changes (DevTools toggles, etc.)                   // NEW
+    const queries = [
+      "(any-pointer: fine)",
+      "(any-hover: hover)",
       "(any-pointer: coarse)",
       "(hover: none)",
       "(any-hover: none)",
-    ]
-      .map(q =>
-        typeof window !== "undefined" && typeof window.matchMedia === "function"
-          ? window.matchMedia(q)
-          : null
-      )
-      .filter(Boolean) as MediaQueryList[];
-
-    const onChange = () => setIsTouch(compute());
-    mqs.forEach(mql => mql.addEventListener?.("change", onChange));
-
-    // If a real touch is detected at runtime, lock it in
-    const onFirstTouch = () => setIsTouch(true);
-    window.addEventListener?.("touchstart", onFirstTouch, { once: true });
+    ];
+    const mqls =
+      typeof window !== "undefined" && typeof window.matchMedia === "function"
+        ? queries.map(q => window.matchMedia(q))
+        : [];
+    const onChange = () => setIsTouchOnly(compute());
+    mqls.forEach(mql => mql.addEventListener?.("change", onChange));
 
     return () => {
-      mqs.forEach(mql => mql.removeEventListener?.("change", onChange));
-      window.removeEventListener?.("touchstart", onFirstTouch);
+      window.removeEventListener?.("pointermove", onPointer);
+      window.removeEventListener?.("pointerdown", onPointer);
+      mqls.forEach(mql => mql.removeEventListener?.("change", onChange));
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Memoize to keep referential stability for consumers
-  return useMemo(() => isTouch, [isTouch]);
+  return useMemo(() => isTouchOnly, [isTouchOnly]);
 }

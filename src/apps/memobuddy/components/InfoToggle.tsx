@@ -1,4 +1,6 @@
+import { useEffect } from "react";
 import type { Dispatch, SetStateAction } from "react";
+import { useInputCapabilities } from "../../../components/hooks/useInputCapabilities"; // keyboard vs phone/tablet
 
 interface InfoToggleProps {
   showInfo: boolean;
@@ -6,12 +8,45 @@ interface InfoToggleProps {
 }
 
 export function InfoToggle({ showInfo, setShowInfo }: InfoToggleProps) {
-  const toggle = () => setShowInfo(v => !v);
+  const { keyboardCapable } = useInputCapabilities(); // ✅ true on desktop/2-in-1 with mouse/trackpad
 
-  // This component renders only the Show/Hide pill (no label). It's placed in col 2 of the grid.
+  // NEW: Toggle Verse Info with Shift key (desktop only)
+  useEffect(() => {
+    if (!keyboardCapable) return; // ✅ don’t attach on phones/tablets
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      // Guard: don’t fire while user is typing in a field/contentEditable
+      const ae = document.activeElement as HTMLElement | null;
+      const typing =
+        ae &&
+        (ae.tagName === "INPUT" ||
+          ae.tagName === "TEXTAREA" ||
+          ae.isContentEditable);
+      if (typing) return;
+
+      // Toggle on Shift key
+      if (e.key === "Shift") {
+        setShowInfo((v) => !v); // ✅ flip show/hide
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [keyboardCapable, setShowInfo]);
+
+  const toggle = () => setShowInfo((v) => !v); // click handler (unchanged)
+
   return (
+    // This component renders only the controls; the "Verse Info" label is in MemoBuddy’s grid col 1
     <div className="w-full">
       <div className="flex items-center gap-3">
+        {/* NEW: keyboard hint appears BEFORE the switch on desktop/keyboard mode */}
+        {keyboardCapable && (
+          <kbd className="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-300 text-[11px] font-mono">
+            Shift
+          </kbd>
+        )}
+
         {/* Show/Hide pill switch with text inside */}
         <button
           type="button"
@@ -64,3 +99,10 @@ export function InfoToggle({ showInfo, setShowInfo }: InfoToggleProps) {
 }
 
 export default InfoToggle;
+
+/*
+SUMMARY OF CHANGES:
+- Desktop/keyboard mode: adds <kbd>Shift</kbd> hint before the pill and binds Shift to toggle verse info.
+- Guarded so typing in inputs/textarea/contentEditable won’t trigger the toggle.
+- Touch-only devices: no hint and no key listener (unchanged).
+*/
