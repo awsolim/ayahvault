@@ -64,7 +64,7 @@ export default function HomePage() {
   return (
     <div className="flex flex-col items-center justify-center text-center min-h-screen px-4 sm:px-6 lg:px-8">
        <Seo
-        title="AyahVault – Quran tools for memorization, trivia, and Arabic"
+        title="AyahVault – Tools for Quran memorization and Islamic knowledge"
         description="AyahVault hosts simple tools for Muslims: random Quran verse generator (MemoBuddy), Islamic Jeopardy-style trivia (TriviaBuddy), and Quranic Arabic vocabulary matching (AraBuddy)."
         canonical="https://ayahvault.com/"
         ogTitle="AyahVault – Quran tools"
