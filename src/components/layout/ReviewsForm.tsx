@@ -126,7 +126,7 @@ export default function ReviewsForm() {
         </div>
 
         {/* COL 2, ROW 1–2 — Review */}
-        <div className="md:col-start-2 md:row-start-1 md:row-span-2">
+        <div className="ml-4 md:col-start-2 md:row-start-1 md:row-span-2">
           <label className="block text-xs font-medium text-slate-700">
             Review <span className="text-rose-500">*</span>
           </label>
@@ -148,7 +148,7 @@ export default function ReviewsForm() {
           <label className="block text-xs font-medium text-slate-700">
             Rating <span className="text-rose-500">*</span>
           </label>
-          <div className="mt-2 flex items-center gap-2">
+          <div className="mt-2 ml-16 flex items-center gap-2">
             <div className="flex items-center gap-1">
               {[1, 2, 3, 4, 5].map((v) => (
                 <StarButton key={v} value={v} />
@@ -158,7 +158,7 @@ export default function ReviewsForm() {
         </div>
 
         {/* COL 3, ROW 2 — Submit */}
-        <div className="md:col-start-3 md:row-start-2 flex items-start">
+        <div className="md:col-start-3 md:row-start-2">
           <button
             type="submit"
             disabled={!canSubmit || isSubmitting || isSuccess}
