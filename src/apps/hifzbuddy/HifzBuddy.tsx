@@ -1,22 +1,36 @@
 // src/apps/hifzbuddy/HifzBuddy.tsx
-import { useEffect, useMemo, useState, useRef, useCallback } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import Footer from "../../components/layout/Footer";
 import Spinner from "../../components/ui/Spinner";
 import Seo from "../../lib/Seo";
 
-type ChoiceKey = "a" | "b" | "c" | "d";
-type HifzRow = {
-  id?: string | number;
-  question: string;
-  a: string; b: string; c: string; d: string;
-  answer: string; // 'a' | 'b' | 'c' | 'd'
-};
+// ---- bring in the typed qviews you already split out ----
+import WhichSurah from "./qviews/WhichSurah";
+import NextVerse from "./qviews/NextVerse";
+import FillBlank from "./qviews/FillBlank";
+import BeforeAfter from "./qviews/BeforeAfter";
+import Match2x2 from "./qviews/Match2x2";
+import SortColumns from "./qviews/SortColumns";
+import SpotDiff from "./qviews/SpotDiff";
+import LocationMCQ from "./qviews/LocationMCQ";
+
+// all qtypes live here (typed)
+import type { AnyQ } from "./qtypes";
 
 type Phase = "loading" | "ready" | "transitioning" | "finished" | "error";
 
-const ORDER: ChoiceKey[] = ["a", "b", "c", "d"];
-const keyFromIndex = (i: number): ChoiceKey => ORDER[(i % 4 + 4) % 4];
+// Shape of a row coming back from Supabase (typed so `r` isn't any)
+type DBRow = {
+  id: number;
+  qtype: AnyQ["qtype"];
+  prompt: unknown;   // may be string or JSON
+  payload: unknown;  // JSON
+  answer: unknown;   // JSON
+  tags: string[] | null;
+  difficulty: number | null;
+  active: boolean | null;
+};
 
 function shuffle<T>(arr: T[]) {
   const a = [...arr];
@@ -27,84 +41,84 @@ function shuffle<T>(arr: T[]) {
   return a;
 }
 
+const safeParse = (x: unknown) => {
+  if (x == null) return x;
+  if (typeof x === "string") {
+    try {
+      return JSON.parse(x);
+    } catch {
+      return x;
+    }
+  }
+  return x;
+};
+
 export default function HifzBuddy() {
   const [phase, setPhase] = useState<Phase>("loading");
-  const [rows, setRows] = useState<HifzRow[]>([]);
+  const [rows, setRows] = useState<AnyQ[]>([]);
   const [idx, setIdx] = useState(0);
-
-  // selection: the single, persistent RED-selected index (0..3) or null
-  const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
-
-  // transient feedback
-  const [flashCorrect, setFlashCorrect] = useState<ChoiceKey | null>(null);
-  const [flashWrong, setFlashWrong] = useState<ChoiceKey | null>(null);
-
   const [score, setScore] = useState(0);
   const [err, setErr] = useState<string | null>(null);
 
   // sounds
   const sCorrect = useRef<HTMLAudioElement | null>(null);
-  const sWrong   = useRef<HTMLAudioElement | null>(null);
+  const sWrong = useRef<HTMLAudioElement | null>(null);
   useEffect(() => {
     sCorrect.current = new Audio("/audio/correct.mp3");
-    sWrong.current   = new Audio("/audio/wrong.mp3");
-    if (sCorrect.current) sCorrect.current.preload = "auto";
-    if (sWrong.current)   sWrong.current.preload   = "auto";
+    sWrong.current = new Audio("/audio/wrong.mp3");
+    sCorrect.current.preload = "auto";
+    sWrong.current.preload = "auto";
   }, []);
 
-  // focusable container to catch keyboard arrows reliably
-  const focusRef = useRef<HTMLDivElement | null>(null);
-  const focusCard = useCallback(() => {
-    requestAnimationFrame(() => {
-      focusRef.current?.focus();
-    });
-  }, []);
-
-  // load questions
+  // load from public.hifzbuddy
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      setPhase("loading");
-      setErr(null);
-      const { data, error } = await supabase
-        .from("hifzbuddy")
-        .select("id, question, a, b, c, d, answer");
+  let cancelled = false;
+  (async () => {
+    setPhase("loading");
+    setErr(null);
 
-      if (cancelled) return;
+    const { data, error } = await supabase
+      .from("hifzbuddy") // ⬅️ no generic here
+      .select("id, qtype, prompt, payload, answer, tags, difficulty, active")
+      .eq("active", true)
+      .order("difficulty", { ascending: true });
 
-      if (error) {
-        console.error("[HifzBuddy] load error:", error?.message ?? error);
-        setErr("Could not load questions. Please try again.");
-        setPhase("error");
-        return;
-      }
-      const list = (data as HifzRow[]).map(r => ({
-        ...r,
-        answer: String(r.answer ?? "").trim().toLowerCase(),
-      }));
-      if (!list.length) {
-        setErr('No questions found in "hifzbuddy".');
-        setPhase("error");
-        return;
-      }
+    if (cancelled) return;
 
-      setRows(shuffle(list));
-      setIdx(0);
-      setSelectedIdx(null);
-      setFlashCorrect(null);
-      setFlashWrong(null);
-      setScore(0);
-      setPhase("ready");
-      focusCard();
-    })();
-    return () => { cancelled = true; };
-  }, [focusCard]);
+    if (error) {
+      setErr(error.message || "Could not load questions.");
+      setPhase("error");
+      return;
+    }
 
-  // refocus each time we advance to keep arrow keys working
-  useEffect(() => {
-    if (phase === "ready") focusCard();
-  }, [phase, idx, focusCard]);
+    const rows = (data ?? []) as DBRow[]; // ⬅️ cast the result
 
+    const list: AnyQ[] = rows.map((r) => ({
+      id: r.id,
+      qtype: r.qtype,
+      prompt: safeParse(r.prompt),
+      payload: safeParse(r.payload),
+      answer: safeParse(r.answer),
+      tags: r.tags ?? undefined,
+      difficulty: r.difficulty ?? undefined,
+    }));
+
+    if (!list.length) {
+      setErr("No questions found in public.hifzbuddy.");
+      setPhase("error");
+      return;
+    }
+
+    setRows(shuffle(list));
+    setIdx(0);
+    setScore(0);
+    setPhase("ready");
+  })();
+
+  return () => {
+    cancelled = true;
+  };
+}, []);
   const current = rows[idx] ?? null;
   const total = rows.length;
   const progressPct = useMemo(
@@ -112,125 +126,52 @@ export default function HifzBuddy() {
     [idx, total]
   );
 
-  // ====== keyboard on the card: arrows move RED selection; Enter submits ======
-  const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (phase !== "ready") return;
-
-    if (e.key === "ArrowDown" || e.key === "ArrowRight") {
-      e.preventDefault();
-      setSelectedIdx(prev => (prev === null ? 0 : (prev + 1) % 4));
-    } else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
-      e.preventDefault();
-      setSelectedIdx(prev => (prev === null ? 3 : (prev + 3) % 4));
-    } else if (e.key === "Enter") {
-      if (selectedIdx !== null) {
-        e.preventDefault();
-        handleSubmit();
-      }
-    }
-  };
-
-  // click to select (set/stick RED background)
-  function selectByClick(_k: ChoiceKey, i: number) {
-    if (phase !== "ready") return;
-    setSelectedIdx(i);
-    focusCard(); // keep keyboard nav alive after clicking
-  }
-
-  function handleSubmit() {
-    if (phase !== "ready" || selectedIdx === null || !current) return;
-    const chosenKey = keyFromIndex(selectedIdx);
-    const isCorrect = chosenKey === current.answer;
-
-    if (isCorrect) {
-      setFlashCorrect(chosenKey);
-      setScore(s => s + 1);
-      try { sCorrect.current && (sCorrect.current.currentTime = 0, sCorrect.current.play()); } catch {}
-      setTimeout(() => {
-        setPhase("transitioning"); // slide out
-        setTimeout(() => advance(), 180); // slide duration
-      }, 320); // green shake duration
-    } else {
-      setFlashWrong(chosenKey);
-      try { sWrong.current && (sWrong.current.currentTime = 0, sWrong.current.play()); } catch {}
-      // keep your red selection; just clear the deeper flash shortly
-      setTimeout(() => setFlashWrong(null), 420);
-    }
-  }
-
   function advance() {
     if (idx + 1 >= rows.length) {
       setPhase("finished");
       return;
     }
-    setIdx(i => i + 1);
-    setSelectedIdx(null);
-    setFlashCorrect(null);
-    setFlashWrong(null);
+    setIdx((i) => i + 1);
     setPhase("ready");
   }
 
-  // single choice button (with clear visual precedence)
-  const choiceBtn = (k: ChoiceKey, i: number) => {
-    const label = current ? current[k] : "";
-    const isSelected = selectedIdx === i;   // SOLID red (click or arrows)
-    const isCorrect  = flashCorrect === k;  // temporary green + shake
-    const isWrong    = flashWrong === k;    // temporary deeper red
-
-    // precedence: CORRECT → WRONG → SELECTED → HOVER
-    let variantClass = "";
-    if (isCorrect) {
-      variantClass = "bg-emerald-500 text-white ring-emerald-600 hzb-shake";
-    } else if (isWrong) {
-      variantClass = "bg-red-900 text-white ring-red-900";
-    } else if (isSelected) {
-      variantClass = "bg-rose-100 ring-rose-300";
-    } else {
-      variantClass = "hover:bg-rose-50";
-    }
-
-    return (
-      <button
-        key={k}
-        onClick={() => selectByClick(k, i)}
-        disabled={phase !== "ready"}
-        aria-selected={isSelected}
-        className={[
-          "w-full text-left px-4 py-3 rounded-xl ring-1 transition relative",
-          variantClass,
-        ].join(" ")}
-      >
-        <span className="mr-3 inline-flex h-7 w-7 items-center justify-center rounded-md ring-1 ring-slate-300 font-bold">
-          {k.toUpperCase()}
-        </span>
-        <span className="align-middle">{label}</span>
-      </button>
-    );
-  };
+  async function onGrade(correct: boolean) {
+    try {
+      if (correct) {
+        if (sCorrect.current) {
+          sCorrect.current.currentTime = 0;
+          await sCorrect.current.play();
+        }
+      } else {
+        if (sWrong.current) {
+          sWrong.current.currentTime = 0;
+          await sWrong.current.play();
+        }
+      }
+    } catch {}
+    if (correct) setScore((s) => s + 1);
+    setPhase("transitioning");
+    setTimeout(() => advance(), correct ? 350 : 450);
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center">
       {/* tiny local animations */}
       <style>{`
-        @keyframes hzb-shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-2px)} 75%{transform:translateX(2px)} }
+        @keyframes hzb-shake {0%,100%{transform:translateX(0)} 25%{transform:translateX(-2px)} 75%{transform:translateX(2px)}}
         .hzb-shake { animation: hzb-shake 320ms ease-in-out 1; }
         .hzb-slide-out { transform: translateX(-12px); opacity: 0; transition: transform 180ms ease-out, opacity 180ms ease-out; }
       `}</style>
 
       <Seo
         title="HifzBuddy – Mutashabihat Trainer | AyahVault"
-        description="Red-themed Mutashabihat drills. Click to select, arrows to move selection, Enter/Submit to check."
+        description="Red-themed Mutashabihat drills — multiple question types."
         canonical="https://ayahvault.com/hifzbuddy"
-        ogTitle="HifzBuddy – Mutashabihat Trainer"
-        ogDescription="Quick multiple-choice Mutashabihat practice from Supabase."
-        ogImage="https://ayahvault.com/og/hifzbuddy.png"
-        ogUrl="https://ayahvault.com/hifzbuddy"
-        keywords="Hifz, Mutashabihat, Quran memorization, complete the verse"
       />
 
-      {/* Header (red theme, no extra Home button) */}
+      {/* Header */}
       <div className="w-full max-w-3xl px-4 pt-6 pb-2 flex items-center justify-between">
-        <h1 className="text-2xl md:text-3xl font-bold text-red-700">HifzBuddy — Complete the Verse</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-red-700">HifzBuddy — Mutashabihat</h1>
         {phase !== "loading" && phase !== "error" && (
           <div className="text-sm text-slate-600">{idx + 1} / {total}</div>
         )}
@@ -251,15 +192,10 @@ export default function HifzBuddy() {
 
         {(phase === "ready" || phase === "transitioning") && current && (
           <div
-            ref={focusRef}
-            tabIndex={0}
-            role="application"
-            onKeyDown={onKeyDown}
             className={[
-              "rounded-2xl bg-white p-5 ring-1 ring-slate-200 outline-none",
+              "rounded-2xl bg-white p-5 ring-1 ring-slate-200",
               phase === "transitioning" ? "hzb-slide-out" : "",
             ].join(" ")}
-            onClick={focusCard}
           >
             {/* progress (orange -> red gradient) */}
             <div className="mb-5">
@@ -274,34 +210,7 @@ export default function HifzBuddy() {
               </div>
             </div>
 
-            {/* question */}
-            <div className="mb-5">
-              <p className="text-lg md:text-xl font-semibold text-gray-900">
-                {current.question}
-              </p>
-              <p className="mt-1 text-xs text-slate-500">(Complete the verse)</p>
-            </div>
-
-            {/* choices */}
-            <div className="grid gap-3" role="listbox" aria-label="Answer choices">
-              {ORDER.map((k, i) => choiceBtn(k, i))}
-            </div>
-
-            {/* actions */}
-            <div className="mt-6 flex items-center justify-end">
-              <button
-                onClick={handleSubmit}
-                disabled={selectedIdx === null || phase !== "ready"}
-                className={[
-                  "rounded-lg px-4 py-2 font-semibold transition",
-                  selectedIdx !== null && phase === "ready"
-                    ? "bg-red-600 text-white hover:bg-red-700"
-                    : "bg-slate-200 text-slate-500 cursor-not-allowed",
-                ].join(" ")}
-              >
-                Submit
-              </button>
-            </div>
+            <QuestionView q={current} onGrade={onGrade} />
           </div>
         )}
 
@@ -314,14 +223,10 @@ export default function HifzBuddy() {
             <div className="mt-5">
               <button
                 onClick={() => {
-                  setRows(r => shuffle(r));
+                  setRows((r) => shuffle(r));
                   setIdx(0);
-                  setSelectedIdx(null);
-                  setFlashCorrect(null);
-                  setFlashWrong(null);
                   setScore(0);
                   setPhase("ready");
-                  focusCard();
                 }}
                 className="rounded-lg bg-red-600 px-4 py-2 font-semibold text-white hover:bg-red-700"
               >
@@ -335,4 +240,27 @@ export default function HifzBuddy() {
       <Footer />
     </div>
   );
+}
+
+/* ---------------------------
+   Render the proper qview
+--------------------------- */
+function QuestionView({
+  q,
+  onGrade,
+}: {
+  q: AnyQ;
+  onGrade: (ok: boolean) => void;
+}) {
+  switch (q.qtype) {
+    case "which_surah":  return <WhichSurah  q={q as any} onGrade={onGrade} />;
+    case "next_verse":   return <NextVerse   q={q as any} onGrade={onGrade} />;
+    case "fill_blank":   return <FillBlank   q={q as any} onGrade={onGrade} />;
+    case "before_after": return <BeforeAfter q={q as any} onGrade={onGrade} />;
+    case "match_2x2":    return <Match2x2    q={q as any} onGrade={onGrade} />;
+    case "sort_columns": return <SortColumns q={q as any} onGrade={onGrade} />;
+    case "spot_diff":    return <SpotDiff    q={q as any} onGrade={onGrade} />;
+    case "location":     return <LocationMCQ q={q as any} onGrade={onGrade} />;
+    default:             return <div>Unsupported question type.</div>;
+  }
 }
