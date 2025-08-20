@@ -4,13 +4,33 @@ import ReviewsForm from "../components/layout/ReviewsForm";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 
-/** SAME theme map as before */
+/** Theme map, now includes per-theme hover bg */
 const themeClasses = {
-  emerald: { title: "text-emerald-700", button: "text-emerald-700" },
-  blue:    { title: "text-blue-700",    button: "text-blue-700" },
-  purple:  { title: "text-purple-700",  button: "text-purple-700" },
-  amber:   { title: "text-amber-700",   button: "text-amber-700" },
-  red:     { title: "text-red-700",     button: "text-red-700" },
+  emerald: {
+    title: "text-emerald-700",
+    button: "text-emerald-700",
+    cardHover: "hover:bg-emerald-50",   // NEW
+  },
+  blue: {
+    title: "text-blue-700",
+    button: "text-blue-700",
+    cardHover: "hover:bg-blue-50",      // NEW
+  },
+  purple: {
+    title: "text-purple-700",
+    button: "text-purple-700",
+    cardHover: "hover:bg-purple-50",    // NEW
+  },
+  amber: {
+    title: "text-amber-700",
+    button: "text-amber-700",
+    cardHover: "hover:bg-amber-50",     // NEW
+  },
+  red: {
+    title: "text-red-700",
+    button: "text-red-700",
+    cardHover: "hover:bg-red-50",       // NEW
+  },
 } as const;
 
 type ThemeKey = keyof typeof themeClasses;
@@ -28,7 +48,13 @@ type AppRow = {
 
 function themeFor(name?: string | null) {
   const k = (name ?? "").toLowerCase().trim() as ThemeKey;
-  return themeClasses[k] ?? { title: "text-gray-700", button: "text-gray-700" };
+  return (
+    themeClasses[k] ?? {
+      title: "text-gray-700",
+      button: "text-gray-700",
+      cardHover: "hover:bg-slate-50",
+    }
+  );
 }
 function fallbackRoute(title: string) {
   return "/" + title.toLowerCase().replace(/[^a-z0-9]+/g, "");
@@ -57,7 +83,6 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col items-center justify-center text-center min-h-screen px-4 sm:px-6 lg:px-8">
-      {/* Hero — unchanged */}
       <h1 className="text-5xl sm:text-6xl md:text-7xl font-mozilla text-black mb-4">
         AyahVault
       </h1>
@@ -66,10 +91,9 @@ export default function HomePage() {
         build memorization, explore knowledge, and support your Islamic journey.
       </p>
 
-      {/* Cards — EXACT classes from before */}
       <div className="w-full max-w-4xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-12 items-stretch">
         {loading ? (
-          <div className="col-span-full h-40 grid place-items-center rounded-lg border border-slate-200 bg-white">
+          <div className="col-span-full h-80 grid place-items-center rounded-lg border border-slate-200 bg-white">
             <span className="text-slate-500">Loading…</span>
           </div>
         ) : (
@@ -82,7 +106,10 @@ export default function HomePage() {
               <Link
                 key={app.id}
                 to={link}
-                className="bg-white hover:bg-emerald-50 hover:shadow-lg transition border border-slate-200 rounded-lg p-6 h-96 flex flex-col"
+                className={[
+                  "bg-white border border-slate-200 rounded-lg p-6 h-96 flex flex-col transition hover:shadow-lg",
+                  theme.cardHover, // <- theme-specific hover color
+                ].join(" ")}
               >
                 <h2 className={`text-xl font-bold ${theme.title} mb-2`}>
                   {app.title}
@@ -106,7 +133,6 @@ export default function HomePage() {
         )}
       </div>
 
-      {/* Reviews */}
       <div className="w-full max-w-6xl mb-8">
         <ReviewsForm />
       </div>
