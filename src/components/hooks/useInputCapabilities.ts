@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 /**
- * Detects input capabilities in a way that keeps 2-in-1 laptops in *desktop mode*.
- * - `keyboardCapable`: true when the environment reports a fine pointer or hover
- *    (mouse/trackpad). We also flip to true if we ever see a mouse/pen pointer.
- * - `touchPrimary`: true when we *don’t* see desktop capability but do see coarse/no-hover/touch.
+ * Robustly detect input capabilities:
+ * - Phones/tablets (touch-first) → treated as "touchPrimary".
+ * - Laptops/desktops (keyboard + mouse/trackpad) → treated as "keyboardCapable".
  *
- * No reliance on keydown (which can fire on soft keyboards).
+ * Rules:
+ *   1. If we ever detect a real mouse/pen event → keyboardCapable = true.
+ *   2. If the device has *no* touch capability but reports fine pointer/hover → desktop.
+ *   3. If the device reports touch capability → favor "touchPrimary" even if it also says fine/hover.
+ *   4. Optionally, wide screens (> 1024px) bias towards desktop if ambiguous.
  */
 export function useInputCapabilities() {
   const sawMouseLike = useRef(false);
@@ -16,28 +19,52 @@ export function useInputCapabilities() {
       typeof window !== "undefined" && typeof window.matchMedia === "function";
     const mq = (q: string) => (supportsMQ ? window.matchMedia(q).matches : false);
 
-    // Desktop-ish signals
+    // Pointer/hover signals
     const anyFine = mq("(any-pointer: fine)");
     const anyHover = mq("(any-hover: hover)");
-
-    // Touch-ish signals
     const anyCoarse = mq("(any-pointer: coarse)");
     const noHover = mq("(hover: none)") || mq("(any-hover: none)");
+
+    // Touch capability checks
     const maxTouch =
       (navigator as any)?.maxTouchPoints > 0 ||
       (navigator as any)?.msMaxTouchPoints > 0;
-    const onTouch = typeof window !== "undefined" && "ontouchstart" in window;
+    const onTouch =
+      typeof window !== "undefined" && "ontouchstart" in window;
 
-    const keyboardCapable = sawMouseLike.current || anyFine || anyHover;
-    const touchPrimary = !keyboardCapable && (anyCoarse || noHover || maxTouch || onTouch);
+    // Heuristic: wide viewport is usually desktop
+    const isWide = typeof window !== "undefined" && window.innerWidth > 1024;
 
-    return { keyboardCapable, touchPrimary };
+    // If we've ever seen a mouse/pen, lock to desktop
+    if (sawMouseLike.current) {
+      return { keyboardCapable: true, touchPrimary: false };
+    }
+
+    // --- Decide keyboard vs touch ---
+    // Case 1: device clearly has no touch → desktop
+    if (!maxTouch && !onTouch && (anyFine || anyHover)) {
+      return { keyboardCapable: true, touchPrimary: false };
+    }
+
+    // Case 2: device clearly has touch capability → treat as touch,
+    // even if it claims fine/hover (covers phones & tablets)
+    if (maxTouch || onTouch || anyCoarse || noHover) {
+      return { keyboardCapable: false, touchPrimary: true };
+    }
+
+    // Case 3: ambiguous → use viewport width as tiebreaker
+    if (isWide && (anyFine || anyHover)) {
+      return { keyboardCapable: true, touchPrimary: false };
+    }
+
+    // Default fallback: assume touch
+    return { keyboardCapable: false, touchPrimary: true };
   };
 
   const [caps, setCaps] = useState(compute);
 
   useEffect(() => {
-    // If we ever see a mouse/pen pointer, lock into keyboard-capable.
+    // Promote to keyboardCapable permanently if we ever see a mouse/pen pointer
     const onPointer = (e: PointerEvent) => {
       if (e.pointerType === "mouse" || e.pointerType === "pen") {
         if (!sawMouseLike.current) {
@@ -49,7 +76,7 @@ export function useInputCapabilities() {
     window.addEventListener?.("pointermove", onPointer, { passive: true });
     window.addEventListener?.("pointerdown", onPointer, { passive: true });
 
-    // React to MQ changes (covers DevTools toggles etc.)
+    // React to media query changes (covers orientation/devtools toggles)
     const queries = [
       "(any-pointer: fine)",
       "(any-hover: hover)",
@@ -64,9 +91,14 @@ export function useInputCapabilities() {
     const onChange = () => setCaps(compute());
     mqls.forEach((mql) => mql.addEventListener?.("change", onChange));
 
+    // React to resize (viewport width heuristic)
+    const onResize = () => setCaps(compute());
+    window.addEventListener?.("resize", onResize);
+
     return () => {
       window.removeEventListener?.("pointermove", onPointer);
       window.removeEventListener?.("pointerdown", onPointer);
+      window.removeEventListener?.("resize", onResize);
       mqls.forEach((mql) => mql.removeEventListener?.("change", onChange));
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -74,3 +106,5 @@ export function useInputCapabilities() {
 
   return useMemo(() => caps, [caps]);
 }
+
+export default useInputCapabilities;
