@@ -84,7 +84,7 @@ export function MemoBuddy() {
         ← Home
       </button>
 
-      <h1 className="text-3xl font-bold text-emerald-600 mb-4">MemoBuddy - Quran Memorization Assistant</h1>
+      <h1 className="text-3xl font-bold text-emerald-600 mb-4">MemoBuddy</h1>
 
       {/* 1. Mode selector */}
       <ModeSelector
