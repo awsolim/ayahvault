@@ -1,24 +1,34 @@
-
-/* Mozilla Headline */
+/* index.css */
 @import url('https://fonts.googleapis.com/css2?family=Mozilla+Headline:wght@200..700&display=swap');
-
-/* Kanit */
-@import url('https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Mozilla+Headline:wght@200..700&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
 @import "tailwindcss";
 
+/* 1. Register the TTF font */
+@font-face {
+  font-family: 'Uthmanic';
+  /* Note the .ttf extension and 'truetype' format */
+  src: url('/fonts/quran.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
   --font-mozilla: "Mozilla Headline", sans-serif;
+  --font-kanit: "Kanit", serif;
+  /* 2. Map to Tailwind */
+  --font-quran: "Uthmanic", serif;
 }
 
-@theme {
-    --font-kanit: "Kanit", serif;
+/* --- Arabic Text Helper --- */
+.quran-text {
+  font-family: var(--font-quran);
+  line-height: 2.2;
+  direction: rtl;
 }
 
-/* --- AraBuddy animations (safe, lightweight) --- */
-
-/* NEW: shake for wrong match */
+/* --- AraBuddy animations --- */
 @keyframes arabuddy-shake {
   0%, 100% { transform: translateX(0); }
   20% { transform: translateX(-6px); }
@@ -27,30 +37,8 @@
   80% { transform: translateX(4px); }
 }
 
-/* NEW: pop for correct match */
 @keyframes arabuddy-pop {
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.05); }
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
   100% { transform: scale(1); }
-}
-
-/* NEW: utility classes to trigger animations */
-.animate-shake {
-  animation: arabuddy-shake 0.25s ease;
-}
-
-.animate-pop {
-  animation: arabuddy-pop 0.25s ease;
-}
-
-@keyframes arabuddy-vibrate {
-  0%   { transform: translate3d(0, 0, 0); }
-  25%  { transform: translate3d(-0.5px, 0.5px, 0); }
-  50%  { transform: translate3d(0.6px, -0.4px, 0); }
-  75%  { transform: translate3d(-0.4px, -0.6px, 0); }
-  100% { transform: translate3d(0, 0, 0); }
-}
-
-.animate-vibrate {
-  animation: arabuddy-vibrate 0.3s linear infinite; /* NEW: gentle, continuous buzz */
 }
