@@ -103,7 +103,7 @@ export function MemoBuddy() {
         <RangeInput
           mode={mode}
           rangeStart={rangeStart} setRangeStart={setRangeStart}
-          rangeEnd={rangeEnd}     setRangeEnd={setRangeEnd}
+          rangeEnd={rangeEnd} setRangeEnd={setRangeEnd}
           useMultiRange={useMultiRange}
           onGo={() => {
             setHasInteracted(true);
@@ -127,14 +127,14 @@ export function MemoBuddy() {
         onNext={handleNext}
       />
 
+      {/* Keyboard Shortcut Hint (Visible on computer/large screens only) */}
+      <div className="hidden lg:block mt-4 text-[11px] text-gray-400 uppercase tracking-widest text-center select-none">
+        Press <span className="font-bold text-gray-500">Enter</span> or click <span className="text-emerald-600 font-bold">Go</span> for a new verse •
+        Use <span className="font-bold text-gray-500">Left/Right arrows</span> to navigate
+      </div>
+
       {/* 4. Settings — two aligned rows */}
-      <div
-        className="
-          w-full max-w-md px-4
-          mt-10               /* push settings down from the verse card */
-          space-y-6
-        "
-      >
+      <div className="w-full max-w-md px-4 mt-6 space-y-6">
         {/* Row 1: Preview — label (col 1) | controls (col 2) */}
         <div className="grid grid-cols-[auto,1fr] items-center gap-4">
           <span className="text-sm font-medium text-gray-700">Preview</span>
