@@ -1,6 +1,5 @@
 // src/apps/memobuddy/components/SurahReference.tsx
 
-import React from 'react';
 
 const surahNames = [
   "Al-Fatihah", "Al-Baqarah", "Aali 'Imran", "An-Nisa'", "Al-Ma'idah", "Al-An'am", "Al-A'raf", "Al-Anfal", "At-Tawbah", "Yunus",
