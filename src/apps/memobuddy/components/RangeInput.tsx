@@ -11,14 +11,19 @@ interface RangeInputProps {
   toggleMulti: () => void;
 }
 
-/** Handles the “start” and optional “end” inputs plus Go/toggle link */
 export function RangeInput({
-  mode,
-  rangeStart, rangeEnd, useMultiRange,
+  mode, rangeStart, rangeEnd, useMultiRange,
   setRangeStart, setRangeEnd, onGo, toggleMulti
 }: RangeInputProps) {
+  
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onGo();
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+  };
+
   return (
-    <div className="mb-4 flex items-center space-x-2">
+    <form onSubmit={handleSubmit} className="mb-4 flex flex-wrap items-center gap-2">
       <input
         type="text" inputMode="numeric" pattern="[0-9]*"
         value={rangeStart}
@@ -26,9 +31,10 @@ export function RangeInput({
         className="border rounded px-2 py-2 w-16 text-center bg-white shadow-sm focus:ring-2 focus:ring-emerald-300"
         placeholder={mode}
       />
+      
       {useMultiRange && (
         <>
-          <span>to</span>
+          <span className="text-gray-500">to</span>
           <input
             type="text" inputMode="numeric" pattern="[0-9]*"
             value={rangeEnd}
@@ -38,18 +44,21 @@ export function RangeInput({
           />
         </>
       )}
+
       <button
-        onClick={onGo}
+        type="submit"
         className="px-3 py-2 rounded-md text-white bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 font-semibold shadow hover:brightness-110 hover:scale-105 transition-all duration-300"
       >
         Go
       </button>
+
       <button
+        type="button"
         onClick={toggleMulti}
-        className="text-sm font-medium text-emerald-600 underline hover:text-teal-600 transition"
+        className="text-xs text-emerald-600 font-bold hover:underline ml-auto"
       >
-        {useMultiRange ? 'Use single range' : `Select multi-${mode} range`}
+        {useMultiRange ? 'Switch to single' : 'Select range'}
       </button>
-    </div>
+    </form>
   );
 }
