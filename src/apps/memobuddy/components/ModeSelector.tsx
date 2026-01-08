@@ -7,17 +7,17 @@ interface ModeSelectorProps {
 
 export function ModeSelector({ mode, onSelect }: ModeSelectorProps) {
   return (
-    <div className="mb-6 grid grid-cols-4 gap-1.5 w-full">
+    <div className="mb-6 grid grid-cols-4 gap-1 w-full">
       {(['surah','juz', 'full', 'custom'] as const).map(m => (
         <button
           key={m}
           onClick={() => onSelect(m)}
           className={`
-            py-2 rounded-lg border text-[11px] sm:text-sm font-bold shadow-md transition-all duration-200 ease-in-out
-            flex items-center justify-center text-center
+            py-2.5 rounded-lg border text-[10px] sm:text-xs font-bold shadow-sm transition-all duration-200
+            flex items-center justify-center text-center whitespace-nowrap
             ${mode === m
-              ? 'text-white bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 shadow-lg scale-[1.02]'
-              : 'bg-white text-emerald-600 border-emerald-400 hover:bg-emerald-50'}
+              ? 'text-white bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 shadow-md ring-1 ring-emerald-300'
+              : 'bg-white text-emerald-600 border-emerald-200 hover:bg-emerald-50'}
           `}
         >
           {m.toUpperCase()}
