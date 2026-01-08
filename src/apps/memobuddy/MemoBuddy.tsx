@@ -13,7 +13,7 @@ import { CustomSelection } from './components/CustomSelection';
 import { SurahReference } from './components/SurahReference';
 import Seo from '../../lib/Seo';
 
-export function MemoBuddy() {
+export default function MemoBuddy() {
   const [mode, setMode] = useState<'surah' | 'juz' | 'full' | 'custom' | null>(null);
   const [rangeStart, setRangeStart] = useState<string>('');
   const [rangeEnd, setRangeEnd] = useState<string>('');
