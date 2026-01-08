@@ -95,7 +95,7 @@ export function CustomSelection({ config, setConfig }: any) {
             </select>
             <input 
               type="text" 
-              placeholder={`${itemType.charAt(0).toUpperCase() + itemType.slice(1)} Number (e.g. 1-11)`}
+              placeholder={`${itemType.charAt(0).toUpperCase() + itemType.slice(1)} Number`}
               value={inputValue} 
               onKeyDown={handleKeyDown}
               onChange={(e) => setInputValue(e.target.value.replace(/[^0-9-]/g, ''))}

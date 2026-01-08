@@ -13,7 +13,7 @@ import { CustomSelection } from './components/CustomSelection';
 import { SurahReference } from './components/SurahReference';
 import Seo from '../../lib/Seo';
 
-export default function MemoBuddy() {
+export function MemoBuddy() {
   const [mode, setMode] = useState<'surah' | 'juz' | 'full' | 'custom' | null>(null);
   const [rangeStart, setRangeStart] = useState<string>('');
   const [rangeEnd, setRangeEnd] = useState<string>('');
@@ -28,11 +28,11 @@ export default function MemoBuddy() {
 
   const [partialMode, setPartialMode] = useState(false);
   const [partialWordCount, setPartialWordCount] = useState(1);
-  const [showInfo, setShowInfo] = useState(true);
+  const [showInfo, setShowInfo] = useState(false); // Defaulting to OFF
   const [hasInteracted, setHasInteracted] = useState(false);
 
-  // Placeholder for Supabase description
-  const appDescription = "Randomly select a Quran verse by specifying a range";
+  // Supabase Table Description
+  const appDescription = "";
 
   const { randomVerse, errorMessage, generateRandomVerse, navigateToAdjacentVerse } = useRandomVerse();
 
@@ -50,7 +50,7 @@ export default function MemoBuddy() {
     (offset) => navigateToAdjacentVerse(offset)
   );
 
-  const goBtnClass = "px-6 py-2 rounded-lg text-white bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 font-semibold shadow-md hover:brightness-110 transition-all active:scale-95";
+  const goBtnClass = "px-8 py-2.5 rounded-lg text-white bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 font-bold shadow-md hover:brightness-110 active:scale-95 transition-all text-sm";
 
   return (
     <div className="flex flex-col items-center min-h-screen py-8 px-4 font-kanit">
@@ -59,37 +59,41 @@ export default function MemoBuddy() {
       
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold text-emerald-600">MEMOBUDDY</h1>
-        <p className="text-gray-500 text-sm mt-2 max-w-sm mx-auto leading-relaxed italic">
+        <p className="text-gray-500 text-[13px] mt-2 max-w-[280px] mx-auto leading-relaxed italic">
           {appDescription}
         </p>
       </div>
 
-      <div className="w-full max-w-md mb-12">
+      <div className="w-full max-w-md mb-8"> {/* mb-16 provides safe distance from VerseCard */}
         <ModeSelector mode={mode} onSelect={(m) => setMode(m)} />
 
-        <div className="flex flex-col items-center w-full mt-4">
+        <div className="flex flex-col items-center w-full mt-6">
           {mode === 'custom' && (
-            <div className="flex flex-col items-center w-full">
+            <div className="flex flex-col items-center w-full animate-in fade-in slide-in-from-top-2 duration-300">
               <CustomSelection config={customConfig} setConfig={setCustomConfig} />
               <button onClick={handleGo} className={goBtnClass}>Go</button>
-              <button onClick={() => setIsRefOpen(true)} className="mt-4 text-[11px] font-bold text-emerald-600/70 uppercase tracking-widest transition-colors flex items-center gap-1">
+              <button onClick={() => setIsRefOpen(true)} className="mt-5 text-[10px] font-bold text-emerald-600/70 uppercase tracking-widest transition-colors flex items-center gap-1">
                 <span className="text-sm">📖</span> Surah List
               </button>
             </div>
           )}
 
           {(mode === 'surah' || mode === 'juz') && (
-            <RangeInput 
-              mode={mode} rangeStart={rangeStart} rangeEnd={rangeEnd} 
-              useMultiRange={useMultiRange} setRangeStart={setRangeStart} 
-              setRangeEnd={setRangeEnd} onGo={handleGo} 
-              toggleMulti={() => setUseMultiRange(!useMultiRange)} 
-              onOpenList={() => setIsRefOpen(true)}
-            />
+            <div className="animate-in fade-in slide-in-from-top-2 duration-300 w-full">
+              <RangeInput 
+                mode={mode} rangeStart={rangeStart} rangeEnd={rangeEnd} 
+                useMultiRange={useMultiRange} setRangeStart={setRangeStart} 
+                setRangeEnd={setRangeEnd} onGo={handleGo} 
+                toggleMulti={() => setUseMultiRange(!useMultiRange)} 
+                onOpenList={() => setIsRefOpen(true)}
+              />
+            </div>
           )}
 
           {mode === 'full' && (
-            <button onClick={handleGo} className={goBtnClass}>Go</button>
+            <div className="animate-in fade-in zoom-in-95 duration-300">
+              <button onClick={handleGo} className={goBtnClass}>Go</button>
+            </div>
           )}
         </div>
       </div>

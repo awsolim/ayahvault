@@ -7,19 +7,20 @@ interface ModeSelectorProps {
 
 export function ModeSelector({ mode, onSelect }: ModeSelectorProps) {
   return (
-    <div className="mb-4 flex flex-wrap justify-center gap-3">
+    <div className="mb-6 grid grid-cols-4 gap-1.5 w-full">
       {(['surah','juz', 'full', 'custom'] as const).map(m => (
         <button
           key={m}
           onClick={() => onSelect(m)}
           className={`
-            px-4 py-2 rounded-lg border text-sm font-semibold shadow-md transition-all duration-300 ease-in-out
+            py-2 rounded-lg border text-[11px] sm:text-sm font-bold shadow-md transition-all duration-200 ease-in-out
+            flex items-center justify-center text-center
             ${mode === m
-              ? 'text-white bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:brightness-110 hover:scale-105 shadow-lg'
-              : 'bg-white text-emerald-600 border-emerald-400 hover:bg-emerald-50 hover:scale-105'}
+              ? 'text-white bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 shadow-lg scale-[1.02]'
+              : 'bg-white text-emerald-600 border-emerald-400 hover:bg-emerald-50'}
           `}
         >
-          {m.charAt(0).toUpperCase() + m.slice(1)}
+          {m.toUpperCase()}
         </button>
       ))}
     </div>

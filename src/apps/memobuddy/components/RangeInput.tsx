@@ -17,7 +17,7 @@ export function RangeInput({
   setRangeStart, setRangeEnd, onGo, toggleMulti, onOpenList
 }: RangeInputProps) {
   
-  const placeholderText = mode === 'surah' ? 'Surah #' : 'Juz #';
+  const placeholderText = mode === 'surah' ? 'Surah' : 'Juz';
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
