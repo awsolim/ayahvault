@@ -104,5 +104,6 @@ export default InfoToggle;
 SUMMARY OF CHANGES:
 - Desktop/keyboard mode: adds <kbd>Shift</kbd> hint before the pill and binds Shift to toggle verse info.
 - Guarded so typing in inputs/textarea/contentEditable won’t trigger the toggle.
-- Touch-only devices: no hint and no key listener (unchanged).
+- Touch-only devices: no hint and no key listener (unchanged)s.
 */
+ 
