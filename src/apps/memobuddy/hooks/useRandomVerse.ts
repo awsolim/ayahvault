@@ -63,7 +63,12 @@ export function useRandomVerse() {
 
   const navigateToAdjacentVerse = useCallback((offset: number) => {
     if (currentPool.length === 0 || !randomVerse) return;
-    const currentIndex = currentPool.findIndex(v => v.text === randomVerse.text);
+    
+    // FIX: Use unique surah and ayah identifiers instead of v.text
+    const currentIndex = currentPool.findIndex(
+      v => v.surah === randomVerse.surah && v.ayah === randomVerse.ayah
+    );
+    
     if (currentIndex === -1) return;
 
     const nextIndex = (currentIndex + offset + currentPool.length) % currentPool.length;
