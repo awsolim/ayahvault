@@ -13,6 +13,38 @@ import { CustomSelection } from './components/CustomSelection';
 import { SurahReference } from './components/SurahReference';
 import Seo from '../../lib/Seo';
 
+type PreviewMode = 'text' | 'audio';
+
+function PreviewModeToggle({
+  previewMode,
+  setPreviewMode,
+}: {
+  previewMode: PreviewMode;
+  setPreviewMode: (mode: PreviewMode) => void;
+}) {
+  const nextMode = previewMode === 'text' ? 'audio' : 'text';
+
+  return (
+    <button
+      type="button"
+      onClick={() => setPreviewMode(nextMode)}
+      className="flex bg-slate-100 p-1 rounded-full border border-slate-200 shadow-inner"
+      aria-label={`Switch to ${nextMode} mode`}
+    >
+      <span
+        className={`px-3 py-1 text-[11px] font-bold rounded-full transition-all ${previewMode === 'text' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-400'}`}
+      >
+        Text
+      </span>
+      <span
+        className={`px-3 py-1 text-[11px] font-bold rounded-full transition-all ${previewMode === 'audio' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-400'}`}
+      >
+        Audio
+      </span>
+    </button>
+  );
+}
+
 export default function MemoBuddy() {
   const [mode, setMode] = useState<'surah' | 'juz' | 'full' | 'custom' | null>(null);
   const [rangeStart, setRangeStart] = useState<string>('');
@@ -28,6 +60,9 @@ export default function MemoBuddy() {
 
   const [partialMode, setPartialMode] = useState(false);
   const [partialWordCount, setPartialWordCount] = useState(1);
+  const [previewMode, setPreviewMode] = useState<PreviewMode>('text');
+  const [audioPartialSeconds, setAudioPartialSeconds] = useState(5);
+  const [audioPlayRequest, setAudioPlayRequest] = useState(0);
   const [showInfo, setShowInfo] = useState(false); // Off by default
   const [hasInteracted, setHasInteracted] = useState(false);
 
@@ -42,14 +77,26 @@ export default function MemoBuddy() {
       ? { start: rangeStart || "1", end: useMultiRange ? (rangeEnd || rangeStart || "1") : (rangeStart || "1") }
       : mode === 'custom' ? customConfig : {};
     generateRandomVerse(mode, config);
-  }, [mode, rangeStart, rangeEnd, useMultiRange, customConfig, generateRandomVerse]);
+    if (previewMode === 'audio') {
+      setAudioPlayRequest(v => v + 1);
+    }
+  }, [mode, rangeStart, rangeEnd, useMultiRange, customConfig, generateRandomVerse, previewMode]);
 
   useKeyboardNav(randomVerse, partialMode, handleGo, () => setPartialMode(v => !v), 
-    (delta) => setPartialWordCount(prev => Math.max(1, prev + delta)),
+    (delta) => {
+      if (previewMode === 'audio') {
+        setAudioPartialSeconds(prev => Math.min(60, Math.max(1, prev + delta)));
+        return;
+      }
+      setPartialWordCount(prev => Math.max(1, prev + delta));
+    },
     (offset) => navigateToAdjacentVerse(offset)
   );
 
   const goBtnClass = "px-6 py-2 rounded-lg text-white bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 font-bold shadow-md hover:brightness-110 active:scale-95 transition-all text-sm";
+  const previewModeToggle = (
+    <PreviewModeToggle previewMode={previewMode} setPreviewMode={setPreviewMode} />
+  );
 
   return (
     <div className="flex flex-col items-center min-h-screen py-8 px-4 font-kanit">
@@ -70,7 +117,10 @@ export default function MemoBuddy() {
           {mode === 'custom' && (
             <div className="flex flex-col items-center w-full">
               <CustomSelection config={customConfig} setConfig={setCustomConfig} />
-              <button onClick={handleGo} className={goBtnClass}>Go</button>
+              <div className="flex items-center justify-center gap-2">
+                <button onClick={handleGo} className={goBtnClass}>Go</button>
+                {previewModeToggle}
+              </div>
               <button onClick={() => setIsRefOpen(true)} className="mt-4 text-[10px] font-bold text-emerald-600/70 uppercase tracking-widest flex items-center gap-1">
                 <span className="text-sm">📖</span> Surah List
               </button>
@@ -84,18 +134,25 @@ export default function MemoBuddy() {
               setRangeEnd={setRangeEnd} onGo={handleGo} 
               toggleMulti={() => setUseMultiRange(!useMultiRange)} 
               onOpenList={() => setIsRefOpen(true)}
+              actionSlot={previewModeToggle}
             />
           )}
 
           {mode === 'full' && (
-            <button onClick={handleGo} className={goBtnClass}>Go</button>
+            <div className="flex items-center justify-center gap-2">
+              <button onClick={handleGo} className={goBtnClass}>Go</button>
+              {previewModeToggle}
+            </div>
           )}
         </div>
       </div>
 
       <VerseCard 
         verse={randomVerse} errorMessage={errorMessage} hasInteracted={hasInteracted} 
-        partialMode={partialMode} partialWordCount={partialWordCount} showInfo={showInfo} 
+        previewMode={previewMode} partialMode={partialMode}
+        partialWordCount={partialWordCount} audioPartialSeconds={audioPartialSeconds}
+        audioPlayRequest={audioPlayRequest}
+        showInfo={showInfo} 
         onPrev={() => navigateToAdjacentVerse(-1)} onNext={() => navigateToAdjacentVerse(1)} 
       />
 
@@ -104,10 +161,13 @@ export default function MemoBuddy() {
         <div className="flex flex-col items-center gap-2 flex-1">
           <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Preview</span>
           <PreviewControls 
+            previewMode={previewMode}
             partialMode={partialMode} 
             setPartialMode={setPartialMode} 
             partialWordCount={partialWordCount} 
             setPartialWordCount={setPartialWordCount} 
+            audioPartialSeconds={audioPartialSeconds}
+            setAudioPartialSeconds={setAudioPartialSeconds}
           />
         </div>
 

@@ -1,4 +1,5 @@
 // src/apps/memobuddy/components/RangeInput.tsx
+import type { ReactNode } from 'react';
 
 interface RangeInputProps {
   mode: 'surah' | 'juz';
@@ -10,18 +11,19 @@ interface RangeInputProps {
   onGo: () => void;
   toggleMulti: () => void;
   onOpenList: () => void;
+  actionSlot?: ReactNode;
 }
 
 export function RangeInput({
   mode, rangeStart, rangeEnd, useMultiRange,
-  setRangeStart, setRangeEnd, onGo, toggleMulti, onOpenList
+  setRangeStart, setRangeEnd, onGo, toggleMulti, onOpenList, actionSlot
 }: RangeInputProps) {
   
   const placeholderText = mode === 'surah' ? 'No.' : 'Juz';
 
   return (
     <form onSubmit={(e) => { e.preventDefault(); onGo(); }} className="flex flex-col items-center w-full">
-      <div className="flex items-center justify-center gap-2 mb-4 w-full">
+      <div className="flex flex-wrap items-center justify-center gap-2 mb-4 w-full">
         <div className="flex items-center gap-1">
           <input
             type="text" inputMode="numeric"
@@ -46,6 +48,7 @@ export function RangeInput({
         <button type="submit" className="px-5 py-2 rounded-lg text-white bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 font-bold shadow-md text-sm whitespace-nowrap">
           Go
         </button>
+        {actionSlot}
       </div>
 
       <div className="flex items-center justify-center gap-4">
