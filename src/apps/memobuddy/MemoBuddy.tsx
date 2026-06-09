@@ -177,6 +177,10 @@ export default function MemoBuddy() {
         </div>
       </div>
 
+      <p className="hidden md:block mt-4 text-[11px] font-bold uppercase tracking-widest text-slate-400">
+        Use left and right arrow keys to check the previous or following verse
+      </p>
+
       <Footer />
     </div>
   );

@@ -5,9 +5,7 @@ import type { Verse } from '../../../assets/types';
 import { useInputCapabilities } from '../../../components/hooks/useInputCapabilities';
 
 type PreviewMode = 'text' | 'audio';
-type BackFaceMode = 'translation' | 'tafsir';
-type TafsirLanguage = 'ar' | 'en';
-type LoadStatus = 'idle' | 'loading' | 'error';
+type TranslationStatus = 'idle' | 'loading' | 'error';
 
 interface VerseCardProps {
   verse: Verse | null;
@@ -34,50 +32,6 @@ function formatTime(seconds: number) {
   const mins = Math.floor(seconds / 60);
   const secs = Math.floor(seconds % 60);
   return `${mins}:${String(secs).padStart(2, '0')}`;
-}
-
-const jalalaynMapPromises: Partial<Record<TafsirLanguage, Promise<Map<string, string>>>> = {};
-
-function parseJalalaynText(raw: string) {
-  return new Map(
-    raw
-      .split(/\r?\n/)
-      .map((line) => {
-        const [surah, ayah, ...textParts] = line.replace(/^\uFEFF/, '').split('|');
-        return [`${surah}:${ayah}`, textParts.join('|').trim()] as const;
-      })
-      .filter(([, text]) => text.length > 0)
-  );
-}
-
-function loadJalalaynMap(language: TafsirLanguage) {
-  const path = language === 'ar' ? '/data/jalalayn-ar.txt' : '/data/jalalayn-en.txt';
-
-  jalalaynMapPromises[language] ??= fetch(path)
-    .then((response) => {
-      if (!response.ok) throw new Error('jalalayn tafsir unavailable');
-      return response.text();
-    })
-    .then(parseJalalaynText);
-
-  return jalalaynMapPromises[language];
-}
-
-function renderBoldedAyahQuotes(text: string) {
-  return text.split(/(﴿[^﴾]+﴾|«[^»]+»|\([^()]+\))/g).map((part, index) => {
-    const isQuote =
-      (part.startsWith('﴿') && part.endsWith('﴾')) ||
-      (part.startsWith('«') && part.endsWith('»')) ||
-      (part.startsWith('(') && part.endsWith(')'));
-
-    return isQuote ? (
-      <strong key={index} className="font-extrabold text-slate-950">
-        {part}
-      </strong>
-    ) : (
-      <span key={index}>{part}</span>
-    );
-  });
 }
 
 function AudioVersePreview({
@@ -241,18 +195,11 @@ export function VerseCard({
   const { keyboardCapable } = useInputCapabilities();
   const goPrev = useMemo(() => onPrev ?? (() => {}), [onPrev]);
   const goNext = useMemo(() => onNext ?? (() => {}), [onNext]);
-  const pressTimerRef = useRef<number | null>(null);
-  const lastPointerTypeRef = useRef<string>('');
   const translationCacheRef = useRef<Map<string, string>>(new Map());
-  const tafsirCacheRef = useRef<Map<string, string>>(new Map());
   const [showTranslation, setShowTranslation] = useState(false);
   const [pendingTranslationFlip, setPendingTranslationFlip] = useState(false);
   const [translation, setTranslation] = useState('');
-  const [translationStatus, setTranslationStatus] = useState<LoadStatus>('idle');
-  const [backFaceMode, setBackFaceMode] = useState<BackFaceMode>('translation');
-  const [tafsirLanguage, setTafsirLanguage] = useState<TafsirLanguage>('ar');
-  const [tafsir, setTafsir] = useState('');
-  const [tafsirStatus, setTafsirStatus] = useState<LoadStatus>('idle');
+  const [translationStatus, setTranslationStatus] = useState<TranslationStatus>('idle');
 
   const showBottomButtons = !keyboardCapable;
 
@@ -266,13 +213,6 @@ export function VerseCard({
   const verseKey = verse ? `${verse.surah}:${verse.ayah}` : '';
   const isTextBackFace = previewMode === 'text' && showTranslation;
   const showHeaderInfo = showInfo && (previewMode === 'audio' || !showTranslation);
-
-  const clearPressTimer = () => {
-    if (pressTimerRef.current) {
-      window.clearTimeout(pressTimerRef.current);
-      pressTimerRef.current = null;
-    }
-  };
 
   const toggleTranslation = () => {
     if (!verse || previewMode !== 'text') return;
@@ -296,13 +236,8 @@ export function VerseCard({
   useEffect(() => {
     setShowTranslation(false);
     setPendingTranslationFlip(false);
-    setBackFaceMode('translation');
-    setTafsirLanguage('ar');
     setTranslation('');
     setTranslationStatus('idle');
-    setTafsir('');
-    setTafsirStatus('idle');
-    clearPressTimer();
   }, [verseKey, previewMode]);
 
   useEffect(() => {
@@ -349,39 +284,6 @@ export function VerseCard({
     };
   }, [pendingTranslationFlip, verse, verseKey]);
 
-  const showTafsir = (language: TafsirLanguage = tafsirLanguage) => {
-    if (!verse) return;
-    const cacheKey = `${language}:${verseKey}`;
-    const cached = tafsirCacheRef.current.get(cacheKey);
-    setTafsirLanguage(language);
-    setBackFaceMode('tafsir');
-
-    if (cached) {
-      setTafsir(cached);
-      setTafsirStatus('idle');
-      return;
-    }
-
-    setTafsir('');
-    setTafsirStatus('loading');
-
-    loadJalalaynMap(language)
-      .then((jalalaynByVerseKey) => {
-        const text = jalalaynByVerseKey.get(verseKey);
-        if (!text) {
-          setTafsirStatus('error');
-          return;
-        }
-
-        tafsirCacheRef.current.set(cacheKey, text);
-        setTafsir(text);
-        setTafsirStatus('idle');
-      })
-      .catch(() => {
-        setTafsirStatus('error');
-      });
-  };
-
   return (
     /* UI FIX: 
        - lg:max-w-3xl: Makes the card wider on desktop to utilize horizontal space.
@@ -402,17 +304,8 @@ export function VerseCard({
           ? 'justify-start p-5 sm:p-6 lg:p-8 min-h-[340px] lg:min-h-[360px]'
           : 'justify-center p-6 lg:p-10 min-h-[280px]',
       ].join(' ')}
-        onPointerDown={(e) => {
-          lastPointerTypeRef.current = e.pointerType;
-          if (previewMode !== 'text' || e.pointerType !== 'touch') return;
-          clearPressTimer();
-          pressTimerRef.current = window.setTimeout(toggleTranslation, 1000);
-        }}
-        onPointerUp={clearPressTimer}
-        onPointerCancel={clearPressTimer}
-        onPointerLeave={clearPressTimer}
         onClick={() => {
-          if (previewMode !== 'text' || lastPointerTypeRef.current === 'touch') return;
+          if (previewMode !== 'text') return;
           toggleTranslation();
         }}
       >
@@ -456,18 +349,21 @@ export function VerseCard({
               />
             ) : (
               <div
-                className={['relative w-full', isTextBackFace ? 'min-h-[300px] lg:min-h-[310px]' : 'min-h-[190px]'].join(' ')}
+                className="relative w-full"
                 style={{ perspective: '1200px' }}
               >
                 <div
-                  className={['relative w-full transition-transform duration-700 ease-in-out', isTextBackFace ? 'min-h-[300px] lg:min-h-[310px]' : 'min-h-[190px]'].join(' ')}
+                  className="relative w-full transition-transform duration-700 ease-in-out"
                   style={{
                     transformStyle: 'preserve-3d',
                     transform: showTranslation ? 'rotateY(180deg)' : 'rotateY(0deg)',
                   }}
                 >
                   <div
-                    className="absolute inset-0 flex items-center justify-center"
+                    className={[
+                      'w-full flex items-center justify-center',
+                      showTranslation ? 'absolute inset-0' : 'relative',
+                    ].join(' ')}
                     style={{
                       backfaceVisibility: 'hidden',
                       WebkitBackfaceVisibility: 'hidden',
@@ -479,6 +375,7 @@ export function VerseCard({
                         text-4xl sm:text-5xl lg:text-4xl text-slate-900
                         font-quran leading-[1.8] lg:leading-[2.0]
                         antialiased
+                        max-w-full whitespace-normal break-words
                         transition-opacity duration-500
                         ${pendingTranslationFlip ? 'opacity-45' : 'opacity-100'}
                       `}
@@ -488,96 +385,25 @@ export function VerseCard({
                   </div>
 
                   <div
-                    className="absolute inset-0 flex flex-col items-center justify-start gap-3 px-1 pt-1"
+                    className={[
+                      'w-full flex flex-col items-center justify-center gap-3 px-1',
+                      showTranslation ? 'relative' : 'absolute inset-0',
+                    ].join(' ')}
                     style={{
                       backfaceVisibility: 'hidden',
                       WebkitBackfaceVisibility: 'hidden',
                       transform: 'rotateY(180deg)',
                     }}
                   >
-                    {backFaceMode === 'tafsir' && (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          showTafsir(tafsirLanguage === 'ar' ? 'en' : 'ar');
-                        }}
-                        onPointerDown={(e) => e.stopPropagation()}
-                        className="flex bg-slate-100 p-1 rounded-full border border-slate-200 shadow-inner"
-                        aria-label={`Switch tafsir to ${tafsirLanguage === 'ar' ? 'English' : 'Arabic'}`}
-                      >
-                        <span className={`px-3 py-1 text-[10px] font-bold rounded-full transition-all ${tafsirLanguage === 'ar' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-400'}`}>
-                          Arabic
-                        </span>
-                        <span className={`px-3 py-1 text-[10px] font-bold rounded-full transition-all ${tafsirLanguage === 'en' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-400'}`}>
-                          English
-                        </span>
-                      </button>
-                    )}
                     <p className="text-xs font-bold tracking-[0.18em] uppercase text-slate-400">
-                      {backFaceMode === 'translation'
-                        ? 'Sahih International'
-                        : `Tafsir al-Jalalayn (${tafsirLanguage === 'ar' ? 'Arabic' : 'English'})`}
+                      Sahih International
                     </p>
-                    {backFaceMode === 'translation' ? (
-                      <>
-                        {translationStatus === 'error' ? (
-                          <p className="text-sm font-medium text-red-500">Translation unavailable.</p>
-                        ) : (
-                          <p className="text-xl sm:text-2xl leading-relaxed text-slate-800 font-kanit">
-                            {translation}
-                          </p>
-                        )}
-                        {translationStatus !== 'error' && (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              showTafsir();
-                            }}
-                            onPointerDown={(e) => e.stopPropagation()}
-                            className="mt-2 rounded-full bg-emerald-50 border border-emerald-100 px-4 py-1.5 text-[11px] font-bold uppercase tracking-widest text-emerald-700 shadow-sm active:scale-95 transition-all"
-                          >
-                            Show Tafsir
-                          </button>
-                        )}
-                      </>
+                    {translationStatus === 'error' ? (
+                      <p className="text-sm font-medium text-red-500">Translation unavailable.</p>
                     ) : (
-                      <>
-                        <div
-                          dir={tafsirLanguage === 'ar' ? 'rtl' : 'ltr'}
-                          className={`w-full max-h-[210px] sm:max-h-[230px] lg:max-h-[240px] overflow-y-auto px-1 text-slate-800 font-kanit ${
-                            tafsirLanguage === 'ar'
-                              ? 'text-xl sm:text-2xl leading-loose'
-                              : 'text-base sm:text-lg leading-relaxed'
-                          }`}
-                        >
-                          {tafsirStatus === 'loading' ? (
-                            <span className="text-sm font-medium text-slate-400">
-                              {tafsirLanguage === 'ar' ? 'جاري تحميل التفسير...' : 'Loading tafsir...'}
-                            </span>
-                          ) : tafsirStatus === 'error' ? (
-                            <span className="text-sm font-medium text-red-500">
-                              {tafsirLanguage === 'ar'
-                                ? 'تعذر تحميل التفسير.'
-                                : 'English Jalalayn is not available yet.'}
-                            </span>
-                          ) : (
-                            renderBoldedAyahQuotes(tafsir)
-                          )}
-                        </div>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setBackFaceMode('translation');
-                          }}
-                          onPointerDown={(e) => e.stopPropagation()}
-                          className="mt-1 rounded-full bg-white border border-slate-200 px-4 py-1.5 text-[11px] font-bold uppercase tracking-widest text-slate-600 shadow-sm active:scale-95 transition-all"
-                        >
-                          Back to Translation
-                        </button>
-                      </>
+                      <p className="text-xl sm:text-2xl leading-relaxed text-slate-800 font-kanit">
+                        {translation}
+                      </p>
                     )}
                   </div>
                 </div>
