@@ -1,0 +1,240 @@
+[
+  {
+    "id": 1,
+    "active": true,
+    "qtype": "which_surah",
+    "prompt": "…وما خلقنا السماء والأرض وما بينهما لاعبين",
+    "payload": {
+      "options": [
+        "الأنبياء",
+        "الدخان",
+        "المؤمنون",
+        "فصلت"
+      ]
+    },
+    "answer": {
+      "index": 0
+    },
+    "tags": [
+      "mutashabihat",
+      "pair:21:16~44:38",
+      "skill:surah"
+    ],
+    "difficulty": 1
+  },
+  {
+    "id": 2,
+    "active": true,
+    "qtype": "next_verse",
+    "prompt": "{\"verse\":\"وما خلقنا السماء والأرض وما بينهما لاعبين\",\"ref\":\"21:16\"}",
+    "payload": {
+      "options": [
+        {
+          "ref": "21:17",
+          "text": "لو أردنا أن نتخذ لهوا لاتخذناه من لدنا إن كنا فاعلين"
+        },
+        {
+          "ref": "44:39",
+          "text": "ما خلقناهما إلا بالحق ولكن أكثرهم لا يعلمون"
+        },
+        {
+          "ref": "15:85",
+          "text": "وما خلقنا السماوات والأرض إلا بالحق"
+        },
+        {
+          "ref": "6:111",
+          "text": "بل أكثرهم لا يعلمون"
+        }
+      ]
+    },
+    "answer": {
+      "index": 0
+    },
+    "tags": [
+      "mutashabihat",
+      "pair:21:16~44:38",
+      "skill:next"
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": 3,
+    "active": true,
+    "qtype": "fill_blank",
+    "prompt": "{\"scaffold\":\"وما خلقنا ___ والأرض وما بينهما لاعبين\",\"blankIndex\":0}",
+    "payload": {
+      "options": [
+        "السماء",
+        "السماوات",
+        "السما",
+        "السماوي"
+      ]
+    },
+    "answer": {
+      "index": 0
+    },
+    "tags": [
+      "mutashabihat",
+      "pair:21:16~44:38",
+      "skill:token"
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": 4,
+    "active": true,
+    "qtype": "before_after",
+    "prompt": "{\"anchor\":\"يجاهدون … بأموالهم وأنفسهم\",\"token\":\"في سبيل الله\"}",
+    "payload": {},
+    "answer": {
+      "side": "before"
+    },
+    "tags": [
+      "theme:jihad-order",
+      "skill:order"
+    ],
+    "difficulty": 1
+  },
+  {
+    "id": 5,
+    "active": true,
+    "qtype": "match_2x2",
+    "prompt": "اربط كل آية بسورتها الصحيحة",
+    "payload": {
+      "left": [
+        "…وما خلقنا السماء والأرض وما بينهما لاعبين",
+        "…وما خلقنا السماوات والأرض وما بينهما لاعبين"
+      ],
+      "right": [
+        "الأنبياء",
+        "الدخان"
+      ]
+    },
+    "answer": {
+      "pairs": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    "tags": [
+      "mutashabihat",
+      "pair:21:16~44:38",
+      "skill:pair"
+    ],
+    "difficulty": 1
+  },
+  {
+    "id": 6,
+    "active": true,
+    "qtype": "sort_columns",
+    "prompt": "فرّز العبارات إلى السورة الصحيحة",
+    "payload": {
+      "items": [
+        {
+          "col": 0,
+          "text": "…السماء… لاعبين"
+        },
+        {
+          "col": 1,
+          "text": "…السماوات… لاعبين"
+        },
+        {
+          "col": 0,
+          "text": "…إن كنا فاعلين"
+        },
+        {
+          "col": 1,
+          "text": "…إلا بالحق"
+        }
+      ],
+      "columns": [
+        "الأنبياء",
+        "الدخان"
+      ]
+    },
+    "answer": {},
+    "tags": [
+      "mutashabihat",
+      "pair:21:16~44:38",
+      "skill:batch"
+    ],
+    "difficulty": 3
+  },
+  {
+    "id": 7,
+    "active": true,
+    "qtype": "spot_diff",
+    "prompt": "ضع إصبعك على مواضع الاختلاف بين الآيتين",
+    "payload": {
+      "A_tokens": [
+        "وما",
+        "خلقنا",
+        "السماء",
+        "والأرض",
+        "وما",
+        "بينهما",
+        "لاعبين"
+      ],
+      "B_tokens": [
+        "وما",
+        "خلقنا",
+        "السماوات",
+        "والأرض",
+        "وما",
+        "بينهما",
+        "لاعبين"
+      ]
+    },
+    "answer": {
+      "diffIndices": [
+        2
+      ]
+    },
+    "tags": [
+      "mutashabihat",
+      "pair:21:16~44:38",
+      "skill:precision"
+    ],
+    "difficulty": 3
+  },
+  {
+    "id": 8,
+    "active": true,
+    "qtype": "location",
+    "prompt": "… قل سيروا في الأرض فانظروا كيف كان عاقبة الذين من قبل …",
+    "payload": {
+      "options": [
+        {
+          "ayah": "30:42",
+          "surah": "الروم"
+        },
+        {
+          "ayah": "35:44",
+          "surah": "فاطر"
+        },
+        {
+          "ayah": "40:21",
+          "surah": "غافر"
+        },
+        {
+          "ayah": "47:10",
+          "surah": "محمد"
+        }
+      ]
+    },
+    "answer": {
+      "index": 0
+    },
+    "tags": [
+      "theme:travel",
+      "skill:index"
+    ],
+    "difficulty": 2
+  }
+]

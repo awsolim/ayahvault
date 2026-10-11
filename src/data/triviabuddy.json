@@ -1,0 +1,858 @@
+[
+  {
+    "id": "127",
+    "category": "Quran",
+    "points": 500,
+    "question": "Which surah has a verse which contains the name \"Allah\" twice, back-to-back?",
+    "answer": "Surah Al An'aam (verse 124)",
+    "include": true
+  },
+  {
+    "id": "131",
+    "category": "Hadith",
+    "points": 500,
+    "question": "What are the 5 conditions of a Sahih (authentic) Hadith?",
+    "answer": "1. Connected Chain of Transmission (Sanad)\n2. Precise Narrators (Dabt)\n3. Just Narrators (Adl)\n4. Free of Anomalies (shudhoodh)\n5. Free of Hidden Defects (illal)",
+    "include": true
+  },
+  {
+    "id": "135",
+    "category": "Prophets",
+    "points": 300,
+    "question": "Which prophet, his father, son, and grandson were all  prophets?",
+    "answer": "Ishaaq",
+    "include": true
+  },
+  {
+    "id": "27",
+    "category": "Quran",
+    "points": 100,
+    "question": "What is the first word revealed in the Quran?",
+    "answer": "Iqra",
+    "include": true
+  },
+  {
+    "id": "136",
+    "category": "Quran",
+    "points": 400,
+    "question": "Which Surah in the Quran contains two lines of prostration?",
+    "answer": "Surah Al Hajj\n",
+    "include": true
+  },
+  {
+    "id": "141",
+    "category": "Prophets",
+    "points": 200,
+    "question": "Which prophet was given the title Khalilullah (the friend of Allah)?",
+    "answer": "Prophet Ibrahim ",
+    "include": true
+  },
+  {
+    "id": "146",
+    "category": "Quran",
+    "points": 400,
+    "question": "Which surah, which when recited to Quraish, caused all the believers and disbelievers to prostrate instantly?\n\n",
+    "answer": "Surah an Najm",
+    "include": true
+  },
+  {
+    "id": "151",
+    "category": "Seerah",
+    "points": 200,
+    "question": "What was the name of the Prophets uncle who died in the battle of Uhud?",
+    "answer": "Hamza",
+    "include": true
+  },
+  {
+    "id": "32",
+    "category": "Hadith",
+    "points": 100,
+    "question": "Who is the most prolific narrator of Hadith from the Sahaba?",
+    "answer": "Abū Hurayrah",
+    "include": true
+  },
+  {
+    "id": "33",
+    "category": "Hadith",
+    "points": 200,
+    "question": "Which Hadith collection is considered second in authenticity after Sahih al-Bukhari?",
+    "answer": "Sahīḥ Muslim",
+    "include": true
+  },
+  {
+    "id": "34",
+    "category": "Hadith",
+    "points": 300,
+    "question": "What does the term “Isnad” refer to in hadith studies?",
+    "answer": "The chain of transmission (Isnād)",
+    "include": true
+  },
+  {
+    "id": "156",
+    "category": "Angels",
+    "points": 400,
+    "question": "Name 5 Angels mentioned by name in the Quran",
+    "answer": "Jibril, Mikaal, Maalik, Harut, Marut. Can also consider Raqeeb, Atid, Malak al Mawt.",
+    "include": true
+  },
+  {
+    "id": "161",
+    "category": "Angels",
+    "points": 400,
+    "question": "Which surah is secondarily called the Surat Al Malaika (The Angels) due to its description of angels in the first verse?",
+    "answer": "Surah Fatir",
+    "include": true
+  },
+  {
+    "id": "37",
+    "category": "Seerah",
+    "points": 100,
+    "question": "In which city was the Prophet Muhammad ﷺ born?",
+    "answer": "Mecca",
+    "include": true
+  },
+  {
+    "id": "38",
+    "category": "Seerah",
+    "points": 200,
+    "question": "What was the name of the Prophet’s ﷺ first wife?",
+    "answer": "Khadījah bint Khuwaylid",
+    "include": true
+  },
+  {
+    "id": "39",
+    "category": "Seerah",
+    "points": 300,
+    "question": "During which battle did the Muslims use a trench as a defense strategy?",
+    "answer": "Battle of the Trench (Ghazwat al-Khandaq)",
+    "include": true
+  },
+  {
+    "id": "40",
+    "category": "Seerah",
+    "points": 400,
+    "question": "Which treaty did the Prophet ﷺ negotiate with the Quraysh to establish ten years of peace?",
+    "answer": "Treaty of Ḥudaybiyyah",
+    "include": true
+  },
+  {
+    "id": "42",
+    "category": "General",
+    "points": 100,
+    "question": "What is the Arabic term for the pilgrimage to Mecca?",
+    "answer": "Ḥajj",
+    "include": true
+  },
+  {
+    "id": "43",
+    "category": "General",
+    "points": 200,
+    "question": "During which month do Muslims fast from dawn to sunset?",
+    "answer": "Ramadan",
+    "include": true
+  },
+  {
+    "id": "45",
+    "category": "General",
+    "points": 400,
+    "question": "Which pillar of Islam requires giving a fixed portion of one’s wealth to charity?",
+    "answer": "Zakāt",
+    "include": true
+  },
+  {
+    "id": "130",
+    "category": "Prophets",
+    "points": 100,
+    "question": "Name two prophets that are brothers?",
+    "answer": "Harun & Musa, Ismail & Ishaaq\n",
+    "include": true
+  },
+  {
+    "id": "35",
+    "category": "Hadith",
+    "points": 400,
+    "question": "What are the names of the six main books of Hadith, known as \"Al Kutub Al Sittah\"?",
+    "answer": "1. Sahih Al Bukhari\r\n2. Sahih Muslim\r\n3. Sunan Abu Dawud\r\n4. Sunan At Tirmidhi\r\n5. Sunan An Nasaa'i\r\n6. Sunan Ibn Majah",
+    "include": true
+  },
+  {
+    "id": "36",
+    "category": "Hadith",
+    "points": 500,
+    "question": "What is the difference between a “Sahih” and a “Hasan” hadith?",
+    "answer": "A Sahih hadith's narrators are stronger (in precision) than those of a Hasan hadith.",
+    "include": true
+  },
+  {
+    "id": "128",
+    "category": "Quran",
+    "points": 400,
+    "question": "Which surah ends with the word \"Allah\"?",
+    "answer": "Surah Al Infitar",
+    "include": true
+  },
+  {
+    "id": "132",
+    "category": "Hadith",
+    "points": 200,
+    "question": "What are the two parts of a hadith?",
+    "answer": "Sanad and Matn (Chain and text)",
+    "include": true
+  },
+  {
+    "id": "137",
+    "category": "Companions",
+    "points": 200,
+    "question": "Which companion was a designated muaddhin (called of Adhan) of the Messenger of Allah?",
+    "answer": "Bilal ibn Rabah, Abdullah ibn Umm Maktum",
+    "include": true
+  },
+  {
+    "id": "67",
+    "category": "Day Of Judgement",
+    "points": 100,
+    "question": "Which deceiver will appear before the Day of Judgment, claiming divinity?",
+    "answer": "Al-Masih ad-Dajjal",
+    "include": true
+  },
+  {
+    "id": "142",
+    "category": "Angels",
+    "points": 300,
+    "question": "Which angel is the appointed guardian of Paradise?",
+    "answer": "Ridwaan",
+    "include": true
+  },
+  {
+    "id": "52",
+    "category": "Prophets",
+    "points": 100,
+    "question": "This prophet was swallowed by a giant fish.",
+    "answer": "Prophet Yunus",
+    "include": true
+  },
+  {
+    "id": "53",
+    "category": "Prophets",
+    "points": 200,
+    "question": "This prophet built the Ark to survive a great flood.",
+    "answer": "Prophet Nuh",
+    "include": true
+  },
+  {
+    "id": "54",
+    "category": "Prophets",
+    "points": 300,
+    "question": "This prophet was given a staff that turned into a serpent.",
+    "answer": "Prophet Musa",
+    "include": true
+  },
+  {
+    "id": "55",
+    "category": "Prophets",
+    "points": 400,
+    "question": "This prophet spoke to ants and ruled over armies of birds.",
+    "answer": "Prophet Sulaiman",
+    "include": true
+  },
+  {
+    "id": "56",
+    "category": "Prophets",
+    "points": 500,
+    "question": "This prophet was the first human created by Allah.",
+    "answer": "Prophet Adam",
+    "include": true
+  },
+  {
+    "id": "58",
+    "category": "Angels",
+    "points": 200,
+    "question": "This angel will blow the trumpet to announce the Last Day.",
+    "answer": "Angel Israfil",
+    "include": true
+  },
+  {
+    "id": "147",
+    "category": "General",
+    "points": 400,
+    "question": "What the 4 Sacred Months in the Islamic Calendar (Al Ashhur Al Hurum)?",
+    "answer": "Muharram, Rajab, Dhul Qi'dah, Dhul Hijjah",
+    "include": true
+  },
+  {
+    "id": "152",
+    "category": "Quran",
+    "points": 300,
+    "question": "Which surah is named after a pillar of Islam",
+    "answer": "Surah Al Hajj",
+    "include": true
+  },
+  {
+    "id": "69",
+    "category": "Day Of Judgement",
+    "points": 300,
+    "question": "Which prophet will return before the Day of Judgment?",
+    "answer": "Prophet Isa ibn Maryam",
+    "include": true
+  },
+  {
+    "id": "61",
+    "category": "Angels",
+    "points": 300,
+    "question": "How many angels carry the Throne of Allah?",
+    "answer": "Eight",
+    "include": true
+  },
+  {
+    "id": "71",
+    "category": "Day Of Judgement",
+    "points": 500,
+    "question": "Who is appointed as the guardian of Hellfire?",
+    "answer": "Angel Malik",
+    "include": true
+  },
+  {
+    "id": "72",
+    "category": "Islamic History",
+    "points": 100,
+    "question": "Which city is the birthplace of Prophet Muhammad?",
+    "answer": "Mecca",
+    "include": true
+  },
+  {
+    "id": "73",
+    "category": "Islamic History",
+    "points": 200,
+    "question": "What event in 622 CE marks the start of the Islamic calendar?",
+    "answer": "The Hijra",
+    "include": true
+  },
+  {
+    "id": "74",
+    "category": "Islamic History",
+    "points": 300,
+    "question": "Which battle in 624 CE was the first major victory for the Muslims?",
+    "answer": "Battle of Badr",
+    "include": true
+  },
+  {
+    "id": "75",
+    "category": "Islamic History",
+    "points": 400,
+    "question": "What treaty was signed in 628 CE between the Muslims and the Quraysh?",
+    "answer": "Treaty of Hudaybiyyah",
+    "include": true
+  },
+  {
+    "id": "76",
+    "category": "Islamic History",
+    "points": 500,
+    "question": "Which caliph commissioned the official compilation of the Quranic text?",
+    "answer": "Caliph Uthman ibn Affan",
+    "include": true
+  },
+  {
+    "id": "77",
+    "category": "Prophets",
+    "points": 100,
+    "question": "Which prophet was tested by being thrown into a fire but emerged unharmed?",
+    "answer": "Prophet Ibrahim",
+    "include": true
+  },
+  {
+    "id": "78",
+    "category": "Prophets",
+    "points": 200,
+    "question": "Which prophet was known for his ability to interpret dreams?",
+    "answer": "Prophet Yusuf",
+    "include": true
+  },
+  {
+    "id": "79",
+    "category": "Prophets",
+    "points": 300,
+    "question": "Which prophet endured extreme illness and remained patient without complaint?",
+    "answer": "Prophet Ayyub",
+    "include": true
+  },
+  {
+    "id": "80",
+    "category": "Prophets",
+    "points": 400,
+    "question": "Which prophet communicated with the ants according to the Quran?",
+    "answer": "Prophet Sulaiman",
+    "include": true
+  },
+  {
+    "id": "81",
+    "category": "Prophets",
+    "points": 500,
+    "question": "Which prophet was the last messenger sent to all of humanity?",
+    "answer": "Prophet Muhammad",
+    "include": true
+  },
+  {
+    "id": "82",
+    "category": "Angels",
+    "points": 100,
+    "question": "Which angel is responsible for sending rain and providing sustenance?",
+    "answer": "Angel Mika’il",
+    "include": true
+  },
+  {
+    "id": "92",
+    "category": "Day Of Judgement",
+    "points": 100,
+    "question": "Which event involves the sun rising from the west as a major sign of the Hour?",
+    "answer": "Sun rising from the west",
+    "include": true
+  },
+  {
+    "id": "93",
+    "category": "Day Of Judgement",
+    "points": 200,
+    "question": "What are the three major landslide signs of the Hour?",
+    "answer": "One in the east, one in the west, and one in Arabia",
+    "include": true
+  },
+  {
+    "id": "94",
+    "category": "Day Of Judgement",
+    "points": 300,
+    "question": "Which major sign is the smoke that will envelop the earth?",
+    "answer": "The smoke (Dukhan)",
+    "include": true
+  },
+  {
+    "id": "95",
+    "category": "Day Of Judgement",
+    "points": 400,
+    "question": "Which two tribes will break through a barrier and spread corruption before the Hour?",
+    "answer": "Ya’juj and Ma’juj",
+    "include": true
+  },
+  {
+    "id": "96",
+    "category": "Day Of Judgement",
+    "points": 500,
+    "question": "What effect does the first trumpet blow by Angel Israfil have?",
+    "answer": "It causes all creatures to die",
+    "include": true
+  },
+  {
+    "id": "97",
+    "category": "Islamic History",
+    "points": 100,
+    "question": "Who succeeded Abu Bakr as the second caliph?",
+    "answer": "Umar ibn al-Khattab",
+    "include": true
+  },
+  {
+    "id": "98",
+    "category": "Islamic History",
+    "points": 200,
+    "question": "Which city served as the first capital of the Rashidun Caliphate?",
+    "answer": "Medina",
+    "include": true
+  },
+  {
+    "id": "99",
+    "category": "Islamic History",
+    "points": 300,
+    "question": "Who is known as the “Sword of Allah” for his military leadership?",
+    "answer": "Khalid ibn al-Walid",
+    "include": true
+  },
+  {
+    "id": "100",
+    "category": "Islamic History",
+    "points": 400,
+    "question": "Which dynasty built the Al-Azhar University in Egypt?",
+    "answer": "Fatimid Dynasty",
+    "include": true
+  },
+  {
+    "id": "101",
+    "category": "Islamic History",
+    "points": 500,
+    "question": "Which scholar authored “Ihya Ulum al-Din”?",
+    "answer": "Imam al-Ghazali",
+    "include": true
+  },
+  {
+    "id": "103",
+    "category": "Quran",
+    "points": 200,
+    "question": "Which Surah is the longest in the Quran?",
+    "answer": "Surah Al-Baqarah",
+    "include": true
+  },
+  {
+    "id": "104",
+    "category": "Quran",
+    "points": 300,
+    "question": "Which Surah is the shortest in the Quran?",
+    "answer": "Surah Al-Kawthar",
+    "include": true
+  },
+  {
+    "id": "112",
+    "category": "Companions",
+    "points": 100,
+    "question": "Who was the first person to compile the Quran in book form?",
+    "answer": "Caliph Uthman ibn Affan",
+    "include": true
+  },
+  {
+    "id": "113",
+    "category": "Companions",
+    "points": 200,
+    "question": "Who was the first muezzin (caller to prayer)?",
+    "answer": "Bilal ibn Rabah",
+    "include": true
+  },
+  {
+    "id": "114",
+    "category": "Companions",
+    "points": 300,
+    "question": "Which companion was known for his expertise in Quranic recitation?",
+    "answer": "Abdullah ibn Mas’ud",
+    "include": true
+  },
+  {
+    "id": "51",
+    "category": "Companions",
+    "points": 200,
+    "question": "Which Companion is famous for narrating the greatest number of Hadith?",
+    "answer": "Abū Hurayrah",
+    "include": false
+  },
+  {
+    "id": "57",
+    "category": "Angels",
+    "points": 100,
+    "question": "Which angel brings revelation to the prophets?",
+    "answer": "Angel Jibril",
+    "include": true
+  },
+  {
+    "id": "157",
+    "category": "Angels",
+    "points": 300,
+    "question": "What task was carried out by the two angels Harut and Marut as mentioned in the Quran?",
+    "answer": "Teaching mankind magic as a warning and trial",
+    "include": true
+  },
+  {
+    "id": "162",
+    "category": "Angels",
+    "points": 500,
+    "question": "The Prophet (p.b.u.h) told in an authentic hadith: The angels do not enter any house that has two things. Name them.",
+    "answer": "A dog or a picture (of living souls)",
+    "include": true
+  },
+  {
+    "id": "129",
+    "category": "Seerah",
+    "points": 200,
+    "question": "How many sons and daughters did the prophet Muhammad have?",
+    "answer": "7 children (4 daughters 3 sons)",
+    "include": true
+  },
+  {
+    "id": "133",
+    "category": "Companions",
+    "points": 500,
+    "question": "Name the \"10 Promised Jannah\" Companions",
+    "answer": "Abu Bakr As Siddiq\nUmar ibn al Khattab\nUthman Ibn Affan\nAli ibn Abi Talib\nTalhah ibn Ubaidillah\nAbu Ubaidah ibn Al Jarrah\nSaad ibn abi Waqqas\nSaeed ibn Zayd\nAbdelrahman ibn Awf \nAz Zubair ibn al Awwam",
+    "include": true
+  },
+  {
+    "id": "48",
+    "category": "Companions",
+    "points": 200,
+    "question": "Which Companion served as the Prophet’s ﷺ scribe and treasury-keeper?",
+    "answer": "Zayd ibn Thābit",
+    "include": true
+  },
+  {
+    "id": "138",
+    "category": "Seerah",
+    "points": 300,
+    "question": "What was the name of the sanctuary in which the early Muslims convened in secret in the early years of Islam?",
+    "answer": "Dar Al Arqam",
+    "include": true
+  },
+  {
+    "id": "143",
+    "category": "Prophets",
+    "points": 300,
+    "question": "Which prophet recited the dua: “My Lord, forgive me and my parents, whoever enters my house as a believer, and all the believing men and women, and do not increase the wrongdoers except in destruction”?\n",
+    "answer": "Prophet Nuh",
+    "include": true
+  },
+  {
+    "id": "148",
+    "category": "Prophets",
+    "points": 300,
+    "question": "Fill in the Blank: The Prophet Muhammad said: the most beloved of fasting to Allah was the fasting of __?\n",
+    "answer": "Dawud",
+    "include": true
+  },
+  {
+    "id": "153",
+    "category": "Hadith",
+    "points": 300,
+    "question": "How many prayers were initially going to be prescribed upon the ummah before it was reduced to five?",
+    "answer": "50",
+    "include": true
+  },
+  {
+    "id": "158",
+    "category": "Angels",
+    "points": 200,
+    "question": "Which angel is the chief guardian of hellfire?",
+    "answer": "Malik",
+    "include": true
+  },
+  {
+    "id": "163",
+    "category": "Angels",
+    "points": 100,
+    "question": "What are angles created from?",
+    "answer": "Light",
+    "include": true
+  },
+  {
+    "id": "139",
+    "category": "Prophets",
+    "points": 300,
+    "question": "Who are the 4 Arab prophets?",
+    "answer": "Hud, Salih, Shuaib, Muhammad\n",
+    "include": true
+  },
+  {
+    "id": "144",
+    "category": "General",
+    "points": 400,
+    "question": "What is the first food fed to the people of Jannah?\n\n",
+    "answer": "Whale liver",
+    "include": true
+  },
+  {
+    "id": "149",
+    "category": "Prophet",
+    "points": 400,
+    "question": "Fill in the Blank: The Prophet Muhammad said: the most beloved of night prayer (qiyam) to Allah was the fasting of __?\n",
+    "answer": "Dawud",
+    "include": true
+  },
+  {
+    "id": "154",
+    "category": "Prophets",
+    "points": 400,
+    "question": "Name 3 miracles that were granted to Prophet Isa",
+    "answer": "Raising the dead\nCuring the blind and leper\nBreathing life into a clay bird\nSpeaking in the cradle\nVirgin Birth\nThe Spread Table",
+    "include": true
+  },
+  {
+    "id": "159",
+    "category": "Angels",
+    "points": 400,
+    "question": "Name an angel authentically mentioned in the Sunnah but not in the Quran explicitly.",
+    "answer": "Israfil, Munkar, Nakir, Ridwaan",
+    "include": true
+  },
+  {
+    "id": "115",
+    "category": "Companions",
+    "points": 400,
+    "question": "Who was the first female warrior in Islam?",
+    "answer": "Nusaybah bint Ka‘b",
+    "include": true
+  },
+  {
+    "id": "116",
+    "category": "Companions",
+    "points": 500,
+    "question": "Which companion was the personal physician of the Prophet?",
+    "answer": "Rufaida al-Aslamiyyah",
+    "include": true
+  },
+  {
+    "id": "117",
+    "category": "Hadith",
+    "points": 100,
+    "question": "Which hadith collection is known for its chapter arrangement by topic?",
+    "answer": "Muwatta Malik",
+    "include": true
+  },
+  {
+    "id": "118",
+    "category": "Hadith",
+    "points": 200,
+    "question": "Which scholar is known for his collection Musnad Ahmad?",
+    "answer": "Imam Ahmad ibn Hanbal",
+    "include": true
+  },
+  {
+    "id": "119",
+    "category": "Hadith",
+    "points": 300,
+    "question": "What term describes a weak hadith?",
+    "answer": "Da‘if",
+    "include": true
+  },
+  {
+    "id": "110",
+    "category": "Seerah",
+    "points": 400,
+    "question": "What pilgrimage was known as the Prophet’s Farewell Pilgrimage?",
+    "answer": "Hajj al-Wada",
+    "include": true
+  },
+  {
+    "id": "109",
+    "category": "Seerah",
+    "points": 300,
+    "question": "Which tribe did the Prophet belong to?",
+    "answer": "Quraysh",
+    "include": true
+  },
+  {
+    "id": "108",
+    "category": "Seerah",
+    "points": 200,
+    "question": "Who was the Prophet’s first wife?",
+    "answer": "Khadijah bint Khuwaylid",
+    "include": true
+  },
+  {
+    "id": "107",
+    "category": "Seerah",
+    "points": 100,
+    "question": "What title refers to the Prophet as the “Seal of the Prophets”?",
+    "answer": "Khatam an-Nabiyyin",
+    "include": true
+  },
+  {
+    "id": "102",
+    "category": "Quran",
+    "points": 100,
+    "question": "How many chapters are there in the Quran?",
+    "answer": "114",
+    "include": true
+  },
+  {
+    "id": "105",
+    "category": "Quran",
+    "points": 400,
+    "question": "Which verse commands Muslims to stand for prayer (establish prayer)?",
+    "answer": "Verse 43 of Surah Al-Baqarah",
+    "include": true
+  },
+  {
+    "id": "120",
+    "category": "Hadith",
+    "points": 400,
+    "question": "Which term means a sound and authentic hadith?",
+    "answer": "Sahih",
+    "include": true
+  },
+  {
+    "id": "121",
+    "category": "Hadith",
+    "points": 500,
+    "question": "Which work by Imam al-Nawawi contains 40 essential hadith?",
+    "answer": "Al-Arba‘in al-Nawawiyyah",
+    "include": true
+  },
+  {
+    "id": "122",
+    "category": "General",
+    "points": 100,
+    "question": "What is the Islamic term for the struggle of the self?",
+    "answer": "Jihad al-nafs",
+    "include": true
+  },
+  {
+    "id": "123",
+    "category": "General",
+    "points": 200,
+    "question": "What is the common greeting among Muslims?",
+    "answer": "Assalamualaikum",
+    "include": true
+  },
+  {
+    "id": "124",
+    "category": "General",
+    "points": 300,
+    "question": "What is the Arabic term for fasting?",
+    "answer": "Sawm",
+    "include": true
+  },
+  {
+    "id": "111",
+    "category": "Seerah",
+    "points": 500,
+    "question": "How old was the Prophet when he received the first revelation?",
+    "answer": "40",
+    "include": true
+  },
+  {
+    "id": "126",
+    "category": "General",
+    "points": 500,
+    "question": "What is the term for the community of Muslim believers?",
+    "answer": "Ummah",
+    "include": false
+  },
+  {
+    "id": "134",
+    "category": "General",
+    "points": 500,
+    "question": "Name the 7 categories of people who are promised to be shaded on the Day of Judgement under the throne of Allah.",
+    "answer": "1. a just ruler, \n2. a young person who grew up in the worship of Allah,\n3. a person whose heart is attached to the mosque, \n4. two people who love each other for the sake of Allah and meet and part upon that, \n5. a man who is called to commit sin by a woman of beauty and status but says “I fear Allah,”\n6. a person who gives charity so secretly that their left hand does not know what the right hand gave, \n7. a person who remembers Allah in seclusion and their eyes overflow with tears.",
+    "include": true
+  },
+  {
+    "id": "140",
+    "category": "General",
+    "points": 100,
+    "question": "What is the highest level of Jannah called?",
+    "answer": "Firdous\n",
+    "include": true
+  },
+  {
+    "id": "145",
+    "category": "General",
+    "points": 400,
+    "question": "One prayer in the Prophet’s Mosque is equal to how many regular prayers?\n",
+    "answer": "1000",
+    "include": true
+  },
+  {
+    "id": "150",
+    "category": "Companions ",
+    "points": 400,
+    "question": "Who was the only companion to lead the Messenger a FULL rakah in prayer",
+    "answer": "Abdulrahman Ibn Awf",
+    "include": true
+  },
+  {
+    "id": "155",
+    "category": "Quran",
+    "points": 400,
+    "question": "What word is located in the middle of the Quran?",
+    "answer": "وليتلطف",
+    "include": true
+  },
+  {
+    "id": "160",
+    "category": "Angels",
+    "points": 500,
+    "question": "Which companion was it reported that Jibril came in his form, or in a form that resembled him the most.",
+    "answer": "Dihya Al-Kalbi",
+    "include": true
+  }
+]

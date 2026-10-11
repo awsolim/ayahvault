@@ -20,7 +20,7 @@ export default defineConfig({
       // --- Workbox caching: what to precache in the app shell ---
       workbox: {
         // NEW: cache common asset types produced by Vite build
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,json}'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,json,ttf,mp3}'],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // NEW: allow up to ~5MB
       },
 

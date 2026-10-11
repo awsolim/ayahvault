@@ -1,0 +1,1754 @@
+[
+  {
+    "id": 1,
+    "arabic": "كتاب",
+    "english": "Book",
+    "type": null,
+    "difficulty": 1,
+    "include": true
+  },
+  {
+    "id": 2,
+    "arabic": "سماء",
+    "english": "Sky",
+    "type": null,
+    "difficulty": 1,
+    "include": true
+  },
+  {
+    "id": 3,
+    "arabic": "أرض",
+    "english": "Earth",
+    "type": null,
+    "difficulty": 1,
+    "include": true
+  },
+  {
+    "id": 4,
+    "arabic": "نور",
+    "english": "Light",
+    "type": null,
+    "difficulty": 1,
+    "include": true
+  },
+  {
+    "id": 5,
+    "arabic": "ظلام",
+    "english": "Darkness",
+    "type": null,
+    "difficulty": 1,
+    "include": true
+  },
+  {
+    "id": 6,
+    "arabic": "حياة",
+    "english": "Life",
+    "type": null,
+    "difficulty": 1,
+    "include": true
+  },
+  {
+    "id": 7,
+    "arabic": "موت",
+    "english": "Death",
+    "type": null,
+    "difficulty": 1,
+    "include": true
+  },
+  {
+    "id": 8,
+    "arabic": "ماء",
+    "english": "Water",
+    "type": null,
+    "difficulty": 1,
+    "include": true
+  },
+  {
+    "id": 9,
+    "arabic": "نار",
+    "english": "Fire",
+    "type": null,
+    "difficulty": 1,
+    "include": true
+  },
+  {
+    "id": 10,
+    "arabic": "ليل",
+    "english": "Night",
+    "type": null,
+    "difficulty": 1,
+    "include": true
+  },
+  {
+    "id": 11,
+    "arabic": "نهار",
+    "english": "Day",
+    "type": null,
+    "difficulty": 1,
+    "include": true
+  },
+  {
+    "id": 12,
+    "arabic": "شمس",
+    "english": "Sun",
+    "type": null,
+    "difficulty": 1,
+    "include": true
+  },
+  {
+    "id": 13,
+    "arabic": "قمر",
+    "english": "Moon",
+    "type": null,
+    "difficulty": 1,
+    "include": true
+  },
+  {
+    "id": 14,
+    "arabic": "نجوم",
+    "english": "Stars",
+    "type": null,
+    "difficulty": 1,
+    "include": true
+  },
+  {
+    "id": 15,
+    "arabic": "ريح",
+    "english": "Wind",
+    "type": null,
+    "difficulty": 1,
+    "include": true
+  },
+  {
+    "id": 16,
+    "arabic": "جبال",
+    "english": "Mountains",
+    "type": null,
+    "difficulty": 1,
+    "include": true
+  },
+  {
+    "id": 17,
+    "arabic": "بحر",
+    "english": "Sea",
+    "type": null,
+    "difficulty": 1,
+    "include": true
+  },
+  {
+    "id": 18,
+    "arabic": "نهر",
+    "english": "River",
+    "type": null,
+    "difficulty": 1,
+    "include": true
+  },
+  {
+    "id": 19,
+    "arabic": "جنة",
+    "english": "Paradise",
+    "type": null,
+    "difficulty": 1,
+    "include": true
+  },
+  {
+    "id": 20,
+    "arabic": "رزق",
+    "english": "Sustenance",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 21,
+    "arabic": "حق",
+    "english": "Truth",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 22,
+    "arabic": "باطل",
+    "english": "Falsehood",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 23,
+    "arabic": "خير",
+    "english": "Goodness",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 24,
+    "arabic": "شر",
+    "english": "Evil",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 25,
+    "arabic": "رحمة",
+    "english": "Mercy",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 26,
+    "arabic": "عذاب",
+    "english": "Punishment",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 27,
+    "arabic": "إيمان",
+    "english": "Faith",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 28,
+    "arabic": "كفر",
+    "english": "Disbelief",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 29,
+    "arabic": "صبر",
+    "english": "Patience",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 30,
+    "arabic": "شكر",
+    "english": "Gratitude",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 31,
+    "arabic": "ذكر",
+    "english": "Remembrance",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 32,
+    "arabic": "دعاء",
+    "english": "Supplication",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 33,
+    "arabic": "عبادة",
+    "english": "Worship",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 34,
+    "arabic": "صلاة",
+    "english": "Prayer",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 35,
+    "arabic": "زكاة",
+    "english": "Charity",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 36,
+    "arabic": "صوم",
+    "english": "Fasting",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 37,
+    "arabic": "حج",
+    "english": "Pilgrimage",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 38,
+    "arabic": "قرآن",
+    "english": "Quran",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 39,
+    "arabic": "رسول",
+    "english": "Messenger",
+    "type": null,
+    "difficulty": 4,
+    "include": true
+  },
+  {
+    "id": 40,
+    "arabic": "نبي",
+    "english": "Prophet",
+    "type": null,
+    "difficulty": 4,
+    "include": true
+  },
+  {
+    "id": 41,
+    "arabic": "أمة",
+    "english": "Nation",
+    "type": null,
+    "difficulty": 4,
+    "include": true
+  },
+  {
+    "id": 42,
+    "arabic": "قوم",
+    "english": "People",
+    "type": null,
+    "difficulty": 4,
+    "include": true
+  },
+  {
+    "id": 43,
+    "arabic": "ملك",
+    "english": "Angel",
+    "type": null,
+    "difficulty": 4,
+    "include": true
+  },
+  {
+    "id": 44,
+    "arabic": "شيطان",
+    "english": "Devil",
+    "type": null,
+    "difficulty": 4,
+    "include": true
+  },
+  {
+    "id": 45,
+    "arabic": "صدق",
+    "english": "Honesty",
+    "type": null,
+    "difficulty": 5,
+    "include": true
+  },
+  {
+    "id": 46,
+    "arabic": "كذب",
+    "english": "Lies",
+    "type": null,
+    "difficulty": 5,
+    "include": true
+  },
+  {
+    "id": 47,
+    "arabic": "نعيم",
+    "english": "Bliss",
+    "type": null,
+    "difficulty": 5,
+    "include": true
+  },
+  {
+    "id": 48,
+    "arabic": "غفلة",
+    "english": "Negligence",
+    "type": null,
+    "difficulty": 5,
+    "include": true
+  },
+  {
+    "id": 49,
+    "arabic": "توبة",
+    "english": "Repentance",
+    "type": null,
+    "difficulty": 5,
+    "include": true
+  },
+  {
+    "id": 50,
+    "arabic": "فساد",
+    "english": "Corruption",
+    "type": null,
+    "difficulty": 5,
+    "include": true
+  },
+  {
+    "id": 51,
+    "arabic": "سلام",
+    "english": "Peace",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 52,
+    "arabic": "أمل",
+    "english": "Hope",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 53,
+    "arabic": "عدل",
+    "english": "Justice",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 54,
+    "arabic": "علم",
+    "english": "Knowledge",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 55,
+    "arabic": "هدى",
+    "english": "Guidance",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 56,
+    "arabic": "بركة",
+    "english": "Blessing",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 57,
+    "arabic": "إخلاص",
+    "english": "Sincerity",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 58,
+    "arabic": "وفاء",
+    "english": "Loyalty",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 59,
+    "arabic": "أمانة",
+    "english": "Trustworthiness",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 60,
+    "arabic": "سعادة",
+    "english": "Happiness",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 61,
+    "arabic": "حكمة",
+    "english": "Wisdom",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 62,
+    "arabic": "وفرة",
+    "english": "Abundance",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 63,
+    "arabic": "شجاعة",
+    "english": "Courage",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 64,
+    "arabic": "طهارة",
+    "english": "Purity",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 65,
+    "arabic": "مغفرة",
+    "english": "Forgiveness",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 66,
+    "arabic": "تفكر",
+    "english": "Reflection",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 67,
+    "arabic": "تفاؤل",
+    "english": "Optimism",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 68,
+    "arabic": "إيثار",
+    "english": "Altruism",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 69,
+    "arabic": "توكل",
+    "english": "Reliance (on Allah)",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 70,
+    "arabic": "توبة",
+    "english": "Repentance",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 71,
+    "arabic": "منزلة",
+    "english": "Rank",
+    "type": null,
+    "difficulty": 4,
+    "include": true
+  },
+  {
+    "id": 72,
+    "arabic": "خضوع",
+    "english": "Submission",
+    "type": null,
+    "difficulty": 4,
+    "include": true
+  },
+  {
+    "id": 73,
+    "arabic": "خشوع",
+    "english": "Humility in prayer",
+    "type": null,
+    "difficulty": 4,
+    "include": true
+  },
+  {
+    "id": 74,
+    "arabic": "استقامة",
+    "english": "Uprightness",
+    "type": null,
+    "difficulty": 4,
+    "include": true
+  },
+  {
+    "id": 75,
+    "arabic": "يقين",
+    "english": "Certainty",
+    "type": null,
+    "difficulty": 4,
+    "include": true
+  },
+  {
+    "id": 76,
+    "arabic": "ابتلاء",
+    "english": "Trial",
+    "type": null,
+    "difficulty": 4,
+    "include": true
+  },
+  {
+    "id": 77,
+    "arabic": "تمكين",
+    "english": "Empowerment",
+    "type": null,
+    "difficulty": 4,
+    "include": true
+  },
+  {
+    "id": 78,
+    "arabic": "تزكية",
+    "english": "Purification",
+    "type": null,
+    "difficulty": 4,
+    "include": true
+  },
+  {
+    "id": 79,
+    "arabic": "شفاعة",
+    "english": "Intercession",
+    "type": null,
+    "difficulty": 4,
+    "include": true
+  },
+  {
+    "id": 80,
+    "arabic": "ولاية",
+    "english": "Guardianship",
+    "type": null,
+    "difficulty": 4,
+    "include": true
+  },
+  {
+    "id": 81,
+    "arabic": "إعجاز",
+    "english": "Miracle (inimitability)",
+    "type": null,
+    "difficulty": 5,
+    "include": true
+  },
+  {
+    "id": 82,
+    "arabic": "منافقة",
+    "english": "Hypocrisy",
+    "type": null,
+    "difficulty": 5,
+    "include": true
+  },
+  {
+    "id": 83,
+    "arabic": "استغفار",
+    "english": "Seeking forgiveness",
+    "type": null,
+    "difficulty": 5,
+    "include": true
+  },
+  {
+    "id": 84,
+    "arabic": "فتنة",
+    "english": "Tribulation",
+    "type": null,
+    "difficulty": 5,
+    "include": true
+  },
+  {
+    "id": 85,
+    "arabic": "ابتداع",
+    "english": "Innovation (in religion)",
+    "type": null,
+    "difficulty": 5,
+    "include": true
+  },
+  {
+    "id": 86,
+    "arabic": "توحيد",
+    "english": "Monotheism",
+    "type": null,
+    "difficulty": 5,
+    "include": true
+  },
+  {
+    "id": 87,
+    "arabic": "شرك",
+    "english": "Polytheism",
+    "type": null,
+    "difficulty": 5,
+    "include": true
+  },
+  {
+    "id": 88,
+    "arabic": "نفاق",
+    "english": "Hypocrisy",
+    "type": null,
+    "difficulty": 5,
+    "include": true
+  },
+  {
+    "id": 89,
+    "arabic": "كهانة",
+    "english": "Soothsaying",
+    "type": null,
+    "difficulty": 5,
+    "include": true
+  },
+  {
+    "id": 90,
+    "arabic": "تنجيم",
+    "english": "Astrology",
+    "type": null,
+    "difficulty": 5,
+    "include": true
+  },
+  {
+    "id": 91,
+    "arabic": "غفلة",
+    "english": "Heedlessness",
+    "type": null,
+    "difficulty": 5,
+    "include": true
+  },
+  {
+    "id": 92,
+    "arabic": "تقوى",
+    "english": "Piety",
+    "type": null,
+    "difficulty": 5,
+    "include": true
+  },
+  {
+    "id": 93,
+    "arabic": "إحسان",
+    "english": "Excellence in faith",
+    "type": null,
+    "difficulty": 5,
+    "include": true
+  },
+  {
+    "id": 94,
+    "arabic": "تفسير",
+    "english": "Exegesis",
+    "type": null,
+    "difficulty": 5,
+    "include": true
+  },
+  {
+    "id": 95,
+    "arabic": "فقه",
+    "english": "Jurisprudence",
+    "type": null,
+    "difficulty": 5,
+    "include": true
+  },
+  {
+    "id": 96,
+    "arabic": "حديث",
+    "english": "Prophetic tradition",
+    "type": null,
+    "difficulty": 5,
+    "include": true
+  },
+  {
+    "id": 97,
+    "arabic": "سيرة",
+    "english": "Biography (of the Prophet)",
+    "type": null,
+    "difficulty": 5,
+    "include": true
+  },
+  {
+    "id": 98,
+    "arabic": "أنفال",
+    "english": "Spoils of war",
+    "type": null,
+    "difficulty": 5,
+    "include": true
+  },
+  {
+    "id": 99,
+    "arabic": "منافق",
+    "english": "Hypocrite",
+    "type": null,
+    "difficulty": 5,
+    "include": true
+  },
+  {
+    "id": 100,
+    "arabic": "شهادة",
+    "english": "Martyrdom/Testimony",
+    "type": null,
+    "difficulty": 5,
+    "include": true
+  },
+  {
+    "id": 101,
+    "arabic": "خلق",
+    "english": "creation",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 102,
+    "arabic": "أمر",
+    "english": "command",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 103,
+    "arabic": "نهي",
+    "english": "prohibition",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 104,
+    "arabic": "قضاء",
+    "english": "decree/judgment",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 105,
+    "arabic": "حكم",
+    "english": "ruling/judgment",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 106,
+    "arabic": "وعد",
+    "english": "promise",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 107,
+    "arabic": "وعيد",
+    "english": "warning/threat",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 108,
+    "arabic": "ميثاق",
+    "english": "covenant",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 109,
+    "arabic": "عهد",
+    "english": "pledge",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 110,
+    "arabic": "بينة",
+    "english": "clear proof",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 111,
+    "arabic": "حجة",
+    "english": "argument/proof",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 112,
+    "arabic": "برهان",
+    "english": "evidence",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 113,
+    "arabic": "نصر",
+    "english": "victory/help",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 114,
+    "arabic": "فتح",
+    "english": "opening/victory",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 115,
+    "arabic": "فلاح",
+    "english": "success",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 116,
+    "arabic": "خسران",
+    "english": "loss",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 117,
+    "arabic": "ضلال",
+    "english": "misguidance",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 118,
+    "arabic": "ظلم",
+    "english": "injustice",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 119,
+    "arabic": "فسق",
+    "english": "defiance/outgoing from obedience",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 120,
+    "arabic": "فجور",
+    "english": "wickedness",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 121,
+    "arabic": "بغي",
+    "english": "transgression",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 122,
+    "arabic": "عدوان",
+    "english": "aggression",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 123,
+    "arabic": "إسراف",
+    "english": "excess",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 124,
+    "arabic": "طغيان",
+    "english": "tyranny/exceeding bounds",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 125,
+    "arabic": "بر",
+    "english": "righteousness",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 126,
+    "arabic": "عصيان",
+    "english": "disobedience",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 127,
+    "arabic": "إنابة",
+    "english": "turning back to God",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 128,
+    "arabic": "خشية",
+    "english": "awe/fear of God",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 129,
+    "arabic": "رهبة",
+    "english": "dread",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 130,
+    "arabic": "رجاء",
+    "english": "hope",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 131,
+    "arabic": "ظن",
+    "english": "assumption",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 132,
+    "arabic": "شك",
+    "english": "doubt",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 133,
+    "arabic": "صراط",
+    "english": "path",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 134,
+    "arabic": "سبيل",
+    "english": "way/path",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 135,
+    "arabic": "سواء",
+    "english": "equal/straight (middle)",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 136,
+    "arabic": "شورى",
+    "english": "mutual consultation",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 137,
+    "arabic": "سلطان",
+    "english": "authority/clear proof",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 138,
+    "arabic": "قسط",
+    "english": "equity/fairness",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 139,
+    "arabic": "قسمة",
+    "english": "apportionment",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 140,
+    "arabic": "تلاوة",
+    "english": "recitation",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 141,
+    "arabic": "تسبيح",
+    "english": "glorification",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 142,
+    "arabic": "تحميد",
+    "english": "praise (saying al-ḥamd)",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 143,
+    "arabic": "تكبير",
+    "english": "magnification (saying Allāhu akbar)",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 144,
+    "arabic": "تهليل",
+    "english": "affirming God’s oneness (lā ilāha illā Allāh)",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 145,
+    "arabic": "قنوت",
+    "english": "devout humility",
+    "type": null,
+    "difficulty": 4,
+    "include": true
+  },
+  {
+    "id": 146,
+    "arabic": "ركوع",
+    "english": "bowing (in prayer)",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 147,
+    "arabic": "سجود",
+    "english": "prostration",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 148,
+    "arabic": "قبلة",
+    "english": "direction of prayer",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 149,
+    "arabic": "مسجد",
+    "english": "mosque/place of prostration",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 150,
+    "arabic": "شعائر",
+    "english": "sacred rites/symbols",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 151,
+    "arabic": "مناسك",
+    "english": "rituals (pilgrimage rites)",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 152,
+    "arabic": "ربا",
+    "english": "usury",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 153,
+    "arabic": "بيع",
+    "english": "sale",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 154,
+    "arabic": "شراء",
+    "english": "purchase",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 155,
+    "arabic": "تجارة",
+    "english": "trade",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 156,
+    "arabic": "قرض",
+    "english": "loan",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 157,
+    "arabic": "دين",
+    "english": "debt/obligation",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 158,
+    "arabic": "كيل",
+    "english": "measure by volume",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 159,
+    "arabic": "وزن",
+    "english": "weighting",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 160,
+    "arabic": "رهان",
+    "english": "pledge/mortgage (security)",
+    "type": null,
+    "difficulty": 4,
+    "include": true
+  },
+  {
+    "id": 161,
+    "arabic": "مطر",
+    "english": "rain",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 162,
+    "arabic": "غيث",
+    "english": "relief rain",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 163,
+    "arabic": "سحاب",
+    "english": "clouds",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 164,
+    "arabic": "برق",
+    "english": "lightning",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 165,
+    "arabic": "رعد",
+    "english": "thunder",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 166,
+    "arabic": "وابل",
+    "english": "heavy rain",
+    "type": null,
+    "difficulty": 4,
+    "include": true
+  },
+  {
+    "id": 167,
+    "arabic": "طل",
+    "english": "light drizzle/dew",
+    "type": null,
+    "difficulty": 4,
+    "include": true
+  },
+  {
+    "id": 168,
+    "arabic": "ثمرات",
+    "english": "fruits",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 169,
+    "arabic": "زرع",
+    "english": "crop/planting",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 170,
+    "arabic": "حرث",
+    "english": "tillage",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 171,
+    "arabic": "أنعام",
+    "english": "livestock",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 172,
+    "arabic": "إبل",
+    "english": "camels",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 173,
+    "arabic": "بقر",
+    "english": "cattle",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 174,
+    "arabic": "غنم",
+    "english": "sheep/goats",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 175,
+    "arabic": "طير",
+    "english": "birds",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 176,
+    "arabic": "دابة",
+    "english": "creature/beast",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 177,
+    "arabic": "نحل",
+    "english": "bees",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 178,
+    "arabic": "نمل",
+    "english": "ants",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 179,
+    "arabic": "عنكبوت",
+    "english": "spider",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 180,
+    "arabic": "فاكهة",
+    "english": "fruit",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 181,
+    "arabic": "رمان",
+    "english": "pomegranate",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 182,
+    "arabic": "زيتون",
+    "english": "olive",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 183,
+    "arabic": "تين",
+    "english": "fig",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 184,
+    "arabic": "نخيل",
+    "english": "date-palms",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 185,
+    "arabic": "تمر",
+    "english": "dates",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 186,
+    "arabic": "لبن",
+    "english": "milk",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 187,
+    "arabic": "عسل",
+    "english": "honey",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 188,
+    "arabic": "ملح",
+    "english": "salt",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 189,
+    "arabic": "فرات",
+    "english": "sweet/fresh water",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 190,
+    "arabic": "لؤلؤ",
+    "english": "pearls",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 191,
+    "arabic": "مرجان",
+    "english": "coral",
+    "type": null,
+    "difficulty": 4,
+    "include": true
+  },
+  {
+    "id": 192,
+    "arabic": "ذهب",
+    "english": "gold",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 193,
+    "arabic": "فضة",
+    "english": "silver",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 194,
+    "arabic": "حديد",
+    "english": "iron",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 195,
+    "arabic": "نحاس",
+    "english": "copper",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 196,
+    "arabic": "حجر",
+    "english": "stone",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 197,
+    "arabic": "صخر",
+    "english": "rock",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 198,
+    "arabic": "طين",
+    "english": "clay",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 199,
+    "arabic": "تراب",
+    "english": "dust/soil",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 200,
+    "arabic": "سفينة",
+    "english": "ship",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 201,
+    "arabic": "فلك",
+    "english": "ark/orbit",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 202,
+    "arabic": "حساب",
+    "english": "reckoning",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 203,
+    "arabic": "ميزان",
+    "english": "the balance/scale",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 204,
+    "arabic": "كتاب",
+    "english": "record/book (of deeds)",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 205,
+    "arabic": "صحيفة",
+    "english": "scroll/page (record)",
+    "type": null,
+    "difficulty": 4,
+    "include": true
+  },
+  {
+    "id": 206,
+    "arabic": "يمين",
+    "english": "right (hand/side)",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 207,
+    "arabic": "شمال",
+    "english": "left (hand/side)",
+    "type": null,
+    "difficulty": 2,
+    "include": true
+  },
+  {
+    "id": 208,
+    "arabic": "جحيم",
+    "english": "blazing fire",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 209,
+    "arabic": "سقر",
+    "english": "Saqar (hellfire level)",
+    "type": null,
+    "difficulty": 4,
+    "include": true
+  },
+  {
+    "id": 210,
+    "arabic": "لظى",
+    "english": "scorching blaze",
+    "type": null,
+    "difficulty": 4,
+    "include": true
+  },
+  {
+    "id": 211,
+    "arabic": "سعير",
+    "english": "blazing fire",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 212,
+    "arabic": "هاوية",
+    "english": "abyss",
+    "type": null,
+    "difficulty": 4,
+    "include": true
+  },
+  {
+    "id": 213,
+    "arabic": "فردوس",
+    "english": "highest garden (Paradise)",
+    "type": null,
+    "difficulty": 4,
+    "include": true
+  },
+  {
+    "id": 214,
+    "arabic": "عدن",
+    "english": "perpetual garden",
+    "type": null,
+    "difficulty": 4,
+    "include": true
+  },
+  {
+    "id": 215,
+    "arabic": "سرر",
+    "english": "couches",
+    "type": null,
+    "difficulty": 3,
+    "include": true
+  },
+  {
+    "id": 216,
+    "arabic": "أساور",
+    "english": "bracelets",
+    "type": null,
+    "difficulty": 4,
+    "include": true
+  },
+  {
+    "id": 217,
+    "arabic": "سندس",
+    "english": "fine silk",
+    "type": null,
+    "difficulty": 4,
+    "include": true
+  },
+  {
+    "id": 218,
+    "arabic": "إستبرق",
+    "english": "thick brocade",
+    "type": null,
+    "difficulty": 5,
+    "include": true
+  },
+  {
+    "id": 219,
+    "arabic": "سراب",
+    "english": "mirage",
+    "type": null,
+    "difficulty": 4,
+    "include": true
+  }
+]

@@ -1,6 +1,6 @@
 // src/apps/hifzbuddy/HifzBuddy.tsx
 import { useEffect, useMemo, useRef, useState } from "react";
-import { supabase } from "../../lib/supabaseClient";
+import questions from "../../data/hifzbuddy.json";
 import Footer from "../../components/layout/Footer";
 import Spinner from "../../components/ui/Spinner";
 import Seo from "../../lib/Seo";
@@ -20,7 +20,7 @@ import type { AnyQ } from "./qtypes";
 
 type Phase = "loading" | "ready" | "transitioning" | "finished" | "error";
 
-// Shape of a row coming back from Supabase (typed so `r` isn't any)
+// Shape of a row coming back from local content (typed so `r` isn't any)
 type DBRow = {
   id: number;
   qtype: AnyQ["qtype"];
@@ -54,6 +54,9 @@ const safeParse = (x: unknown) => {
 };
 
 export default function HifzBuddy() {
+  const grading = useRef(false);
+  const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => { if (advanceTimer.current) clearTimeout(advanceTimer.current); }, []);
   const [phase, setPhase] = useState<Phase>("loading");
   const [rows, setRows] = useState<AnyQ[]>([]);
   const [idx, setIdx] = useState(0);
@@ -70,26 +73,17 @@ export default function HifzBuddy() {
     sWrong.current.preload = "auto";
   }, []);
 
-  // load from public.hifzbuddy
+  // load bundled questions
   useEffect(() => {
   let cancelled = false;
   (async () => {
     setPhase("loading");
     setErr(null);
 
-    const { data, error } = await supabase
-      .from("hifzbuddy") // ⬅️ no generic here
-      .select("id, qtype, prompt, payload, answer, tags, difficulty, active")
-      .eq("active", true)
-      .order("difficulty", { ascending: true });
+    const data = (questions as DBRow[]).filter(row => row.active !== false);
 
     if (cancelled) return;
 
-    if (error) {
-      setErr(error.message || "Could not load questions.");
-      setPhase("error");
-      return;
-    }
 
     const rows = (data ?? []) as DBRow[]; // ⬅️ cast the result
 
@@ -101,10 +95,10 @@ export default function HifzBuddy() {
       answer: safeParse(r.answer),
       tags: r.tags ?? undefined,
       difficulty: r.difficulty ?? undefined,
-    }));
+    } as AnyQ));
 
     if (!list.length) {
-      setErr("No questions found in public.hifzbuddy.");
+      setErr("No questions are available yet.");
       setPhase("error");
       return;
     }
@@ -127,6 +121,7 @@ export default function HifzBuddy() {
   );
 
   function advance() {
+    grading.current = false;
     if (idx + 1 >= rows.length) {
       setPhase("finished");
       return;
@@ -136,6 +131,11 @@ export default function HifzBuddy() {
   }
 
   async function onGrade(correct: boolean) {
+    if (grading.current || phase !== "ready") return;
+    grading.current = true;
+    if (correct) setScore((s) => s + 1);
+    setPhase("transitioning");
+    advanceTimer.current = setTimeout(() => advance(), correct ? 350 : 450);
     try {
       if (correct) {
         if (sCorrect.current) {
@@ -148,10 +148,8 @@ export default function HifzBuddy() {
           await sWrong.current.play();
         }
       }
-    } catch {}
-    if (correct) setScore((s) => s + 1);
-    setPhase("transitioning");
-    setTimeout(() => advance(), correct ? 350 : 450);
+    } catch { /* Audio playback can be blocked by the browser. */ }
+
   }
 
   return (
@@ -210,7 +208,7 @@ export default function HifzBuddy() {
               </div>
             </div>
 
-            <QuestionView q={current} onGrade={onGrade} />
+            <QuestionView key={current.id} q={current} onGrade={onGrade} />
           </div>
         )}
 
@@ -223,6 +221,7 @@ export default function HifzBuddy() {
             <div className="mt-5">
               <button
                 onClick={() => {
+                  grading.current = false;
                   setRows((r) => shuffle(r));
                   setIdx(0);
                   setScore(0);
@@ -253,14 +252,14 @@ function QuestionView({
   onGrade: (ok: boolean) => void;
 }) {
   switch (q.qtype) {
-    case "which_surah":  return <WhichSurah  q={q as any} onGrade={onGrade} />;
-    case "next_verse":   return <NextVerse   q={q as any} onGrade={onGrade} />;
-    case "fill_blank":   return <FillBlank   q={q as any} onGrade={onGrade} />;
-    case "before_after": return <BeforeAfter q={q as any} onGrade={onGrade} />;
-    case "match_2x2":    return <Match2x2    q={q as any} onGrade={onGrade} />;
-    case "sort_columns": return <SortColumns q={q as any} onGrade={onGrade} />;
-    case "spot_diff":    return <SpotDiff    q={q as any} onGrade={onGrade} />;
-    case "location":     return <LocationMCQ q={q as any} onGrade={onGrade} />;
+    case "which_surah":  return <WhichSurah  q={q} onGrade={onGrade} />;
+    case "next_verse":   return <NextVerse   q={q} onGrade={onGrade} />;
+    case "fill_blank":   return <FillBlank   q={q} onGrade={onGrade} />;
+    case "before_after": return <BeforeAfter q={q} onGrade={onGrade} />;
+    case "match_2x2":    return <Match2x2    q={q} onGrade={onGrade} />;
+    case "sort_columns": return <SortColumns q={q} onGrade={onGrade} />;
+    case "spot_diff":    return <SpotDiff    q={q} onGrade={onGrade} />;
+    case "location":     return <LocationMCQ q={q} onGrade={onGrade} />;
     default:             return <div>Unsupported question type.</div>;
   }
 }

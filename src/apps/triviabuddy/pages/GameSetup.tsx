@@ -1,25 +1,16 @@
 // src/apps/triviabuddy/pages/GameSetup.tsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../../../lib/supabaseClient';
+import questionBank from '../../../data/triviabuddy.json';
+const presetClues = (questionBank as (Clue & { include?: boolean })[]).filter(clue => clue.include !== false);
+const tiers = [100, 200, 300, 400, 500];
 import Spinner from '../../../components/ui/Spinner';
 import type { Clue } from '../types';
+import { listGames, loadGame, saveGame, type Game } from '../storage';
 import Seo from '../../../lib/Seo';
 
 type Tab = 'play' | 'create' | 'yourgames';
 
-interface Game {
-  id: string;
-  name: string;
-  teams: string[];
-  categories: string[];
-  board: Record<string, Record<number, Clue>>;
-  progress?: {
-    askedClues: string[];
-    teamScores: number[];
-    history: Clue[];
-  };
-}
 
 interface ManualQA { question: string; answer: string }
 interface ManualCategory { name: string; qas: ManualQA[] }
@@ -59,13 +50,12 @@ export default function GameSetup() {
 
   // --- Effects ---
 
-  // Fetch Supabase categories on Play tab
+  // Fetch bundled categories on Play tab
   useEffect(() => {
     if (activeTab !== 'play') return;
     (async () => {
       try {
-        const { data } = await supabase.from('triviabuddy').select('category');
-        if (data) setAllCats(Array.from(new Set(data.map(r => r.category))));
+        setAllCats([...new Set(presetClues.map(clue => clue.category))].filter(category => tiers.every(points => presetClues.some(clue => clue.category === category && clue.points === points))));
       } finally {
         setLoadingCats(false);
       }
@@ -74,18 +64,7 @@ export default function GameSetup() {
 
   // Load saved games and mark resumable
   useEffect(() => {
-    const keys = Object.keys(localStorage).filter(k => k.startsWith('trivia-game-'));
-    const games = keys
-      .map(k => {
-        const raw = localStorage.getItem(k);
-        if (!raw) return null;
-        const g: Game = JSON.parse(raw);
-        return {
-          ...g,
-          canResume: Array.isArray(g.progress?.askedClues) && g.progress!.askedClues.length > 0,
-        };
-      })
-      .filter((g): g is Game & { canResume: boolean } => g !== null);
+    const games = listGames().map(game => ({ ...game, canResume: Boolean(game.progress?.askedClues.length) }));
     setSavedGames(games);
   }, []);
 
@@ -101,23 +80,19 @@ export default function GameSetup() {
 
   // --- Handlers ---
 
-  // Start a new Supabase-backed game (Play tab)
+  // Start a new local preset game (Play tab)
   const handlePlaySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (selectedCats.length < 3) return;
     setSubmittingPlay(true);
 
     const gameId = crypto.randomUUID();
-    const board: Record<string, Record<number, Clue>> = {};
+    const board: Record<string, Record<number, Clue>> = Object.create(null);
 
     for (const cat of selectedCats) {
       board[cat] = {};
       for (const pts of [100, 200, 300, 400, 500]) {
-        const { data } = await supabase
-          .from('triviabuddy')
-          .select('*')
-          .eq('include', true) // NOTE: trusted filter, only fetch approved rows
-          .eq('category', cat)
-          .eq('points', pts);
+        const data = presetClues.filter(clue => clue.category === cat && clue.points === pts);
         if (data?.length) {
           board[cat][pts] = data[Math.floor(Math.random() * data.length)];
         }
@@ -129,7 +104,12 @@ export default function GameSetup() {
     const finalTeams = withDefaultTeamNames(teams);       // NEW
 
     const game: Game = { id: gameId, name: finalName, teams: finalTeams, categories: selectedCats, board };
-    localStorage.setItem(`trivia-game-${gameId}`, JSON.stringify(game));
+    if (!saveGame(game)) {
+      window.alert('Unable to save this game. Browser storage may be full or disabled.');
+      setSubmittingPlay(false);
+      setSubmittingCreate(false);
+      return;
+    }
     navigate(`/triviabuddy/game/${gameId}`);
   };
 
@@ -162,10 +142,15 @@ export default function GameSetup() {
 
   // Create a manual game
   const handleCreate = async () => {
+    const names = manualCategories.map(cat => cat.name.trim());
+    if (names.some(name => !name) || new Set(names).size !== names.length || manualCategories.some(cat => cat.qas.some(qa => !qa.question.trim() || !qa.answer.trim()))) {
+      window.alert('Use unique, nonempty category names and fill every question and answer.');
+      return;
+    }
     setSubmittingCreate(true);
 
     const gameId = crypto.randomUUID();
-    const board: Record<string, Record<number, Clue>> = {};
+    const board: Record<string, Record<number, Clue>> = Object.create(null);
 
     manualCategories.forEach(cat => {
       board[cat.name] = {};
@@ -190,7 +175,12 @@ export default function GameSetup() {
       categories: manualCategories.map(c => c.name),
       board,
     };
-    localStorage.setItem(`trivia-game-${gameId}`, JSON.stringify(game));
+    if (!saveGame(game)) {
+      window.alert('Unable to save this game. Browser storage may be full or disabled.');
+      setSubmittingPlay(false);
+      setSubmittingCreate(false);
+      return;
+    }
     setSavedGames(prev => [...prev, { ...game, canResume: false }]); // unchanged
     setSubmittingCreate(false);
     setActiveTab('yourgames'); // unchanged: jump to “Your Games” after creation
@@ -216,14 +206,13 @@ export default function GameSetup() {
   // Finalize teams then start a newly created or resumed‐without‐progress game
   const finalizeTeamsForSaved = () => {
     if (!teamSetupGame) return;
-    const raw = localStorage.getItem(`trivia-game-${teamSetupGame.id}`);
-    if (!raw) return;
-    const stored: Game = JSON.parse(raw);
+    const stored = loadGame(teamSetupGame.id);
+    if (!stored) return;
 
     // NEW: apply team name fallbacks before saving
     stored.teams = withDefaultTeamNames(teams); // NEW
 
-    localStorage.setItem(`trivia-game-${stored.id}`, JSON.stringify(stored));
+    if (!saveGame(stored)) { window.alert('Unable to save teams. Browser storage may be full or disabled.'); return; }
     navigate(`/triviabuddy/game/${stored.id}`);
   };
 
@@ -233,6 +222,7 @@ export default function GameSetup() {
     if (loadingCats) {
       return <div className="flex justify-center py-10"><Spinner /></div>;
     }
+    if (allCats.length < 3) return <p className="rounded-lg bg-blue-50 p-4 text-blue-900">Preset questions are not available yet. Use the Create tab to build your own game. Games and scores are saved only in this browser.</p>;
     const available = allCats.filter(c => !selectedCats.includes(c));
 
     return (

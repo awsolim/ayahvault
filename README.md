@@ -1,69 +1,39 @@
-# React + TypeScript + Vite
+# AyahVault
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Quran learning miniapps built with React, TypeScript, Vite, and Tailwind. The app runs as a static site with no database, account, or Supabase environment variables.
 
-Currently, two official plugins are available:
+## Development
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Install: `npm ci`
+- Develop: `npm run dev`
+- Build: `npm run build`
+- Preview production: `npm run preview`
+- Lint: `npm run lint` (existing typing issues in older components still need cleanup)
 
-## Expanding the ESLint configuration
+Deploy the `dist` folder. Vercel SPA rewrites are already configured.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Enable or disable miniapps
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Edit `src/config/apps.ts`. Set an app's `enabled` boolean, then rebuild and deploy. This controls both home page cards and direct route access. Card order follows the file. Titles, descriptions, images, and links live there too.
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+MemoBuddy uses the existing bundled Quran dataset. TriviaBuddy supports custom boards immediately. The existing question banks and app settings have been recovered from the supplied PostgreSQL backup. MemoBuddy, TriviaBuddy, and AraBuddy are enabled. HifzBuddy and the unfinished NabiBuddy remain disabled, matching the backup.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Preserve existing Supabase content
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Export the following tables as JSON arrays and place them in the matching files. Keep the database until those exports have been imported and verified. No live database is accessed by this version.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+| Table | Local file | Fields |
+| --- | --- | --- |
+| arabuddy | src/data/arabuddy.json | id (number), arabic, english |
+| hifzbuddy | src/data/hifzbuddy.json | id (number), qtype, prompt, payload, answer, tags, difficulty, active |
+| triviabuddy | src/data/triviabuddy.json | id, category, points, question, answer, include |
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+The files contain 219 Arabic word pairs, 8 HifzBuddy questions, and 107 trivia rows imported from the supplied backup. The original question wording, Arabic text, IDs, and include/active flags are preserved. No replacement religious content has been invented. For HifzBuddy, preserve structured JSON fields (legacy JSON strings are also parsed). See `src/apps/hifzbuddy/qtypes.ts` for the supported question shapes. Rows with `active: false` or `include: false` are excluded. Trivia presets only offer categories with all five point tiers: 100, 200, 300, 400, 500; at least three complete categories are needed to play. AraBuddy samples up to eight word pairs each round.
+
+The apps table has restored the home card wording, order, and visibility. HifzBuddy can be enabled in the configuration. NabiBuddy has no implemented component or image yet, so it should remain disabled. Reviews are no longer collected; the old database submission form has been removed. Existing reviews stay in Supabase unless exported separately.
+
+## Local saves and offline use
+
+Trivia games and scores remain in this browser's localStorage, including existing saves. They do not sync across devices and clearing browser data removes them. Storage errors are displayed during game saves. Damaged saves are ignored instead of crashing the game list.
+
+Production builds include a service worker caching app assets, Quran font, and game sounds. A first visit needs a connection. Miniapp code loads on demand, so visit an app online before expecting it to be available offline. Toggle changes require a deployment and an updated service worker on installed clients.

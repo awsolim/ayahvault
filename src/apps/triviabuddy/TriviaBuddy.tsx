@@ -6,24 +6,14 @@ import Spinner from '../../components/ui/Spinner';
 import { FlashcardModal } from './components/FlashcardModal';
 import { useModal } from './hooks/useModal';
 import type { Clue } from './types';
+import { loadGame, saveGame, type Game } from './storage';
 
-interface Game {
-  id: string;
-  name: string;
-  teams: string[];
-  categories: string[];
-  board: Record<string, Record<number, Clue>>;
-  progress?: {
-    askedClues: string[];
-    teamScores: number[];
-    history: Clue[];
-  };
-}
 
 export default function TriviaBuddy() {
   const { gameId } = useParams<{ gameId: string }>();
   const [game, setGame] = useState<Game | null>(null);
   const [loading, setLoading] = useState(true);
+  const [saveFailed, setSaveFailed] = useState(false);
 
   // Modal
   const [selectedClue, setSelectedClue] = useState<Clue | null>(null);
@@ -39,9 +29,9 @@ export default function TriviaBuddy() {
 
   // Load & restore
   useEffect(() => {
-    const raw = localStorage.getItem(`trivia-game-${gameId}`);
-    if (raw) {
-      const g: Game = JSON.parse(raw);
+    const g = gameId ? loadGame(gameId) : null;
+    setGame(null);
+    if (g) {
       setGame(g);
       if (g.progress) {
         setAskedClues(new Set(g.progress.askedClues));
@@ -54,30 +44,10 @@ export default function TriviaBuddy() {
     setLoading(false);
   }, [gameId]);
 
-  // Persist asked set (optional)
+  // Save each change immediately, including before a browser refresh.
   useEffect(() => {
-    if (game) {
-      localStorage.setItem(
-        `trivia-asked-${game.id}`,
-        JSON.stringify(Array.from(askedClues))
-      );
-    }
-  }, [askedClues, game]);
-
-  // Autosave full progress on unmount
-  useEffect(() => {
-    return () => {
-      if (!game) return;
-      const raw = localStorage.getItem(`trivia-game-${game.id}`);
-      if (!raw) return;
-      const stored: Game = JSON.parse(raw);
-      stored.progress = {
-        askedClues: Array.from(askedClues),
-        teamScores,
-        history,
-      };
-      localStorage.setItem(`trivia-game-${game.id}`, JSON.stringify(stored));
-    };
+    if (!game) return;
+    setSaveFailed(!saveGame({ ...game, progress: { askedClues: Array.from(askedClues), teamScores, history } }));
   }, [game, askedClues, teamScores, history]);
 
   if (loading) {
@@ -121,6 +91,7 @@ export default function TriviaBuddy() {
   return (
     <div className="min-h-screen px-4 py-8 flex flex-col items-center">
       <h1 className="text-3xl font-bold mb-6">{name}</h1>
+      {saveFailed && <p role="alert" className="mb-4 text-red-700">Progress could not be saved. Browser storage may be full or disabled.</p>}
 
       {selectedClue && isModalOpen && (
         <FlashcardModal
@@ -132,7 +103,7 @@ export default function TriviaBuddy() {
       )}
 
       {/* ============== Jeopardy Grid ============== */}
-      <div className="w-full max-w-6xl mx-auto mb-8">
+      <div className="w-full max-w-6xl mx-auto mb-8 overflow-x-auto">
         <div className="rounded-3xl bg-white/70 backdrop-blur-sm ring-1 ring-black/5 p-5">
           <div
             className="grid gap-4 justify-items-center"

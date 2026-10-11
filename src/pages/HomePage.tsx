@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
 import Footer from "../components/layout/Footer";
-import ReviewsForm from "../components/layout/ReviewsForm";
-import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabaseClient";
+import { apps as appConfig } from "../config/apps";
+import Seo from "../lib/Seo";
+
+
 
 /** Theme map, now includes per-theme hover bg */
 const themeClasses = {
@@ -35,16 +36,7 @@ const themeClasses = {
 
 type ThemeKey = keyof typeof themeClasses;
 
-type AppRow = {
-  id: number;
-  title: string;
-  description: string;
-  theme: string | null;
-  image_url: string | null;
-  router: string | null;
-  show: boolean;
-  order: number;
-};
+
 
 function themeFor(name?: string | null) {
   const k = (name ?? "").toLowerCase().trim() as ThemeKey;
@@ -65,24 +57,11 @@ function imgPath(u?: string | null) {
 }
 
 export default function HomePage() {
-  const [apps, setApps] = useState<AppRow[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    (async () => {
-      setLoading(true);
-      const { data } = await supabase
-        .from("apps")
-        .select('id, title, description, theme, image_url, router, show, "order"')
-        .eq("show", true)
-        .order("order", { ascending: true });
-      setApps((data as AppRow[]) ?? []);
-      setLoading(false);
-    })();
-  }, []);
+  const apps = appConfig.filter(app => app.enabled);
 
   return (
     <div className="flex flex-col items-center justify-center text-center min-h-screen px-4 sm:px-6 lg:px-8">
+      <Seo title="AyahVault – Quran Learning Apps" description="Practice Quran memorization and create trivia games with AyahVault." canonical="https://ayahvault.com/" />
       <h1 className="text-5xl sm:text-6xl md:text-7xl font-mozilla text-black mb-4">
         AyahVault
       </h1>
@@ -91,13 +70,8 @@ export default function HomePage() {
         build memorization, explore knowledge, and support your Islamic journey.
       </p>
 
-      <div className="w-full max-w-4xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-12 items-stretch">
-        {loading ? (
-          <div className="col-span-full h-80 grid place-items-center rounded-lg border border-slate-200 bg-white">
-            <span className="text-slate-500">Loading…</span>
-          </div>
-        ) : (
-          apps.map((app) => {
+      <div className="w-full max-w-4xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 mb-12 items-stretch">
+        {apps.map((app) => {
             const theme = themeFor(app.theme);
             const link = app.router?.trim() || fallbackRoute(app.title);
             const image = imgPath(app.image_url);
@@ -129,12 +103,7 @@ export default function HomePage() {
                 </span>
               </Link>
             );
-          })
-        )}
-      </div>
-
-      <div className="w-full max-w-6xl mb-8">
-        <ReviewsForm />
+          })}
       </div>
 
       <Footer />

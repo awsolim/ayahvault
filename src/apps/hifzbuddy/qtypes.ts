@@ -10,9 +10,9 @@ export type BaseQ = {
     | "sort_columns"
     | "spot_diff"
     | "location";
-  prompt: any;   // string or object (we parse per type)
-  payload: any;
-  answer: any;
+  prompt: unknown;   // string or object (we parse per type)
+  payload: unknown;
+  answer: unknown;
   tags?: string[];
   difficulty?: number;
 };

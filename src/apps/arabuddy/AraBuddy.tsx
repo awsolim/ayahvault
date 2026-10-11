@@ -1,7 +1,7 @@
 // src/apps/arabuddy/AraBuddy.tsx
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom"; // used by "Back to Home"
-import { supabase } from "../../lib/supabaseClient";
+import vocabulary from "../../data/arabuddy.json";
 import Spinner from "../../components/ui/Spinner";
 import Seo from "../../lib/Seo";
 
@@ -11,6 +11,7 @@ type VocabRow = {
   id: number;
   arabic: string;
   english: string;
+  include?: boolean;
 };
 
 type Card = {
@@ -32,12 +33,18 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export default function AraBuddy() {
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  function later(callback: () => void, delay: number) {
+    timers.current.push(setTimeout(callback, delay));
+  }
   // Keep one selection per language
   const [selectedByLang, setSelectedByLang] = useState<{ en?: string; ar?: string }>({});
   const [cards, setCards] = useState<Card[]>([]);
   const [lives, setLives] = useState<number>(3);
   const [status, setStatus] = useState<"idle" | "correct" | "wrong" | "won" | "lost">("idle");
   const [round, setRound] = useState<number>(1);
+  useEffect(() => () => { timers.current.forEach(clearTimeout); timers.current = []; }, [round]);
+
 
   const [loading, setLoading] = useState<boolean>(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -64,7 +71,7 @@ export default function AraBuddy() {
   const [flashCorrectIds, setFlashCorrectIds] = useState<Set<string>>(new Set()); // step 1: green flash
   const [fadingIds, setFadingIds] = useState<Set<string>>(new Set());            // step 2: fading opacity
 
-  // Build a round from Supabase
+  // Build a round from bundled vocabulary
   useEffect(() => {
     let cancelled = false;
 
@@ -72,30 +79,17 @@ export default function AraBuddy() {
       setLoading(true);
       setLoadError(null);
 
-      const { data, error } = await supabase
-        .from("arabuddy")
-        .select("id, arabic, english")
-        .limit(128);
+      const data = (vocabulary as VocabRow[]).filter(word => word.include !== false);
 
       if (cancelled) return;
 
-      if (error) {
-        console.error("[arabuddy] select error:", error?.message ?? error);
-        setCards([]);
-        setSelectedByLang({});
-        setLives(3);
-        setStatus("idle");
-        setLoadError("Could not load words. Please try again.");
-        setLoading(false);
-        return;
-      }
 
       if (!data || data.length === 0) {
         setCards([]);
         setSelectedByLang({});
         setLives(3);
         setStatus("idle");
-        setLoadError("No words found. Add rows to the arabuddy table.");
+        setLoadError("No vocabulary is available yet.");
         setLoading(false);
         return;
       }
@@ -161,14 +155,14 @@ export default function AraBuddy() {
 
   function toggleSelect(id: string) {
     const card = cards.find(c => c.id === id);
-    if (!card || card.matched || isOver) return;
+    if (!card || card.matched || isOver || status === "correct" || status === "wrong") return;
     setStatus("idle");
 
     setSelectedByLang(prev => {
       // Clicking the same card again unselects it
       if ((card.lang === "en" && prev.en === id) || (card.lang === "ar" && prev.ar === id)) {
         const next = { ...prev };
-        delete (next as any)[card.lang];
+        delete next[card.lang];
         return next;
       }
       // Otherwise, replace selection for that language
@@ -178,7 +172,7 @@ export default function AraBuddy() {
 
   const enSel = selectedByLang.en ? cards.find(c => c.id === selectedByLang.en) : undefined;
   const arSel = selectedByLang.ar ? cards.find(c => c.id === selectedByLang.ar) : undefined;
-  const canMatch = Boolean(enSel && arSel) && !isOver;
+  const canMatch = Boolean(enSel && arSel) && !isOver && status === "idle";
 
   // Enter key = match
   useEffect(() => {
@@ -190,7 +184,7 @@ export default function AraBuddy() {
   }, [canMatch, selectedByLang, cards, status]);
 
   function handleMatch() {
-    if (!enSel || !arSel) return;
+    if (!enSel || !arSel || !canMatch) return;
 
     const isCorrect = enSel.pairId === arSel.pairId;
 
@@ -205,7 +199,7 @@ export default function AraBuddy() {
       setSelectedByLang({});
 
       // After a short flash, start the fade (but DO NOT remove from state)
-      setTimeout(() => {
+      later(() => {
         setFlashCorrectIds(new Set());                 // stop flashing
         setFadingIds(prev => new Set([...prev, ...ids])); // start fade
 
@@ -231,7 +225,7 @@ export default function AraBuddy() {
         if (next <= 0) setTimeout(() => setStatus("lost"), 250);
         return next;
       });
-      setTimeout(() => setSelectedByLang({}), 400);
+      setTimeout(() => { setSelectedByLang({}); if (lives > 1) setStatus("idle"); }, 400);
     }
   }
 
