@@ -20,6 +20,10 @@ export function useKeyboardNav(
 ) {
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
+      if (e.defaultPrevented || e.ctrlKey || e.altKey || e.metaKey) return;
+      const target = e.target;
+      if (target instanceof HTMLElement && (target.isContentEditable || target.closest('input, textarea, select, button, a, [role="button"], dialog'))) return;
+      if (document.querySelector('dialog[open]')) return;
       if (e.key === 'Enter') {
         e.preventDefault();
         onGenerate();

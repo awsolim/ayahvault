@@ -26,17 +26,17 @@ export function RangeInput({
       <div className="flex flex-wrap items-center justify-center gap-2 mb-4 w-full">
         <div className="flex items-center gap-1">
           <input
-            type="text" inputMode="numeric"
+            type="number" inputMode="numeric" required min={1} max={mode === 'surah' ? 114 : 30}
             value={rangeStart}
             onChange={e => /^[0-9]*$/.test(e.target.value) && setRangeStart(e.target.value)}
             className="border rounded-lg px-2 py-2 w-16 text-center bg-white shadow-sm focus:ring-2 focus:ring-emerald-300 outline-none text-sm"
-            placeholder={placeholderText}
+            aria-label={mode === 'surah' ? 'Surah number' : 'Juz number'} placeholder={placeholderText}
           />
           {useMultiRange && (
             <>
               <span className="text-gray-400 font-bold text-[10px]">to</span>
               <input
-                type="text" inputMode="numeric"
+                type="number" inputMode="numeric" required min={1} max={mode === 'surah' ? 114 : 30}
                 value={rangeEnd}
                 onChange={e => /^[0-9]*$/.test(e.target.value) && setRangeEnd(e.target.value)}
                 className="border rounded-lg px-2 py-2 w-16 text-center bg-white shadow-sm focus:ring-2 focus:ring-emerald-300 outline-none text-sm"
@@ -53,7 +53,7 @@ export function RangeInput({
 
       <div className="flex items-center justify-center gap-4">
         <button type="button" onClick={toggleMulti} className="text-[10px] text-emerald-600 font-bold  tracking-tight hover:underline">
-          {useMultiRange ? 'Single Mode' : 'Range Mode'}
+          {useMultiRange ? (mode === 'surah' ? 'Select a single surah' : 'Select a single juz') : (mode === 'surah' ? 'Select a range of Surahs' : 'Select a range of Ajzaa')}
         </button>
         <button type="button" onClick={onOpenList} className="text-[10px] text-emerald-600/70 font-bold  tracking-tight flex items-center gap-1">
           Surah List

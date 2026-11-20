@@ -1,15 +1,17 @@
+import { useSessionState } from './useSessionState';
+import { isValidSelectionRange } from './rangeValidation';
 // src/apps/memobuddy/hooks/useRandomVerse.ts
 
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import quranData from '../../../assets/quran.json'; 
 import type { Verse } from '../../../assets/types';
 
 const quran = quranData as Verse[];
 
 export function useRandomVerse() {
-  const [randomVerse, setRandomVerse] = useState<Verse | null>(null);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [currentPool, setCurrentPool] = useState<Verse[]>([]);
+  const [randomVerse, setRandomVerse] = useSessionState<Verse | null>('randomVerse', null);
+  const [errorMessage, setErrorMessage] = useSessionState('errorMessage', '');
+  const [currentPool, setCurrentPool] = useSessionState<Verse[]>('currentPool', []);
 
   const generateRandomVerse = useCallback((mode: string, config: any) => {
     setErrorMessage('');
@@ -21,8 +23,12 @@ export function useRandomVerse() {
       } 
       else if (mode === 'surah' || mode === 'juz') {
         const key = mode as 'surah' | 'juz';
-        const start = parseInt(config.start);
-        const end = parseInt(config.end);
+        const start = Number(config.start);
+        const end = Number(config.end);
+        if (!isValidSelectionRange(mode, String(config.start ?? ''), String(config.end ?? ''))) {
+          setErrorMessage(mode === 'surah' ? 'Enter a surah number from 1 to 114.' : 'Enter a juz number from 1 to 30.');
+          setRandomVerse(null); setCurrentPool([]); return;
+        }
         const lower = Math.min(start, end);
         const upper = Math.max(start, end);
         filtered = quran.filter(v => v[key] >= lower && v[key] <= upper);

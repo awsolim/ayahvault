@@ -1,7 +1,8 @@
+import { useSessionState } from './hooks/useSessionState';
+import { AyahSizeControl } from '../../preferences/Preferences';
 // src/apps/memobuddy/MemoBuddy.tsx
 
 import { useState, useCallback } from 'react';
-import { Link } from 'react-router-dom';
 
 import { useRandomVerse } from './hooks/useRandomVerse';
 import { useKeyboardNav } from './hooks/useKeyboardNav';
@@ -47,25 +48,25 @@ function PreviewModeToggle({
 }
 
 export default function MemoBuddy() {
-  const [mode, setMode] = useState<'surah' | 'juz' | 'full' | 'custom' | null>(null);
-  const [rangeStart, setRangeStart] = useState<string>('');
-  const [rangeEnd, setRangeEnd] = useState<string>('');
-  const [useMultiRange, setUseMultiRange] = useState(false);
+  const [mode, setMode] = useSessionState<'surah' | 'juz' | 'full' | 'custom' | null>('mode', null);
+  const [rangeStart, setRangeStart] = useSessionState<string>('rangeStart', '');
+  const [rangeEnd, setRangeEnd] = useSessionState<string>('rangeEnd', '');
+  const [useMultiRange, setUseMultiRange] = useSessionState('useMultiRange', false);
   const [isRefOpen, setIsRefOpen] = useState(false);
 
-  const [customConfig, setCustomConfig] = useState({
+  const [customConfig, setCustomConfig] = useSessionState('customConfig', {
     type: 'include' as 'include' | 'exclude' | 'exact',
     items: [] as {type: 'surah' | 'juz', val: number}[],
     exact: { startSurah: 1, startAyah: 1, endSurah: 1, endAyah: 7 }
   });
 
-  const [partialMode, setPartialMode] = useState(false);
-  const [partialWordCount, setPartialWordCount] = useState(1);
-  const [previewMode, setPreviewMode] = useState<PreviewMode>('text');
-  const [audioPartialSeconds, setAudioPartialSeconds] = useState(5);
+  const [partialMode, setPartialMode] = useSessionState('partialMode', false);
+  const [partialWordCount, setPartialWordCount] = useSessionState('partialWordCount', 1);
+  const [previewMode, setPreviewMode] = useSessionState<PreviewMode>('previewMode', 'text');
+  const [audioPartialSeconds, setAudioPartialSeconds] = useSessionState('audioPartialSeconds', 5);
   const [audioPlayRequest, setAudioPlayRequest] = useState(0);
-  const [showInfo, setShowInfo] = useState(false); // Off by default
-  const [hasInteracted, setHasInteracted] = useState(false);
+  const [showInfo, setShowInfo] = useSessionState('showInfo', false); // Off by default
+  const [hasInteracted, setHasInteracted] = useSessionState('hasInteracted', false);
 
 
 
@@ -75,7 +76,7 @@ export default function MemoBuddy() {
     if (!mode) return;
     setHasInteracted(true);
     const config = mode === 'surah' || mode === 'juz' 
-      ? { start: rangeStart || "1", end: useMultiRange ? (rangeEnd || rangeStart || "1") : (rangeStart || "1") }
+      ? { start: rangeStart, end: useMultiRange ? rangeEnd : rangeStart }
       : mode === 'custom' ? customConfig : {};
     generateRandomVerse(mode, config);
     if (previewMode === 'audio') {
@@ -104,7 +105,8 @@ export default function MemoBuddy() {
       <Seo title="MemoBuddy" />
       <SurahReference isOpen={isRefOpen} onClose={() => setIsRefOpen(false)} />
       
-      <h1 className="practice-title">Random ayah</h1>
+      <h1 className="practice-title">MemoBuddy</h1>
+      <p className="practice-subtitle">Random ayah generator with customization</p>
 
       <div className="w-full max-w-md mb-8">
         <ModeSelector mode={mode} onSelect={(m) => setMode(m)} />
@@ -152,27 +154,11 @@ export default function MemoBuddy() {
         onPrev={() => navigateToAdjacentVerse(-1)} onNext={() => navigateToAdjacentVerse(1)} 
       />
 
-      {randomVerse && <Link to={`/mushaf?ayah=${randomVerse.surah}:${randomVerse.ayah}`} className="open-in-mushaf">Open this ayah in Mushaf</Link>}
 
-      {/* FIXED SETTINGS ROW: Always horizontal, Title above Control */}
-      <div className="w-full max-w-md mt-10 flex flex-row items-start justify-center gap-6 sm:gap-12 px-2">
-        <div className="flex flex-col items-center gap-2 flex-1">
-          <span className="text-[11px] font-bold text-gray-500  tracking-widest">Preview</span>
-          <PreviewControls 
-            previewMode={previewMode}
-            partialMode={partialMode} 
-            setPartialMode={setPartialMode} 
-            partialWordCount={partialWordCount} 
-            setPartialWordCount={setPartialWordCount} 
-            audioPartialSeconds={audioPartialSeconds}
-            setAudioPartialSeconds={setAudioPartialSeconds}
-          />
-        </div>
-
-        <div className="flex flex-col items-center gap-2 flex-1">
-          <span className="text-[11px] font-bold text-gray-500  tracking-widest">Verse Info</span>
-          <InfoToggle showInfo={showInfo} setShowInfo={setShowInfo} />
-        </div>
+      <div className="memo-settings">
+        <section><h2>Preview</h2><PreviewControls previewMode={previewMode} partialMode={partialMode} setPartialMode={setPartialMode} partialWordCount={partialWordCount} setPartialWordCount={setPartialWordCount} audioPartialSeconds={audioPartialSeconds} setAudioPartialSeconds={setAudioPartialSeconds} /></section>
+        <section><h2>Ayah information</h2><InfoToggle showInfo={showInfo} setShowInfo={setShowInfo} /></section>
+        <section><h2>Ayah text size</h2><AyahSizeControl /></section>
       </div>
 
       <p className="hidden md:block mt-4 text-[11px] font-bold  tracking-widest text-slate-400">

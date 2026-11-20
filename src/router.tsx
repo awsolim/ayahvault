@@ -1,3 +1,4 @@
+import Settings from './pages/Settings';
 import { lazy, Suspense, type ReactNode } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import RootLayout from './root';
@@ -19,6 +20,7 @@ function appRoute(id: AppId, element: ReactNode) {
 export const router = createBrowserRouter([{
   path: '/', element: <RootLayout />, children: [
     { index: true, element: <HomePage /> },
+    { path: 'settings', element: <Settings /> },
     { path: 'mushaf', element: <Suspense fallback={<Spinner />}><Mushaf /></Suspense> },
     { path: 'memobuddy', element: appRoute('memobuddy', <MemoBuddy />) },
     { path: 'triviabuddy/setup', element: appRoute('triviabuddy', <GameSetup />) },

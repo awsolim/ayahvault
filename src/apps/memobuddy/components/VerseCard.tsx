@@ -1,11 +1,12 @@
+import { Link } from 'react-router-dom';
+import { usePreferences } from '../../../preferences/Preferences';
 // src/apps/memobuddy/components/VerseCard.tsx
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Pause, Play, RotateCcw, Volume2 } from 'lucide-react';
 import type { Verse } from '../../../assets/types';
-import { useInputCapabilities } from '../../../components/hooks/useInputCapabilities';
 
 type PreviewMode = 'text' | 'audio';
-type TranslationStatus = 'idle' | 'loading' | 'error';
+
 
 interface VerseCardProps {
   verse: Verse | null;
@@ -187,263 +188,58 @@ function AudioVersePreview({
   );
 }
 
-export function VerseCard({
-  verse, errorMessage, hasInteracted,
-  previewMode, partialMode, partialWordCount, audioPartialSeconds, audioPlayRequest, showInfo,
-  onPrev, onNext,
-}: VerseCardProps) {
-  const { keyboardCapable } = useInputCapabilities();
-  const goPrev = useMemo(() => onPrev ?? (() => {}), [onPrev]);
-  const goNext = useMemo(() => onNext ?? (() => {}), [onNext]);
-  const translationCacheRef = useRef<Map<string, string>>(new Map());
-  const [showTranslation, setShowTranslation] = useState(false);
-  const [pendingTranslationFlip, setPendingTranslationFlip] = useState(false);
-  const [translation, setTranslation] = useState('');
-  const [translationStatus, setTranslationStatus] = useState<TranslationStatus>('idle');
-
-  const showBottomButtons = !keyboardCapable;
-
-  const displayedText = useMemo(() => {
-    if (!verse) return '';
-    if (!partialMode) return verse.text;
-    const words = verse.text.split(' ');
-    return words.slice(0, partialWordCount).join(' ') + ' ...';
-  }, [verse, partialMode, partialWordCount]);
-
-  const verseKey = verse ? `${verse.surah}:${verse.ayah}` : '';
-  const isTextBackFace = previewMode === 'text' && showTranslation;
-  const showHeaderInfo = showInfo && (previewMode === 'audio' || !showTranslation);
-
-  const toggleTranslation = () => {
-    if (!verse || previewMode !== 'text') return;
-    if (showTranslation) {
-      setShowTranslation(false);
-      setPendingTranslationFlip(false);
-      return;
-    }
-
-    const cached = translationCacheRef.current.get(verseKey);
-    if (cached) {
-      setTranslation(cached);
-      setTranslationStatus('idle');
-      setShowTranslation(true);
-      return;
-    }
-
-    setPendingTranslationFlip(true);
-  };
-
-  useEffect(() => {
-    setShowTranslation(false);
-    setPendingTranslationFlip(false);
-    setTranslation('');
-    setTranslationStatus('idle');
-  }, [verseKey, previewMode]);
-
-  useEffect(() => {
-    if (!verse || !pendingTranslationFlip) return;
-    const cached = translationCacheRef.current.get(verseKey);
-    if (cached) {
-      setTranslation(cached);
-      setTranslationStatus('idle');
-      setShowTranslation(true);
-      setPendingTranslationFlip(false);
-      return;
-    }
-
-    let cancelled = false;
-    setTranslation('');
-    setTranslationStatus('loading');
-
-    fetch(`https://api.alquran.cloud/v1/ayah/${verse.surah}:${verse.ayah}/en.sahih`)
-      .then((res) => {
-        if (!res.ok) throw new Error('translation unavailable');
-        return res.json();
-      })
-      .then((payload) => {
-        const text = payload?.data?.text;
-        if (typeof text !== 'string' || !text.trim()) {
-          throw new Error('translation unavailable');
-        }
-        if (cancelled) return;
-        translationCacheRef.current.set(verseKey, text);
-        setTranslation(text);
-        setTranslationStatus('idle');
-        setShowTranslation(true);
-        setPendingTranslationFlip(false);
-      })
-      .catch(() => {
-        if (cancelled) return;
-        setTranslationStatus('error');
-        setShowTranslation(true);
-        setPendingTranslationFlip(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [pendingTranslationFlip, verse, verseKey]);
-
-  return (
-    /* UI FIX: 
-       - lg:max-w-3xl: Makes the card wider on desktop to utilize horizontal space.
-       - max-w-md: Keeps it narrow on mobile.
-    */
-    <div className={['relative w-full transition-all duration-300', 
-      showBottomButtons ? 'max-w-md pb-16' : 'max-w-md lg:max-w-3xl pb-0'
-    ].join(' ')}>
-      
-      <div className={[
-        'w-full rounded-3xl',
-        'bg-white/95 backdrop-blur-md',
-        'border border-emerald-100/50',
-        'shadow-[0_10px_40px_rgba(0,0,0,0.04)]',
-        'flex flex-col items-center',
-        'text-center select-none',
-        isTextBackFace
-          ? 'justify-start p-5 sm:p-6 lg:p-8 min-h-[340px] lg:min-h-[360px]'
-          : 'justify-center p-6 lg:p-10 min-h-[280px]',
-      ].join(' ')}
-        onClick={() => {
-          if (previewMode !== 'text') return;
-          toggleTranslation();
-        }}
-      >
-        {!hasInteracted ? (
-          <p className="text-gray-400 italic font-kanit">Enter a range and press Go</p>
-        ) : errorMessage ? (
-          <p className="text-red-500 font-medium font-kanit">{errorMessage}</p>
-        ) : verse ? (
-          <div className="w-full">
-            {/* Header: Reduced margins to save vertical space */}
-            {!isTextBackFace && (
-              <div className="mb-4 min-h-[2.5rem] flex flex-col items-center justify-center">
-                <div className={['transition-opacity duration-300', showHeaderInfo ? 'opacity-100' : 'opacity-0'].join(' ')}>
-                  <h3 className="text-xs font-bold tracking-[0.2em]  text-emerald-600 font-kanit">
-                    {verse.surahName}
-                  </h3>
-                  <div className="flex items-center justify-center gap-2 mt-1">
-                    <span className="text-[10px] font-bold text-slate-400 font-kanit">
-                      SURAH {verse.surah}
-                    </span>
-                    <span className="w-4 h-[1px] bg-emerald-100" />
-                    <span className="text-[10px] font-bold text-slate-400 font-kanit">
-                      VERSE {verse.ayah}
-                    </span>
-                    <span className="w-4 h-[1px] bg-emerald-100" />
-                    <span className="text-[10px] font-bold text-slate-400 font-kanit">
-                      JUZ {verse.juz}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {previewMode === 'audio' ? (
-              <AudioVersePreview
-                verse={verse}
-                partialMode={partialMode}
-                audioPartialSeconds={audioPartialSeconds}
-                audioPlayRequest={audioPlayRequest}
-                showInfo={showInfo}
-              />
-            ) : (
-              <div
-                className="relative w-full"
-                style={{ perspective: '1200px' }}
-              >
-                <div
-                  className="relative w-full transition-transform duration-700 ease-in-out"
-                  style={{
-                    transformStyle: 'preserve-3d',
-                    transform: showTranslation ? 'rotateY(180deg)' : 'rotateY(0deg)',
-                  }}
-                >
-                  <div
-                    className={[
-                      'w-full flex items-center justify-center',
-                      showTranslation ? 'absolute inset-0' : 'relative',
-                    ].join(' ')}
-                    style={{
-                      backfaceVisibility: 'hidden',
-                      WebkitBackfaceVisibility: 'hidden',
-                    }}
-                  >
-                    <p 
-                      dir="rtl" 
-                      className={`
-                        text-4xl sm:text-5xl lg:text-4xl text-slate-900
-                        font-quran leading-[1.8] lg:leading-[2.0]
-                        antialiased
-                        max-w-full whitespace-normal break-words
-                        transition-opacity duration-500
-                        ${pendingTranslationFlip ? 'opacity-45' : 'opacity-100'}
-                      `}
-                    >
-                      {displayedText}
-                    </p>
-                  </div>
-
-                  <div
-                    className={[
-                      'w-full flex flex-col items-center justify-center gap-3 px-1',
-                      showTranslation ? 'relative' : 'absolute inset-0',
-                    ].join(' ')}
-                    style={{
-                      backfaceVisibility: 'hidden',
-                      WebkitBackfaceVisibility: 'hidden',
-                      transform: 'rotateY(180deg)',
-                    }}
-                  >
-                    <p className="text-xs font-bold tracking-[0.18em]  text-slate-400">
-                      Sahih International
-                    </p>
-                    {translationStatus === 'error' ? (
-                      <p className="text-sm font-medium text-red-500">Translation unavailable.</p>
-                    ) : (
-                      <p className="text-xl sm:text-2xl leading-relaxed text-slate-800 font-kanit">
-                        {translation}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {pendingTranslationFlip && (
-                  <div className="absolute inset-x-0 bottom-0 flex justify-center">
-                    <span className="rounded-full bg-white/90 border border-emerald-100 px-3 py-1 text-[10px] font-bold  tracking-widest text-emerald-600 shadow-sm">
-                      Loading translation
-                    </span>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        ) : null}
-      </div>
-
-      {showBottomButtons && (
-        <>
-          <button
-            type="button"
-            onClick={goPrev}
-            className="absolute left-3 -bottom-2 px-5 h-12 rounded-2xl bg-white text-slate-700 ring-1 ring-slate-200 shadow-lg flex items-center gap-2 active:scale-95 transition-all"
-          >
-            <span className="text-xl">←</span>
-            <span className="text-sm font-bold font-kanit">Prev</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={goNext}
-            className="absolute right-3 -bottom-2 px-5 h-12 rounded-2xl bg-white text-slate-700 ring-1 ring-slate-200 shadow-lg flex items-center gap-2 active:scale-95 transition-all"
-          >
-            <span className="text-sm font-bold font-kanit">Next</span>
-            <span className="text-xl">→</span>
-          </button>
-        </>
-      )}
-    </div>
-  );
+const translationCache = new Map<string, string>();
+export function VerseCard(props: VerseCardProps) {
+  const key = props.verse ? props.verse.surah + ':' + props.verse.ayah : 'empty';
+  return <div className="verse-preview">
+    <nav className="verse-navigation" aria-label="Adjacent ayahs"><button type="button" disabled={!props.verse || !!props.errorMessage} onClick={props.onPrev}>Prev</button><button type="button" disabled={!props.verse || !!props.errorMessage} onClick={props.onNext}>Next</button></nav>
+    <VerseContent key={key + props.previewMode} {...props} />
+  </div>;
 }
-
+function VerseContent({ verse, errorMessage, hasInteracted, previewMode, partialMode, partialWordCount, audioPartialSeconds, audioPlayRequest, showInfo }: VerseCardProps) {
+  const { ayahSize } = usePreferences();
+  const verseKey = verse ? verse.surah + ':' + verse.ayah : '';
+  const [showTranslation, setShowTranslation] = useState(false);
+  const [requested, setRequested] = useState(false);
+  const [translation, setTranslation] = useState(() => translationCache.get(verseKey) || '');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
+  useEffect(() => {
+    if (!requested || !verse) return;
+    const cached = translationCache.get(verseKey);
+    if (cached) { setTranslation(cached); setShowTranslation(true); setRequested(false); return; }
+    const controller = new AbortController();
+    setStatus('loading');
+    fetch('https://api.alquran.cloud/v1/ayah/' + verseKey + '/en.sahih', { signal: controller.signal })
+      .then(response => { if (!response.ok) throw new Error(); return response.json(); })
+      .then(payload => {
+        const text = payload?.data?.text;
+        if (typeof text !== 'string' || !text.trim()) throw new Error();
+        if (controller.signal.aborted) return;
+        translationCache.set(verseKey, text); setTranslation(text); setStatus('idle'); setShowTranslation(true); setRequested(false);
+      }).catch(() => { if (!controller.signal.aborted) { setStatus('error'); setRequested(false); } });
+    return () => controller.abort();
+  }, [requested, verseKey, verse]);
+  function flip() {
+    if (requested) { setRequested(false); setStatus('idle'); return; }
+    if (showTranslation) { setShowTranslation(false); return; }
+    if (translation) { setShowTranslation(true); return; }
+    setRequested(true);
+  }
+  if (errorMessage) return <p className="verse-message" role="alert">{errorMessage}</p>;
+  if (!hasInteracted || !verse) return <p className="verse-message">Choose a selection and press Go.</p>;
+  const displayedText = partialMode ? verse.text.split(' ').slice(0, partialWordCount).join(' ') + ' …' : verse.text;
+  return <div className="verse-content">
+    <Link className="verse-mushaf-link" to={'/mushaf?ayah=' + verseKey} state={{ from: 'memobuddy' }}>Mushaf</Link>
+    <div className="verse-reference" style={{ visibility: showInfo ? 'visible' : 'hidden' }}>{verse.surahName} · Surah {verse.surah} · Ayah {verse.ayah} · Juz {verse.juz}</div>
+    {previewMode === 'audio' ? <AudioVersePreview verse={verse} partialMode={partialMode} audioPartialSeconds={audioPartialSeconds} audioPlayRequest={audioPlayRequest} showInfo={showInfo} /> : <>
+      <div className="verse-flip" role="button" tabIndex={0} aria-label={showTranslation ? 'Show Arabic ayah' : requested ? 'Cancel loading translation' : 'Show English translation'} aria-pressed={showTranslation} onClick={flip} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); flip(); } }}>
+        <div className={'verse-flip-inner' + (showTranslation ? ' is-translated' : '')}>
+          <div className="verse-face verse-arabic" aria-hidden={showTranslation}><p dir="rtl" lang="ar" style={{ fontSize: ayahSize }}>{displayedText}</p></div>
+          <div className="verse-face verse-translation" aria-hidden={!showTranslation}><p>{translation}</p><span>Sahih International</span></div>
+        </div>
+      </div>
+      <div className="translation-feedback" aria-live="polite">{status === 'loading' ? 'Loading translation…' : status === 'error' ? <button type="button" onClick={() => setRequested(true)}>Translation unavailable. Try again</button> : ''}</div>
+    </>}
+  </div>;
+}
 export default VerseCard;

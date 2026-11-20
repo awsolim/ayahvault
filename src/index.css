@@ -154,3 +154,120 @@ a { color: inherit; text-decoration: none; }
  .practice-title { font-size: 30px; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; } }
+
+/* Horizontal mushaf: page 604 is physically leftmost, page 1 rightmost. */
+.reading-stream { display: flex; flex-direction: row; direction: ltr; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; overscroll-behavior-y: auto; }
+.reading-page { flex: 0 0 100%; width: 100%; min-width: 0; height: 100%; border-bottom: 0; border-left: 1px solid var(--rule); }
+.wordmark img { object-fit: contain; flex: 0 0 auto; }
+.index-intro { padding-bottom: 32px; }
+.resume-reading { display: flex; width: 100%; align-items: center; gap: 24px; min-height: 64px; padding: 14px 0; margin: 0 0 28px; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); color: var(--ink); transition: border-color 150ms; }
+.resume-reading:hover { border-color: var(--blue); color: var(--blue); }
+.resume-reading .resume-label { color: var(--blue); font-size: 15px; text-decoration: underline; text-underline-offset: 4px; font-weight: 500; }
+.resume-reading .resume-surah { color: inherit; font-size: 16px; margin-left: auto; overflow: hidden; text-overflow: ellipsis; }
+.resume-reading .resume-page { color: var(--muted); font-size: 14px; }
+.resume-reading svg { flex: 0 0 auto; }
+.practice-title { margin-bottom: 7px; }
+.practice-subtitle { margin: 0 0 30px; font-size: 15px; color: var(--muted); }
+.practice-modes button { display: flex; align-items: center; justify-content: center; flex-direction: column; min-height: 68px; line-height: 1.25; }
+.verse-preview { width: 100%; max-width: 720px; }
+.verse-navigation { display: flex; justify-content: space-between; gap: 20px; margin-bottom: 16px; }
+.practice .verse-navigation button { background: var(--ink); color: #fff; border: 0; border-radius: 3px; padding: 11px 24px; font: 500 16px 'Instrument Sans', sans-serif; min-width: 94px; min-height: 44px; }
+.practice .verse-navigation button:hover:not(:disabled) { background: var(--blue); }
+.practice .verse-navigation button:disabled { opacity: .45; cursor: default; }
+.verse-content { border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: 18px 0; width: 100%; }
+.verse-reference { text-align: center; color: var(--muted); font-size: 14px; min-height: 38px; }
+.verse-message { padding: 60px 15px; text-align: center; color: var(--muted); border-block: 1px solid var(--rule); }
+.verse-message[role=alert] { color: #a32929; }
+.verse-flip { perspective: 1400px; cursor: pointer; width: 100%; }
+.verse-flip-inner { display: grid; transform-style: preserve-3d; transition: transform 360ms cubic-bezier(.4,0,.2,1); }
+.verse-flip-inner.is-translated { transform: rotateY(180deg); }
+.verse-face { grid-area: 1 / 1; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 220px; padding: 12px 16px; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.verse-face p { margin: 0; }
+.verse-arabic p { font: 36px/1.9 Uthmanic, serif; text-align: center; overflow-wrap: anywhere; }
+.verse-translation { transform: rotateY(180deg); gap: 20px; }
+.verse-translation p { font-size: 21px; line-height: 1.6; text-align: center; }
+.verse-translation > span { font-size: 14px; color: var(--muted); }
+.translation-feedback { min-height: 30px; text-align: center; font-size: 14px; color: var(--muted); padding-top: 8px; }
+.translation-feedback button { border: 0; background: none; text-decoration: underline; color: var(--blue); }
+.surah-reference { margin: auto; padding: 0; border: 1px solid var(--rule); background: #fff; color: var(--ink); width: min(560px, calc(100vw - 32px)); max-height: 82dvh; font-family: 'Instrument Sans', sans-serif; }
+.surah-reference[open] { display: flex; flex-direction: column; }
+.surah-reference::backdrop { background: rgb(17 25 43 / .55); }
+.surah-reference header { display: flex; align-items: center; justify-content: space-between; padding: 16px 22px; border-bottom: 1px solid var(--rule); flex-shrink: 0; }
+.surah-reference h2 { margin: 0; font-size: 21px; font-weight: 500; }
+.surah-reference header button { background: none; border: 0; font-size: 28px; width: 40px; height: 40px; }
+.surah-reference ol { list-style: none; margin: 0; padding: 8px 22px; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 0 22px; }
+.surah-reference li { padding: 13px 0; border-bottom: 1px solid var(--rule); display: flex; align-items: baseline; gap: 12px; font-size: 15px; }
+.surah-reference li > span:first-child { color: var(--muted); min-width: 25px; font-variant-numeric: tabular-nums; }
+.surah-reference footer { padding: 14px 22px; border-top: 1px solid var(--rule); text-align: right; }
+.surah-reference footer button { color: white; background: var(--ink); border: 0; padding: 10px 24px; }
+@media (max-width: 640px) {
+ .resume-reading { gap: 12px; margin: 0 0 24px; }
+ .resume-reading .resume-label { font-size: 14px; }
+ .resume-reading .resume-surah { font-size: 14px; }
+ .resume-reading .resume-page { font-size: 13px; }
+ .resume-reading svg { width: 16px; }
+ .verse-arabic p { font-size: 32px; }
+ .verse-translation p { font-size: 19px; }
+ .surah-reference ol { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { .verse-flip-inner { transition: none; } }
+
+/* Reading and practice preferences */
+.resume-reading { background: linear-gradient(175deg, rgb(255 255 255 / .48), transparent 48%), linear-gradient(110deg, #f1d67f, #e4bd57 60%, #f4db94); border: 1px solid #c5a046; border-radius: 5px; padding: 10px 20px; min-height: 46px; gap: 20px; color: #302b20; box-shadow: inset 0 1px 0 rgb(255 255 255 / .7), 0 2px 5px rgb(138 101 25 / .12); }
+.resume-reading:hover { background: linear-gradient(175deg, rgb(255 255 255 / .55), transparent 48%), linear-gradient(110deg, #f7df91, #ecc45d 60%, #f8e2a6); border-color: #b18a30; color: #302b20; }
+.resume-reading .resume-label { color: inherit; text-decoration: none; font-size: 15px; font-weight: 600; }
+.resume-reading .resume-surah { color: inherit; }
+.resume-reading .resume-page { color: #574b30; }
+.resume-reading svg { color: #574b30; }
+.memo-settings { width: 100%; max-width: 720px; margin-top: 24px; border-top: 1px solid var(--rule); }
+.memo-settings > section { display: grid; grid-template-columns: minmax(130px, 1fr) auto; gap: 16px; align-items: center; min-height: 78px; padding: 18px 0; border-bottom: 1px solid var(--rule); }
+.memo-settings h2 { margin: 0; font-size: 15px; font-weight: 500; line-height: 1.4; }
+.setting-segments { display: inline-flex; border: 1px solid #cbd0da; border-radius: 4px; padding: 3px; gap: 3px; background: #fff; }
+.practice .setting-segments button { min-width: 74px; min-height: 36px; border: 0; background: none; color: var(--muted); font-size: 14px; padding: 6px 12px; }
+.practice .setting-segments button[aria-pressed=true] { background: var(--ink); color: #fff; }
+.preview-setting { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+.size-control, .partial-amount { display: inline-grid; grid-template-columns: 40px 74px 40px; align-items: center; height: 44px; border: 1px solid #cbd0da; border-radius: 4px; overflow: hidden; background: #fff; }
+.size-control button, .partial-amount button { width: 40px; height: 42px; padding: 0; border: 0; background: transparent; color: var(--ink); font-size: 22px; font-weight: 400; line-height: 1; border-radius: 0; }
+.size-control button:hover:not(:disabled), .partial-amount button:hover:not(:disabled) { background: #eef0f5; }
+.size-control button:disabled, .partial-amount button:disabled { color: #b9bec8; cursor: default; }
+.size-control output, .partial-amount output { text-align: center; font-size: 15px; font-variant-numeric: tabular-nums; line-height: 22px; border-inline: 1px solid var(--rule); }
+.size-control output span { color: var(--muted); font-size: 13px; }
+.partial-amount output { font-size: 13px; }
+.verse-content { display: flex; flex-direction: column; align-items: stretch; min-width: 0; }
+.verse-mushaf-link { align-self: center; display: inline-flex; align-items: center; min-height: 32px; padding: 5px 15px; margin: 0 0 12px; font-size: 13px; font-weight: 500; color: var(--ink); border: 1px solid #bfc6d3; border-radius: 4px; line-height: 1.4; }
+.verse-mushaf-link:hover { border-color: var(--ink); background: #f0f2f6; }
+.verse-flip-inner { grid-template-columns: minmax(0, 1fr); }
+.verse-face, .verse-face p { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+.verse-arabic p { line-height: 1.9; }
+.mushaf-sheet { max-width: 800px; padding: 8px 10px; }
+.page-lines { margin: 0; }
+.page-selector { display: flex; align-items: center; gap: 5px; font-size: 14px; }
+.page-selector select { appearance: none; border: 0; background: transparent; color: var(--ink); font: inherit; padding: 10px 18px 10px 4px; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='m1 1 5 5 5-5' fill='none' stroke='%23202c49' stroke-width='1.5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right center; }
+.settings-page { max-width: 720px; margin: 0 auto; padding: 45px 0; }
+.settings-page h1 { margin: 0 0 38px; font-size: 36px; font-weight: 500; letter-spacing: -1px; }
+.settings-section { border-top: 2px solid var(--ink); padding-top: 22px; }
+.settings-section h2 { font-size: 20px; font-weight: 500; margin: 0 0 26px; }
+.preference-row { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.preference-row h3 { margin: 0; font-size: 16px; font-weight: 500; }
+.preference-row p { font-size: 14px; color: var(--muted); margin: 6px 0 0; max-width: 320px; line-height: 1.5; }
+.settings-ayah-sample { font-family: Uthmanic, serif; text-align: center; padding: 36px 0; margin: 24px 0; border-block: 1px solid var(--rule); overflow-wrap: anywhere; }
+.reset-preference { border: 0; border-bottom: 1px solid currentColor; background: none; padding: 8px 0; color: var(--blue); font-size: 14px; }
+.reset-preference:disabled { opacity: .4; cursor: default; }
+@media (max-width: 640px) {
+ .primary-nav { gap: 28px; }
+ .resume-reading { padding: 10px 12px; gap: 10px; }
+ .resume-reading .resume-label, .resume-reading .resume-surah { font-size: 13px; }
+ .resume-reading .resume-page { font-size: 12px; }
+ .memo-settings > section { grid-template-columns: minmax(100px, 1fr) auto; gap: 12px; }
+ .memo-settings h2 { font-size: 14px; }
+ .practice .setting-segments button { min-width: 65px; padding: 6px 9px; }
+ .mushaf-sheet { padding: 6px; }
+ .reader-toolbar { grid-template-columns: auto minmax(0,1fr) auto; }
+ .reader-title { text-align: center; font-size: 13px; }
+ .reader-index-link { gap: 2px; font-size: 14px; }
+ .page-selector { gap: 3px; font-size: 13px; }
+ .page-selector select { max-width: 90px; }
+ .folio-total { display: none; }
+ .preference-row { flex-wrap: wrap; }
+ .settings-page { padding-top: 30px; }
+}
