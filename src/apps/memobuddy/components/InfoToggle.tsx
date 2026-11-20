@@ -29,7 +29,7 @@ export function InfoToggle({ showInfo, setShowInfo }: InfoToggleProps) {
     <div className="flex items-center gap-3">
       {/* Keyboard Hint - sits to the left of the switch */}
       {keyboardCapable && (
-        <kbd className="px-2 py-1 rounded bg-slate-100 border border-slate-300 text-[10px] font-mono text-slate-500 shadow-sm uppercase">
+        <kbd className="px-2 py-1 rounded bg-slate-100 border border-slate-300 text-[10px] font-mono text-slate-500 shadow-sm ">
           Shift
         </kbd>
       )}

@@ -124,14 +124,14 @@ export function CustomSelection({ config, setConfig }: any) {
       ) : (
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1 text-left">
-            <label className="text-[9px] uppercase font-bold text-emerald-600 pl-1">Start</label>
+            <label className="text-[9px]  font-bold text-emerald-600 pl-1">Start</label>
             <div className="flex gap-1">
               <input type="number" placeholder="Surah" className="w-full border rounded p-2 text-xs outline-none" onChange={e => setConfig({...config, exact: {...config.exact, startSurah: +e.target.value}})} />
               <input type="number" placeholder="Ayah" className="w-full border rounded p-2 text-xs outline-none" onChange={e => setConfig({...config, exact: {...config.exact, startAyah: +e.target.value}})} />
             </div>
           </div>
           <div className="space-y-1 text-left">
-            <label className="text-[9px] uppercase font-bold text-emerald-600 pl-1">End</label>
+            <label className="text-[9px]  font-bold text-emerald-600 pl-1">End</label>
             <div className="flex gap-1">
               <input type="number" placeholder="Surah" className="w-full border rounded p-2 text-xs outline-none" onChange={e => setConfig({...config, exact: {...config.exact, endSurah: +e.target.value}})} />
               <input type="number" placeholder="Ayah" className="w-full border rounded p-2 text-xs outline-none" onChange={e => setConfig({...config, exact: {...config.exact, endAyah: +e.target.value}})} />

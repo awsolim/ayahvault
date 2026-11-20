@@ -135,7 +135,7 @@ function AudioVersePreview({
       </div>
 
       <div className="text-center">
-        <p className="text-xs font-bold tracking-[0.18em] uppercase text-slate-400">
+        <p className="text-xs font-bold tracking-[0.18em]  text-slate-400">
           Minshawi Murattal
         </p>
         <p className="mt-1 text-sm font-semibold text-slate-700">
@@ -319,7 +319,7 @@ export function VerseCard({
             {!isTextBackFace && (
               <div className="mb-4 min-h-[2.5rem] flex flex-col items-center justify-center">
                 <div className={['transition-opacity duration-300', showHeaderInfo ? 'opacity-100' : 'opacity-0'].join(' ')}>
-                  <h3 className="text-xs font-bold tracking-[0.2em] uppercase text-emerald-600 font-kanit">
+                  <h3 className="text-xs font-bold tracking-[0.2em]  text-emerald-600 font-kanit">
                     {verse.surahName}
                   </h3>
                   <div className="flex items-center justify-center gap-2 mt-1">
@@ -395,7 +395,7 @@ export function VerseCard({
                       transform: 'rotateY(180deg)',
                     }}
                   >
-                    <p className="text-xs font-bold tracking-[0.18em] uppercase text-slate-400">
+                    <p className="text-xs font-bold tracking-[0.18em]  text-slate-400">
                       Sahih International
                     </p>
                     {translationStatus === 'error' ? (
@@ -410,7 +410,7 @@ export function VerseCard({
 
                 {pendingTranslationFlip && (
                   <div className="absolute inset-x-0 bottom-0 flex justify-center">
-                    <span className="rounded-full bg-white/90 border border-emerald-100 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-emerald-600 shadow-sm">
+                    <span className="rounded-full bg-white/90 border border-emerald-100 px-3 py-1 text-[10px] font-bold  tracking-widest text-emerald-600 shadow-sm">
                       Loading translation
                     </span>
                   </div>

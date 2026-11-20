@@ -16,7 +16,7 @@ export const apps = [
     "theme": "blue",
     "image_url": "/images/triviabuddy.png",
     "router": "/triviabuddy/setup",
-    "enabled": true
+    "enabled": false
   },
   {
     "id": "arabuddy",
@@ -25,7 +25,7 @@ export const apps = [
     "theme": "purple",
     "image_url": "/images/arabuddy.png",
     "router": "/arabuddy",
-    "enabled": true
+    "enabled": false
   },
   {
     "id": "hifzbuddy",

@@ -52,11 +52,11 @@ export function RangeInput({
       </div>
 
       <div className="flex items-center justify-center gap-4">
-        <button type="button" onClick={toggleMulti} className="text-[10px] text-emerald-600 font-bold uppercase tracking-tight hover:underline">
+        <button type="button" onClick={toggleMulti} className="text-[10px] text-emerald-600 font-bold  tracking-tight hover:underline">
           {useMultiRange ? 'Single Mode' : 'Range Mode'}
         </button>
-        <button type="button" onClick={onOpenList} className="text-[10px] text-emerald-600/70 font-bold uppercase tracking-tight flex items-center gap-1">
-          📖 Surah List
+        <button type="button" onClick={onOpenList} className="text-[10px] text-emerald-600/70 font-bold  tracking-tight flex items-center gap-1">
+          Surah List
         </button>
       </div>
     </form>

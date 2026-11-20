@@ -1,7 +1,8 @@
 // src/apps/memobuddy/MemoBuddy.tsx
 
 import { useState, useCallback } from 'react';
-import Footer from '../../components/layout/Footer';
+import { Link } from 'react-router-dom';
+
 import { useRandomVerse } from './hooks/useRandomVerse';
 import { useKeyboardNav } from './hooks/useKeyboardNav';
 import { ModeSelector } from './components/ModeSelector';
@@ -66,7 +67,7 @@ export default function MemoBuddy() {
   const [showInfo, setShowInfo] = useState(false); // Off by default
   const [hasInteracted, setHasInteracted] = useState(false);
 
-  const appDescription = "";
+
 
   const { randomVerse, errorMessage, generateRandomVerse, navigateToAdjacentVerse } = useRandomVerse();
 
@@ -99,16 +100,11 @@ export default function MemoBuddy() {
   );
 
   return (
-    <div className="flex flex-col items-center min-h-screen py-8 px-4 font-kanit">
+    <div className="practice flex flex-col items-center">
       <Seo title="MemoBuddy" />
       <SurahReference isOpen={isRefOpen} onClose={() => setIsRefOpen(false)} />
       
-      <div className="text-center mb-6">
-        <h1 className="text-4xl font-bold text-emerald-600 tracking-tight">MEMOBUDDY</h1>
-        <p className="text-gray-500 text-[12px] mt-1 max-w-[260px] mx-auto leading-tight italic">
-          {appDescription}
-        </p>
-      </div>
+      <h1 className="practice-title">Random ayah</h1>
 
       <div className="w-full max-w-md mb-8">
         <ModeSelector mode={mode} onSelect={(m) => setMode(m)} />
@@ -121,8 +117,8 @@ export default function MemoBuddy() {
                 <button onClick={handleGo} className={goBtnClass}>Go</button>
                 {previewModeToggle}
               </div>
-              <button onClick={() => setIsRefOpen(true)} className="mt-4 text-[10px] font-bold text-emerald-600/70 uppercase tracking-widest flex items-center gap-1">
-                <span className="text-sm">📖</span> Surah List
+              <button onClick={() => setIsRefOpen(true)} className="mt-4 text-[10px] font-bold text-emerald-600/70  tracking-widest flex items-center gap-1">
+                <span className="text-sm"></span> Surah List
               </button>
             </div>
           )}
@@ -156,10 +152,12 @@ export default function MemoBuddy() {
         onPrev={() => navigateToAdjacentVerse(-1)} onNext={() => navigateToAdjacentVerse(1)} 
       />
 
+      {randomVerse && <Link to={`/mushaf?ayah=${randomVerse.surah}:${randomVerse.ayah}`} className="open-in-mushaf">Open this ayah in Mushaf</Link>}
+
       {/* FIXED SETTINGS ROW: Always horizontal, Title above Control */}
       <div className="w-full max-w-md mt-10 flex flex-row items-start justify-center gap-6 sm:gap-12 px-2">
         <div className="flex flex-col items-center gap-2 flex-1">
-          <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Preview</span>
+          <span className="text-[11px] font-bold text-gray-500  tracking-widest">Preview</span>
           <PreviewControls 
             previewMode={previewMode}
             partialMode={partialMode} 
@@ -172,16 +170,16 @@ export default function MemoBuddy() {
         </div>
 
         <div className="flex flex-col items-center gap-2 flex-1">
-          <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Verse Info</span>
+          <span className="text-[11px] font-bold text-gray-500  tracking-widest">Verse Info</span>
           <InfoToggle showInfo={showInfo} setShowInfo={setShowInfo} />
         </div>
       </div>
 
-      <p className="hidden md:block mt-4 text-[11px] font-bold uppercase tracking-widest text-slate-400">
+      <p className="hidden md:block mt-4 text-[11px] font-bold  tracking-widest text-slate-400">
         Use left and right arrow keys to check the previous or following verse
       </p>
 
-      <Footer />
+
     </div>
   );
 }

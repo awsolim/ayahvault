@@ -40,7 +40,7 @@ export function PreviewControls({
     <div className="flex flex-col items-center gap-3">
       <div className="flex items-center gap-3">
         {keyboardCapable && (
-          <kbd className="px-2 py-1 rounded bg-slate-100 border border-slate-300 text-[10px] font-mono text-slate-500 shadow-sm uppercase">
+          <kbd className="px-2 py-1 rounded bg-slate-100 border border-slate-300 text-[10px] font-mono text-slate-500 shadow-sm ">
             Space
           </kbd>
         )}

@@ -1,23 +1,12 @@
-// src/root.tsx
-import { Outlet } from 'react-router-dom'
-import BackButton from './components/ui/BackButton'   // adjust path if needed
-
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
 export default function RootLayout() {
-  return (
-    <div className="relative isolation-isolate min-h-screen">
-      {/* Dot-grid background */}
-      <div
-        className="absolute inset-0 -z-10
-                   bg-[radial-gradient(circle,#e5e7eb_1px,_transparent_1px)]
-                   bg-[size:16px_16px]"
-      />
-      
-      {/* ← Your shared Back button */}
-      <BackButton />
-
-      <main className="relative z-0 p-8">
-        <Outlet />      {/* <-- All pages (Home, MemoBuddy, TriviaBuddy) render here */}
-      </main>
-    </div>
-  )
+  const { pathname } = useLocation();
+  const reading = pathname === '/mushaf';
+  return <div className={reading ? 'app-shell reading-shell' : 'app-shell'}>
+    {!reading && <header className="app-header">
+      <NavLink to="/" className="wordmark" aria-label="AyahVault home"><svg width="25" height="30" viewBox="0 0 25 30" fill="none" aria-hidden="true"><path d="M3 3h13l6 6v18H3V3Z" stroke="currentColor" strokeWidth="1.6"/><path d="M8 3v24M16 3v7h6M12 16h6M12 21h6" stroke="currentColor" strokeWidth="1.6"/></svg>AyahVault<span className="brand-period">.</span></NavLink>
+      <nav className="primary-nav" aria-label="Main navigation"><NavLink to="/" end>Mushaf</NavLink><NavLink to="/memobuddy">Random ayah</NavLink></nav>
+    </header>}
+    <main className={reading ? 'reader-main' : 'app-main'}><Outlet /></main>
+  </div>;
 }

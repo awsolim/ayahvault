@@ -1,0 +1,914 @@
+[
+  {
+    "id": 1,
+    "name": "Al-Fatihah",
+    "arabic": "الفاتحة",
+    "verses": 7,
+    "page": 1,
+    "revelation": "makkah"
+  },
+  {
+    "id": 2,
+    "name": "Al-Baqarah",
+    "arabic": "البقرة",
+    "verses": 286,
+    "page": 2,
+    "revelation": "madinah"
+  },
+  {
+    "id": 3,
+    "name": "Ali 'Imran",
+    "arabic": "آل عمران",
+    "verses": 200,
+    "page": 50,
+    "revelation": "madinah"
+  },
+  {
+    "id": 4,
+    "name": "An-Nisa",
+    "arabic": "النساء",
+    "verses": 176,
+    "page": 77,
+    "revelation": "madinah"
+  },
+  {
+    "id": 5,
+    "name": "Al-Ma'idah",
+    "arabic": "المائدة",
+    "verses": 120,
+    "page": 106,
+    "revelation": "madinah"
+  },
+  {
+    "id": 6,
+    "name": "Al-An'am",
+    "arabic": "الأنعام",
+    "verses": 165,
+    "page": 128,
+    "revelation": "makkah"
+  },
+  {
+    "id": 7,
+    "name": "Al-A'raf",
+    "arabic": "الأعراف",
+    "verses": 206,
+    "page": 151,
+    "revelation": "makkah"
+  },
+  {
+    "id": 8,
+    "name": "Al-Anfal",
+    "arabic": "الأنفال",
+    "verses": 75,
+    "page": 177,
+    "revelation": "madinah"
+  },
+  {
+    "id": 9,
+    "name": "At-Tawbah",
+    "arabic": "التوبة",
+    "verses": 129,
+    "page": 187,
+    "revelation": "madinah"
+  },
+  {
+    "id": 10,
+    "name": "Yunus",
+    "arabic": "يونس",
+    "verses": 109,
+    "page": 208,
+    "revelation": "makkah"
+  },
+  {
+    "id": 11,
+    "name": "Hud",
+    "arabic": "هود",
+    "verses": 123,
+    "page": 221,
+    "revelation": "makkah"
+  },
+  {
+    "id": 12,
+    "name": "Yusuf",
+    "arabic": "يوسف",
+    "verses": 111,
+    "page": 235,
+    "revelation": "makkah"
+  },
+  {
+    "id": 13,
+    "name": "Ar-Ra'd",
+    "arabic": "الرعد",
+    "verses": 43,
+    "page": 249,
+    "revelation": "madinah"
+  },
+  {
+    "id": 14,
+    "name": "Ibrahim",
+    "arabic": "ابراهيم",
+    "verses": 52,
+    "page": 255,
+    "revelation": "makkah"
+  },
+  {
+    "id": 15,
+    "name": "Al-Hijr",
+    "arabic": "الحجر",
+    "verses": 99,
+    "page": 262,
+    "revelation": "makkah"
+  },
+  {
+    "id": 16,
+    "name": "An-Nahl",
+    "arabic": "النحل",
+    "verses": 128,
+    "page": 267,
+    "revelation": "makkah"
+  },
+  {
+    "id": 17,
+    "name": "Al-Isra",
+    "arabic": "الإسراء",
+    "verses": 111,
+    "page": 282,
+    "revelation": "makkah"
+  },
+  {
+    "id": 18,
+    "name": "Al-Kahf",
+    "arabic": "الكهف",
+    "verses": 110,
+    "page": 293,
+    "revelation": "makkah"
+  },
+  {
+    "id": 19,
+    "name": "Maryam",
+    "arabic": "مريم",
+    "verses": 98,
+    "page": 305,
+    "revelation": "makkah"
+  },
+  {
+    "id": 20,
+    "name": "Taha",
+    "arabic": "طه",
+    "verses": 135,
+    "page": 312,
+    "revelation": "makkah"
+  },
+  {
+    "id": 21,
+    "name": "Al-Anbya",
+    "arabic": "الأنبياء",
+    "verses": 112,
+    "page": 322,
+    "revelation": "makkah"
+  },
+  {
+    "id": 22,
+    "name": "Al-Hajj",
+    "arabic": "الحج",
+    "verses": 78,
+    "page": 332,
+    "revelation": "madinah"
+  },
+  {
+    "id": 23,
+    "name": "Al-Mu'minun",
+    "arabic": "المؤمنون",
+    "verses": 118,
+    "page": 342,
+    "revelation": "makkah"
+  },
+  {
+    "id": 24,
+    "name": "An-Nur",
+    "arabic": "النور",
+    "verses": 64,
+    "page": 350,
+    "revelation": "madinah"
+  },
+  {
+    "id": 25,
+    "name": "Al-Furqan",
+    "arabic": "الفرقان",
+    "verses": 77,
+    "page": 359,
+    "revelation": "makkah"
+  },
+  {
+    "id": 26,
+    "name": "Ash-Shu'ara",
+    "arabic": "الشعراء",
+    "verses": 227,
+    "page": 367,
+    "revelation": "makkah"
+  },
+  {
+    "id": 27,
+    "name": "An-Naml",
+    "arabic": "النمل",
+    "verses": 93,
+    "page": 377,
+    "revelation": "makkah"
+  },
+  {
+    "id": 28,
+    "name": "Al-Qasas",
+    "arabic": "القصص",
+    "verses": 88,
+    "page": 385,
+    "revelation": "makkah"
+  },
+  {
+    "id": 29,
+    "name": "Al-'Ankabut",
+    "arabic": "العنكبوت",
+    "verses": 69,
+    "page": 396,
+    "revelation": "makkah"
+  },
+  {
+    "id": 30,
+    "name": "Ar-Rum",
+    "arabic": "الروم",
+    "verses": 60,
+    "page": 404,
+    "revelation": "makkah"
+  },
+  {
+    "id": 31,
+    "name": "Luqman",
+    "arabic": "لقمان",
+    "verses": 34,
+    "page": 411,
+    "revelation": "makkah"
+  },
+  {
+    "id": 32,
+    "name": "As-Sajdah",
+    "arabic": "السجدة",
+    "verses": 30,
+    "page": 415,
+    "revelation": "makkah"
+  },
+  {
+    "id": 33,
+    "name": "Al-Ahzab",
+    "arabic": "الأحزاب",
+    "verses": 73,
+    "page": 418,
+    "revelation": "madinah"
+  },
+  {
+    "id": 34,
+    "name": "Saba",
+    "arabic": "سبإ",
+    "verses": 54,
+    "page": 428,
+    "revelation": "makkah"
+  },
+  {
+    "id": 35,
+    "name": "Fatir",
+    "arabic": "فاطر",
+    "verses": 45,
+    "page": 434,
+    "revelation": "makkah"
+  },
+  {
+    "id": 36,
+    "name": "Ya-Sin",
+    "arabic": "يس",
+    "verses": 83,
+    "page": 440,
+    "revelation": "makkah"
+  },
+  {
+    "id": 37,
+    "name": "As-Saffat",
+    "arabic": "الصافات",
+    "verses": 182,
+    "page": 446,
+    "revelation": "makkah"
+  },
+  {
+    "id": 38,
+    "name": "Sad",
+    "arabic": "ص",
+    "verses": 88,
+    "page": 453,
+    "revelation": "makkah"
+  },
+  {
+    "id": 39,
+    "name": "Az-Zumar",
+    "arabic": "الزمر",
+    "verses": 75,
+    "page": 458,
+    "revelation": "makkah"
+  },
+  {
+    "id": 40,
+    "name": "Ghafir",
+    "arabic": "غافر",
+    "verses": 85,
+    "page": 467,
+    "revelation": "makkah"
+  },
+  {
+    "id": 41,
+    "name": "Fussilat",
+    "arabic": "فصلت",
+    "verses": 54,
+    "page": 477,
+    "revelation": "makkah"
+  },
+  {
+    "id": 42,
+    "name": "Ash-Shuraa",
+    "arabic": "الشورى",
+    "verses": 53,
+    "page": 483,
+    "revelation": "makkah"
+  },
+  {
+    "id": 43,
+    "name": "Az-Zukhruf",
+    "arabic": "الزخرف",
+    "verses": 89,
+    "page": 489,
+    "revelation": "makkah"
+  },
+  {
+    "id": 44,
+    "name": "Ad-Dukhan",
+    "arabic": "الدخان",
+    "verses": 59,
+    "page": 496,
+    "revelation": "makkah"
+  },
+  {
+    "id": 45,
+    "name": "Al-Jathiyah",
+    "arabic": "الجاثية",
+    "verses": 37,
+    "page": 499,
+    "revelation": "makkah"
+  },
+  {
+    "id": 46,
+    "name": "Al-Ahqaf",
+    "arabic": "الأحقاف",
+    "verses": 35,
+    "page": 502,
+    "revelation": "makkah"
+  },
+  {
+    "id": 47,
+    "name": "Muhammad",
+    "arabic": "محمد",
+    "verses": 38,
+    "page": 507,
+    "revelation": "madinah"
+  },
+  {
+    "id": 48,
+    "name": "Al-Fath",
+    "arabic": "الفتح",
+    "verses": 29,
+    "page": 511,
+    "revelation": "madinah"
+  },
+  {
+    "id": 49,
+    "name": "Al-Hujurat",
+    "arabic": "الحجرات",
+    "verses": 18,
+    "page": 515,
+    "revelation": "madinah"
+  },
+  {
+    "id": 50,
+    "name": "Qaf",
+    "arabic": "ق",
+    "verses": 45,
+    "page": 518,
+    "revelation": "makkah"
+  },
+  {
+    "id": 51,
+    "name": "Adh-Dhariyat",
+    "arabic": "الذاريات",
+    "verses": 60,
+    "page": 520,
+    "revelation": "makkah"
+  },
+  {
+    "id": 52,
+    "name": "At-Tur",
+    "arabic": "الطور",
+    "verses": 49,
+    "page": 523,
+    "revelation": "makkah"
+  },
+  {
+    "id": 53,
+    "name": "An-Najm",
+    "arabic": "النجم",
+    "verses": 62,
+    "page": 526,
+    "revelation": "makkah"
+  },
+  {
+    "id": 54,
+    "name": "Al-Qamar",
+    "arabic": "القمر",
+    "verses": 55,
+    "page": 528,
+    "revelation": "makkah"
+  },
+  {
+    "id": 55,
+    "name": "Ar-Rahman",
+    "arabic": "الرحمن",
+    "verses": 78,
+    "page": 531,
+    "revelation": "madinah"
+  },
+  {
+    "id": 56,
+    "name": "Al-Waqi'ah",
+    "arabic": "الواقعة",
+    "verses": 96,
+    "page": 534,
+    "revelation": "makkah"
+  },
+  {
+    "id": 57,
+    "name": "Al-Hadid",
+    "arabic": "الحديد",
+    "verses": 29,
+    "page": 537,
+    "revelation": "madinah"
+  },
+  {
+    "id": 58,
+    "name": "Al-Mujadila",
+    "arabic": "المجادلة",
+    "verses": 22,
+    "page": 542,
+    "revelation": "madinah"
+  },
+  {
+    "id": 59,
+    "name": "Al-Hashr",
+    "arabic": "الحشر",
+    "verses": 24,
+    "page": 545,
+    "revelation": "madinah"
+  },
+  {
+    "id": 60,
+    "name": "Al-Mumtahanah",
+    "arabic": "الممتحنة",
+    "verses": 13,
+    "page": 549,
+    "revelation": "madinah"
+  },
+  {
+    "id": 61,
+    "name": "As-Saf",
+    "arabic": "الصف",
+    "verses": 14,
+    "page": 551,
+    "revelation": "madinah"
+  },
+  {
+    "id": 62,
+    "name": "Al-Jumu'ah",
+    "arabic": "الجمعة",
+    "verses": 11,
+    "page": 553,
+    "revelation": "madinah"
+  },
+  {
+    "id": 63,
+    "name": "Al-Munafiqun",
+    "arabic": "المنافقون",
+    "verses": 11,
+    "page": 554,
+    "revelation": "madinah"
+  },
+  {
+    "id": 64,
+    "name": "At-Taghabun",
+    "arabic": "التغابن",
+    "verses": 18,
+    "page": 556,
+    "revelation": "madinah"
+  },
+  {
+    "id": 65,
+    "name": "At-Talaq",
+    "arabic": "الطلاق",
+    "verses": 12,
+    "page": 558,
+    "revelation": "madinah"
+  },
+  {
+    "id": 66,
+    "name": "At-Tahrim",
+    "arabic": "التحريم",
+    "verses": 12,
+    "page": 560,
+    "revelation": "madinah"
+  },
+  {
+    "id": 67,
+    "name": "Al-Mulk",
+    "arabic": "الملك",
+    "verses": 30,
+    "page": 562,
+    "revelation": "makkah"
+  },
+  {
+    "id": 68,
+    "name": "Al-Qalam",
+    "arabic": "القلم",
+    "verses": 52,
+    "page": 564,
+    "revelation": "makkah"
+  },
+  {
+    "id": 69,
+    "name": "Al-Haqqah",
+    "arabic": "الحاقة",
+    "verses": 52,
+    "page": 566,
+    "revelation": "makkah"
+  },
+  {
+    "id": 70,
+    "name": "Al-Ma'arij",
+    "arabic": "المعارج",
+    "verses": 44,
+    "page": 568,
+    "revelation": "makkah"
+  },
+  {
+    "id": 71,
+    "name": "Nuh",
+    "arabic": "نوح",
+    "verses": 28,
+    "page": 570,
+    "revelation": "makkah"
+  },
+  {
+    "id": 72,
+    "name": "Al-Jinn",
+    "arabic": "الجن",
+    "verses": 28,
+    "page": 572,
+    "revelation": "makkah"
+  },
+  {
+    "id": 73,
+    "name": "Al-Muzzammil",
+    "arabic": "المزمل",
+    "verses": 20,
+    "page": 574,
+    "revelation": "makkah"
+  },
+  {
+    "id": 74,
+    "name": "Al-Muddaththir",
+    "arabic": "المدثر",
+    "verses": 56,
+    "page": 575,
+    "revelation": "makkah"
+  },
+  {
+    "id": 75,
+    "name": "Al-Qiyamah",
+    "arabic": "القيامة",
+    "verses": 40,
+    "page": 577,
+    "revelation": "makkah"
+  },
+  {
+    "id": 76,
+    "name": "Al-Insan",
+    "arabic": "الانسان",
+    "verses": 31,
+    "page": 578,
+    "revelation": "madinah"
+  },
+  {
+    "id": 77,
+    "name": "Al-Mursalat",
+    "arabic": "المرسلات",
+    "verses": 50,
+    "page": 580,
+    "revelation": "makkah"
+  },
+  {
+    "id": 78,
+    "name": "An-Naba",
+    "arabic": "النبإ",
+    "verses": 40,
+    "page": 582,
+    "revelation": "makkah"
+  },
+  {
+    "id": 79,
+    "name": "An-Nazi'at",
+    "arabic": "النازعات",
+    "verses": 46,
+    "page": 583,
+    "revelation": "makkah"
+  },
+  {
+    "id": 80,
+    "name": "'Abasa",
+    "arabic": "عبس",
+    "verses": 42,
+    "page": 585,
+    "revelation": "makkah"
+  },
+  {
+    "id": 81,
+    "name": "At-Takwir",
+    "arabic": "التكوير",
+    "verses": 29,
+    "page": 586,
+    "revelation": "makkah"
+  },
+  {
+    "id": 82,
+    "name": "Al-Infitar",
+    "arabic": "الإنفطار",
+    "verses": 19,
+    "page": 587,
+    "revelation": "makkah"
+  },
+  {
+    "id": 83,
+    "name": "Al-Mutaffifin",
+    "arabic": "المطففين",
+    "verses": 36,
+    "page": 587,
+    "revelation": "makkah"
+  },
+  {
+    "id": 84,
+    "name": "Al-Inshiqaq",
+    "arabic": "الإنشقاق",
+    "verses": 25,
+    "page": 589,
+    "revelation": "makkah"
+  },
+  {
+    "id": 85,
+    "name": "Al-Buruj",
+    "arabic": "البروج",
+    "verses": 22,
+    "page": 590,
+    "revelation": "makkah"
+  },
+  {
+    "id": 86,
+    "name": "At-Tariq",
+    "arabic": "الطارق",
+    "verses": 17,
+    "page": 591,
+    "revelation": "makkah"
+  },
+  {
+    "id": 87,
+    "name": "Al-A'la",
+    "arabic": "الأعلى",
+    "verses": 19,
+    "page": 591,
+    "revelation": "makkah"
+  },
+  {
+    "id": 88,
+    "name": "Al-Ghashiyah",
+    "arabic": "الغاشية",
+    "verses": 26,
+    "page": 592,
+    "revelation": "makkah"
+  },
+  {
+    "id": 89,
+    "name": "Al-Fajr",
+    "arabic": "الفجر",
+    "verses": 30,
+    "page": 593,
+    "revelation": "makkah"
+  },
+  {
+    "id": 90,
+    "name": "Al-Balad",
+    "arabic": "البلد",
+    "verses": 20,
+    "page": 594,
+    "revelation": "makkah"
+  },
+  {
+    "id": 91,
+    "name": "Ash-Shams",
+    "arabic": "الشمس",
+    "verses": 15,
+    "page": 595,
+    "revelation": "makkah"
+  },
+  {
+    "id": 92,
+    "name": "Al-Layl",
+    "arabic": "الليل",
+    "verses": 21,
+    "page": 595,
+    "revelation": "makkah"
+  },
+  {
+    "id": 93,
+    "name": "Ad-Duhaa",
+    "arabic": "الضحى",
+    "verses": 11,
+    "page": 596,
+    "revelation": "makkah"
+  },
+  {
+    "id": 94,
+    "name": "Ash-Sharh",
+    "arabic": "الشرح",
+    "verses": 8,
+    "page": 596,
+    "revelation": "makkah"
+  },
+  {
+    "id": 95,
+    "name": "At-Tin",
+    "arabic": "التين",
+    "verses": 8,
+    "page": 597,
+    "revelation": "makkah"
+  },
+  {
+    "id": 96,
+    "name": "Al-'Alaq",
+    "arabic": "العلق",
+    "verses": 19,
+    "page": 597,
+    "revelation": "makkah"
+  },
+  {
+    "id": 97,
+    "name": "Al-Qadr",
+    "arabic": "القدر",
+    "verses": 5,
+    "page": 598,
+    "revelation": "makkah"
+  },
+  {
+    "id": 98,
+    "name": "Al-Bayyinah",
+    "arabic": "البينة",
+    "verses": 8,
+    "page": 598,
+    "revelation": "madinah"
+  },
+  {
+    "id": 99,
+    "name": "Az-Zalzalah",
+    "arabic": "الزلزلة",
+    "verses": 8,
+    "page": 599,
+    "revelation": "madinah"
+  },
+  {
+    "id": 100,
+    "name": "Al-'Adiyat",
+    "arabic": "العاديات",
+    "verses": 11,
+    "page": 599,
+    "revelation": "makkah"
+  },
+  {
+    "id": 101,
+    "name": "Al-Qari'ah",
+    "arabic": "القارعة",
+    "verses": 11,
+    "page": 600,
+    "revelation": "makkah"
+  },
+  {
+    "id": 102,
+    "name": "At-Takathur",
+    "arabic": "التكاثر",
+    "verses": 8,
+    "page": 600,
+    "revelation": "makkah"
+  },
+  {
+    "id": 103,
+    "name": "Al-'Asr",
+    "arabic": "العصر",
+    "verses": 3,
+    "page": 601,
+    "revelation": "makkah"
+  },
+  {
+    "id": 104,
+    "name": "Al-Humazah",
+    "arabic": "الهمزة",
+    "verses": 9,
+    "page": 601,
+    "revelation": "makkah"
+  },
+  {
+    "id": 105,
+    "name": "Al-Fil",
+    "arabic": "الفيل",
+    "verses": 5,
+    "page": 601,
+    "revelation": "makkah"
+  },
+  {
+    "id": 106,
+    "name": "Quraysh",
+    "arabic": "قريش",
+    "verses": 4,
+    "page": 602,
+    "revelation": "makkah"
+  },
+  {
+    "id": 107,
+    "name": "Al-Ma'un",
+    "arabic": "الماعون",
+    "verses": 7,
+    "page": 602,
+    "revelation": "makkah"
+  },
+  {
+    "id": 108,
+    "name": "Al-Kawthar",
+    "arabic": "الكوثر",
+    "verses": 3,
+    "page": 602,
+    "revelation": "makkah"
+  },
+  {
+    "id": 109,
+    "name": "Al-Kafirun",
+    "arabic": "الكافرون",
+    "verses": 6,
+    "page": 603,
+    "revelation": "makkah"
+  },
+  {
+    "id": 110,
+    "name": "An-Nasr",
+    "arabic": "النصر",
+    "verses": 3,
+    "page": 603,
+    "revelation": "madinah"
+  },
+  {
+    "id": 111,
+    "name": "Al-Masad",
+    "arabic": "المسد",
+    "verses": 5,
+    "page": 603,
+    "revelation": "makkah"
+  },
+  {
+    "id": 112,
+    "name": "Al-Ikhlas",
+    "arabic": "الإخلاص",
+    "verses": 4,
+    "page": 604,
+    "revelation": "makkah"
+  },
+  {
+    "id": 113,
+    "name": "Al-Falaq",
+    "arabic": "الفلق",
+    "verses": 5,
+    "page": 604,
+    "revelation": "makkah"
+  },
+  {
+    "id": 114,
+    "name": "An-Nas",
+    "arabic": "الناس",
+    "verses": 6,
+    "page": 604,
+    "revelation": "makkah"
+  }
+]

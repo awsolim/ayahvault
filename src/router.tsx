@@ -5,6 +5,7 @@ import HomePage from './pages/HomePage';
 import Unavailable from './pages/Unavailable';
 import { apps, type AppId } from './config/apps';
 import Spinner from './components/ui/Spinner';
+const Mushaf = lazy(() => import('./apps/mushaf/Mushaf'));
 const MemoBuddy = lazy(() => import('./apps/memobuddy/MemoBuddy'));
 const GameSetup = lazy(() => import('./apps/triviabuddy/pages/GameSetup'));
 const TriviaBuddy = lazy(() => import('./apps/triviabuddy/TriviaBuddy'));
@@ -18,6 +19,7 @@ function appRoute(id: AppId, element: ReactNode) {
 export const router = createBrowserRouter([{
   path: '/', element: <RootLayout />, children: [
     { index: true, element: <HomePage /> },
+    { path: 'mushaf', element: <Suspense fallback={<Spinner />}><Mushaf /></Suspense> },
     { path: 'memobuddy', element: appRoute('memobuddy', <MemoBuddy />) },
     { path: 'triviabuddy/setup', element: appRoute('triviabuddy', <GameSetup />) },
     { path: 'triviabuddy/game/:gameId', element: appRoute('triviabuddy', <TriviaBuddy />) },

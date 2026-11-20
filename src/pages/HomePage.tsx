@@ -1,112 +1,24 @@
-import { Link } from "react-router-dom";
-import Footer from "../components/layout/Footer";
-import { apps as appConfig } from "../config/apps";
-import Seo from "../lib/Seo";
-
-
-
-/** Theme map, now includes per-theme hover bg */
-const themeClasses = {
-  emerald: {
-    title: "text-emerald-700",
-    button: "text-emerald-700",
-    cardHover: "hover:bg-emerald-50",   // NEW
-  },
-  blue: {
-    title: "text-blue-700",
-    button: "text-blue-700",
-    cardHover: "hover:bg-blue-50",      // NEW
-  },
-  purple: {
-    title: "text-purple-700",
-    button: "text-purple-700",
-    cardHover: "hover:bg-purple-50",    // NEW
-  },
-  amber: {
-    title: "text-amber-700",
-    button: "text-amber-700",
-    cardHover: "hover:bg-amber-50",     // NEW
-  },
-  red: {
-    title: "text-red-700",
-    button: "text-red-700",
-    cardHover: "hover:bg-red-50",       // NEW
-  },
-} as const;
-
-type ThemeKey = keyof typeof themeClasses;
-
-
-
-function themeFor(name?: string | null) {
-  const k = (name ?? "").toLowerCase().trim() as ThemeKey;
-  return (
-    themeClasses[k] ?? {
-      title: "text-gray-700",
-      button: "text-gray-700",
-      cardHover: "hover:bg-slate-50",
-    }
-  );
-}
-function fallbackRoute(title: string) {
-  return "/" + title.toLowerCase().replace(/[^a-z0-9]+/g, "");
-}
-function imgPath(u?: string | null) {
-  if (!u) return "";
-  return u.startsWith("/") ? u : `/${u}`;
-}
-
+import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
+import chapters from '../assets/chapters.json';
+import Seo from '../lib/Seo';
 export default function HomePage() {
-  const apps = appConfig.filter(app => app.enabled);
-
-  return (
-    <div className="flex flex-col items-center justify-center text-center min-h-screen px-4 sm:px-6 lg:px-8">
-      <Seo title="AyahVault – Quran Learning Apps" description="Practice Quran memorization and create trivia games with AyahVault." canonical="https://ayahvault.com/" />
-      <h1 className="text-5xl sm:text-6xl md:text-7xl font-mozilla text-black mb-4">
-        AyahVault
-      </h1>
-      <p className="text-lg sm:text-xl text-gray-700 max-w-2xl mb-12">
-        Select from a variety of apps designed to help you learn Quran,
-        build memorization, explore knowledge, and support your Islamic journey.
-      </p>
-
-      <div className="w-full max-w-4xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 mb-12 items-stretch">
-        {apps.map((app) => {
-            const theme = themeFor(app.theme);
-            const link = app.router?.trim() || fallbackRoute(app.title);
-            const image = imgPath(app.image_url);
-
-            return (
-              <Link
-                key={app.id}
-                to={link}
-                className={[
-                  "bg-white border border-slate-200 rounded-lg p-6 h-96 flex flex-col transition hover:shadow-lg",
-                  theme.cardHover, // <- theme-specific hover color
-                ].join(" ")}
-              >
-                <h2 className={`text-xl font-bold ${theme.title} mb-2`}>
-                  {app.title}
-                </h2>
-
-                <p className="text-gray-600 flex-1">{app.description}</p>
-
-                <img
-                  src={image}
-                  alt={`${app.title} preview`}
-                  className="w-full h-40 object-contain mx-auto my-4 rounded-lg shadow-sm border border-gray-200"
-                  loading="lazy"
-                />
-
-                <span className={`mt-4 text-sm font-medium ${theme.button}`}>
-                  Open →
-                </span>
-              </Link>
-            );
-          })}
-      </div>
-
-      <Footer />
+  const [search, setSearch] = useState('');
+  const filtered = useMemo(() => {
+    const clean = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^\p{L}\p{N}]/gu, '');
+    const q = clean(search.trim());
+    return chapters.filter(c => clean(String(c.id) + c.name + c.arabic).includes(q));
+  }, [search]);
+  let lastPage = 0;
+  try { lastPage = Number(localStorage.getItem('ayahvault-last-page')); } catch { /* Optional reading history. */ }
+  return <div className="surah-index">
+    <Seo title="Mushaf" description="Read the Quran in the 15-line Madinah mushaf with AyahVault." />
+    <div className="index-intro"><div><h1>The Quran<span lang="ar" dir="rtl">القرآن الكريم</span></h1><p>Begin with a surah. Stay with the page.</p></div>
+      {Number.isInteger(lastPage) && lastPage > 0 && lastPage <= 604 && <Link className="resume-reading" to={'/mushaf?page=' + lastPage}>Continue reading <span>Page {lastPage}</span><svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m7 4 6 6-6 6" stroke="currentColor" strokeWidth="1.5"/></svg></Link>}
     </div>
-  );
+    <div className="index-tools"><h2>Surahs <span>114</span></h2><label className="surah-search"><svg width="19" height="19" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" strokeWidth="1.5"/><path d="m13 13 4 4" stroke="currentColor" strokeWidth="1.5"/></svg><input type="search" placeholder="Find a surah" aria-label="Find a surah by name or number" value={search} onChange={e => setSearch(e.target.value)} /></label></div>
+    <ol className="surah-list">{filtered.map(c => <li key={c.id}><Link to={'/mushaf?surah=' + c.id} className="surah-row"><span className="surah-number">{String(c.id).padStart(2, '0')}</span><span className="surah-name">{c.name}<span>{c.verses} ayahs</span></span><span className="surah-arabic" lang="ar" dir="rtl">{c.arabic}</span><span className="surah-page">{c.page}</span></Link></li>)}</ol>
+    {!filtered.length && <p className="empty-search">No surahs found. Try a name or surah number.</p>}
+    <footer className="index-footer"><span>AyahVault</span><span>15-line Madinah mushaf · Hafs</span></footer>
+  </div>;
 }
