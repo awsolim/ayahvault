@@ -1,3 +1,4 @@
+import { previewSegments } from '../previewText';
 import { Link } from 'react-router-dom';
 import { usePreferences } from '../../../preferences/Preferences';
 // src/apps/memobuddy/components/VerseCard.tsx
@@ -192,8 +193,8 @@ const translationCache = new Map<string, string>();
 export function VerseCard(props: VerseCardProps) {
   const key = props.verse ? props.verse.surah + ':' + props.verse.ayah : 'empty';
   return <div className="verse-preview">
-    <nav className="verse-navigation" aria-label="Adjacent ayahs"><button type="button" disabled={!props.verse || !!props.errorMessage} onClick={props.onPrev}>Prev</button><button type="button" disabled={!props.verse || !!props.errorMessage} onClick={props.onNext}>Next</button></nav>
     <VerseContent key={key + props.previewMode} {...props} />
+    <nav className="verse-navigation" aria-label="Adjacent ayahs"><button type="button" disabled={!props.verse || !!props.errorMessage} onClick={props.onPrev}>Prev</button>{props.verse && !props.errorMessage ? <Link className="verse-mushaf-link" to={'/mushaf?ayah=' + key} state={{ from: 'memobuddy' }}>Mushaf</Link> : <span />}<button type="button" disabled={!props.verse || !!props.errorMessage} onClick={props.onNext}>Next</button></nav>
   </div>;
 }
 function VerseContent({ verse, errorMessage, hasInteracted, previewMode, partialMode, partialWordCount, audioPartialSeconds, audioPlayRequest, showInfo }: VerseCardProps) {
@@ -227,14 +228,13 @@ function VerseContent({ verse, errorMessage, hasInteracted, previewMode, partial
   }
   if (errorMessage) return <p className="verse-message" role="alert">{errorMessage}</p>;
   if (!hasInteracted || !verse) return <p className="verse-message">Choose a selection and press Go.</p>;
-  const displayedText = partialMode ? verse.text.split(' ').slice(0, partialWordCount).join(' ') + ' …' : verse.text;
+  const segments = previewSegments(verse.text, partialMode ? partialWordCount : Infinity);
   return <div className="verse-content">
-    <Link className="verse-mushaf-link" to={'/mushaf?ayah=' + verseKey} state={{ from: 'memobuddy' }}>Mushaf</Link>
-    <div className="verse-reference" style={{ visibility: showInfo ? 'visible' : 'hidden' }}>{verse.surahName} · Surah {verse.surah} · Ayah {verse.ayah} · Juz {verse.juz}</div>
+    {showInfo && <div className="verse-reference">{verse.surahName} · Surah {verse.surah} · Ayah {verse.ayah} · Juz {verse.juz}</div>}
     {previewMode === 'audio' ? <AudioVersePreview verse={verse} partialMode={partialMode} audioPartialSeconds={audioPartialSeconds} audioPlayRequest={audioPlayRequest} showInfo={showInfo} /> : <>
       <div className="verse-flip" role="button" tabIndex={0} aria-label={showTranslation ? 'Show Arabic ayah' : requested ? 'Cancel loading translation' : 'Show English translation'} aria-pressed={showTranslation} onClick={flip} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); flip(); } }}>
         <div className={'verse-flip-inner' + (showTranslation ? ' is-translated' : '')}>
-          <div className="verse-face verse-arabic" aria-hidden={showTranslation}><p dir="rtl" lang="ar" style={{ fontSize: ayahSize }}>{displayedText}</p></div>
+          <div className="verse-face verse-arabic" aria-hidden={showTranslation}><p dir="rtl" lang="ar" style={{ fontSize: ayahSize }}>{segments.map((segment, index) => /\S/u.test(segment.text) ? <span key={index} style={{ visibility: segment.hidden ? 'hidden' : 'visible', opacity: segment.hidden ? 0 : 1 }} aria-hidden={segment.hidden || undefined}>{segment.text}</span> : segment.text)}</p></div>
           <div className="verse-face verse-translation" aria-hidden={!showTranslation}><p>{translation}</p><span>Sahih International</span></div>
         </div>
       </div>

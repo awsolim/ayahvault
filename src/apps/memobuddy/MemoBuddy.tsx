@@ -24,27 +24,7 @@ function PreviewModeToggle({
   previewMode: PreviewMode;
   setPreviewMode: (mode: PreviewMode) => void;
 }) {
-  const nextMode = previewMode === 'text' ? 'audio' : 'text';
-
-  return (
-    <button
-      type="button"
-      onClick={() => setPreviewMode(nextMode)}
-      className="flex bg-slate-100 p-1 rounded-full border border-slate-200 shadow-inner"
-      aria-label={`Switch to ${nextMode} mode`}
-    >
-      <span
-        className={`px-3 py-1 text-[11px] font-bold rounded-full transition-all ${previewMode === 'text' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-400'}`}
-      >
-        Text
-      </span>
-      <span
-        className={`px-3 py-1 text-[11px] font-bold rounded-full transition-all ${previewMode === 'audio' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-400'}`}
-      >
-        Audio
-      </span>
-    </button>
-  );
+  return <div className="setting-segments" role="group" aria-label="Preview format"><button type="button" aria-pressed={previewMode === 'text'} onClick={() => setPreviewMode('text')}>Text</button><button type="button" aria-pressed={previewMode === 'audio'} onClick={() => setPreviewMode('audio')}>Audio</button></div>;
 }
 
 export default function MemoBuddy() {
@@ -108,16 +88,15 @@ export default function MemoBuddy() {
       <h1 className="practice-title">MemoBuddy</h1>
       <p className="practice-subtitle">Random ayah generator with customization</p>
 
-      <div className="w-full max-w-md mb-8">
+      <div className="memo-setup w-full max-w-md">
         <ModeSelector mode={mode} onSelect={(m) => setMode(m)} />
 
-        <div className="flex flex-col items-center w-full mt-4">
+        <div className="memo-selection flex flex-col items-center w-full">
           {mode === 'custom' && (
             <div className="flex flex-col items-center w-full">
               <CustomSelection config={customConfig} setConfig={setCustomConfig} />
               <div className="flex items-center justify-center gap-2">
                 <button onClick={handleGo} className={goBtnClass}>Go</button>
-                {previewModeToggle}
               </div>
               <button onClick={() => setIsRefOpen(true)} className="mt-4 text-[10px] font-bold text-emerald-600/70  tracking-widest flex items-center gap-1">
                 <span className="text-sm"></span> Surah List
@@ -132,14 +111,12 @@ export default function MemoBuddy() {
               setRangeEnd={setRangeEnd} onGo={handleGo} 
               toggleMulti={() => setUseMultiRange(!useMultiRange)} 
               onOpenList={() => setIsRefOpen(true)}
-              actionSlot={previewModeToggle}
             />
           )}
 
           {mode === 'full' && (
             <div className="flex items-center justify-center gap-2">
               <button onClick={handleGo} className={goBtnClass}>Go</button>
-              {previewModeToggle}
             </div>
           )}
         </div>
@@ -156,8 +133,9 @@ export default function MemoBuddy() {
 
 
       <div className="memo-settings">
-        <section><h2>Preview</h2><PreviewControls previewMode={previewMode} partialMode={partialMode} setPartialMode={setPartialMode} partialWordCount={partialWordCount} setPartialWordCount={setPartialWordCount} audioPartialSeconds={audioPartialSeconds} setAudioPartialSeconds={setAudioPartialSeconds} /></section>
+        <section className="memo-preview-row"><h2>Preview</h2><PreviewControls previewMode={previewMode} partialMode={partialMode} setPartialMode={setPartialMode} partialWordCount={partialWordCount} setPartialWordCount={setPartialWordCount} audioPartialSeconds={audioPartialSeconds} setAudioPartialSeconds={setAudioPartialSeconds} /></section>
         <section><h2>Ayah information</h2><InfoToggle showInfo={showInfo} setShowInfo={setShowInfo} /></section>
+        <section><h2>Text / Audio</h2>{previewModeToggle}</section>
         <section><h2>Ayah text size</h2><AyahSizeControl /></section>
       </div>
 

@@ -1,36 +1,36 @@
 import { defineConfig } from 'vite'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react-swc'
-import { VitePWA } from 'vite-plugin-pwa';
+import { VitePWA } from 'vite-plugin-pwa'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [
     tailwindcss(),
     react(),
     VitePWA({
-
-      
-      // --- Service Worker registration behavior ---
-      registerType: 'autoUpdate', // NEW: SW auto-updates in background when you deploy
-
-      // --- How to inject the registration code ---
-      injectRegister: 'auto',     // NEW: injects small runtime to register SW (no manual code needed)
-
-      // --- Workbox caching: what to precache in the app shell ---
+      registerType: 'autoUpdate',
+      // main.tsx imports virtual:pwa-register, so no duplicate script is injected.
+      injectRegister: 'auto',
       workbox: {
-        // NEW: cache common asset types produced by Vite build
         globPatterns: ['**/*.{js,css,html,ico,png,svg,json,ttf,mp3}'],
-        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // NEW: allow up to ~5MB
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+        // Page artwork is cached on demand, never in the app-shell download.
+        globIgnores: ['**/mushaf/**'],
+        runtimeCaching: [{
+          urlPattern: /\/mushaf\/dar-al-marefa\/\d+\.(png|json)$/,
+          handler: 'CacheFirst',
+          options: {
+            cacheName: 'dar-al-marefa-pages-v1',
+            expiration: { maxEntries: 120, maxAgeSeconds: 60 * 60 * 24 * 30, purgeOnQuotaError: true },
+            cacheableResponse: { statuses: [200] },
+          },
+        }],
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true,
+        navigateFallbackDenylist: [/^\/api\//],
       },
-
-      // We already provided a manual /site.webmanifest, so don't autogenerate one.
-      manifest: false, // NEW: prevents plugin from generating a second manifest
+      manifest: false,
     }),
-
-
-
-
-
   ],
-});
+})

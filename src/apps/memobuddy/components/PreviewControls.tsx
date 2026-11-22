@@ -7,7 +7,10 @@ interface PreviewControlsProps {
 export function PreviewControls({ previewMode, partialMode, setPartialMode, partialWordCount, setPartialWordCount, audioPartialSeconds, setAudioPartialSeconds }: PreviewControlsProps) {
  const audio = previewMode === 'audio';
  const amount = audio ? audioPartialSeconds : partialWordCount;
+ const unit = audio ? 'seconds' : 'words';
  const adjust = (offset: number) => audio ? setAudioPartialSeconds(Math.max(1, Math.min(60, amount + offset))) : setPartialWordCount(Math.max(1, Math.min(100, amount + offset)));
- return <div className="preview-setting"><div className="setting-segments" role="group" aria-label="Preview length"><button type="button" aria-pressed={!partialMode} onClick={() => setPartialMode(false)}>Full</button><button type="button" aria-pressed={partialMode} onClick={() => setPartialMode(true)}>Partial</button></div>
- {partialMode && <div className="partial-amount"><button type="button" disabled={amount <= 1} aria-label="Decrease preview length" onClick={() => adjust(-1)}>−</button><output>{amount} {audio ? 'sec' : amount === 1 ? 'word' : 'words'}</output><button type="button" disabled={amount >= (audio ? 60 : 100)} aria-label="Increase preview length" onClick={() => adjust(1)}>+</button></div>}</div>;
+ return <>
+  <div className="partial-amount" role="group" aria-label={'Partial preview ' + unit} title={'Preview ' + unit} style={{ visibility: partialMode ? 'visible' : 'hidden' }} aria-hidden={!partialMode} inert={!partialMode}><button type="button" disabled={amount <= 1} aria-label={'Decrease preview ' + unit} onClick={() => adjust(-1)}>−</button><output aria-label={amount + ' ' + unit}>{amount}</output><button type="button" disabled={amount >= (audio ? 60 : 100)} aria-label={'Increase preview ' + unit} onClick={() => adjust(1)}>+</button></div>
+  <div className="setting-segments" role="group" aria-label="Preview length"><button type="button" aria-pressed={!partialMode} onClick={() => setPartialMode(false)}>Full</button><button type="button" aria-pressed={partialMode} onClick={() => setPartialMode(true)}>Partial</button></div>
+ </>;
 }

@@ -23,7 +23,7 @@ export function RangeInput({
 
   return (
     <form onSubmit={(e) => { e.preventDefault(); onGo(); }} className="flex flex-col items-center w-full">
-      <div className="flex flex-wrap items-center justify-center gap-2 mb-4 w-full">
+      <div className="flex flex-wrap items-center justify-center gap-2 mb-2 w-full">
         <div className="flex items-center gap-1">
           <input
             type="number" inputMode="numeric" required min={1} max={mode === 'surah' ? 114 : 30}

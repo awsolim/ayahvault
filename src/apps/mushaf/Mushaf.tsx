@@ -1,85 +1,77 @@
+import Spinner from '../../components/ui/Spinner';
+import { imagePoint, nearestAyah } from './selection';
+import { Languages, BookOpen, Bookmark, MessageSquare, X } from 'lucide-react';
 import { pageOffset, pageAtOffset } from './paging';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import chapters from '../../assets/chapters.json';
+import ayahPages from '../../assets/mushaf-pages.json';
 import Seo from '../../lib/Seo';
 
-type Word = { id: number; code_v2: string; page_number: number; line_number: number; position: number };
-type Verse = { verse_key: string; words: Word[] };
-const API = 'https://api.quran.com/api/v4/verses';
-const supported = import.meta.env.VITE_QURAN_CONTENT_API === 'supported';
+type Region = [number, number, number, number, number, number, number];
+type PageData = { width: number; height: number; regions: Region[] };
 const pages = Array.from({ length: 604 }, (_, i) => 604 - i);
-const cache = new Map<number, Verse[]>();
-const fonts = new Map<number, Promise<FontFace>>();
+const cache = new Map<number, PageData>();
+const artworkPath = (page: number) => '/mushaf/dar-al-marefa/' + page;
 function validPage(n: number) { return Number.isInteger(n) && n >= 1 && n <= 604; }
 function savedPage() { try { const n = Number(localStorage.getItem('ayahvault-last-page')); return validPage(n) ? n : 1; } catch { return 1; } }
-async function getPage(page: number, signal: AbortSignal): Promise<Verse[]> {
+async function getPage(page: number, signal: AbortSignal): Promise<PageData> {
   if (cache.has(page)) return cache.get(page)!;
-  const url = supported ? '/api/mushaf?page=' + page : API + '/by_page/' + page + '?mushaf=1&words=true&word_fields=code_v2,line_number&page=1&per_page=50';
-  const response = await fetch(url, { signal });
+  const response = await fetch(artworkPath(page) + '.json', { signal });
   if (!response.ok) throw new Error('Page unavailable');
-  const data = await response.json();
-  if (!Array.isArray(data.verses) || !data.verses.length || data.pagination?.next_page) throw new Error('Incomplete page data');
-  const words = data.verses.flatMap((v: Verse) => v.words).filter((w: Word) => w.page_number === page);
-  if (!words.length || words.some((w: Word) => !w.code_v2 || !Number.isInteger(w.line_number) || w.line_number < 1 || w.line_number > 15)) throw new Error('Invalid page data');
-  cache.set(page, data.verses);
+  const data: PageData = await response.json();
+  if (!(data.width > 0 && data.height > 0 && data.regions?.length)) throw new Error('Invalid page data');
+  cache.set(page, data);
   if (cache.size > 14) cache.delete(cache.keys().next().value!);
-  return data.verses;
+  return data;
 }
-async function loadFont(page: number) {
-  if (!fonts.has(page)) {
-    const font = new FontFace('madinah-' + page, 'url(https://quran.com/fonts/quran/hafs/v2/woff2/p' + page + '.woff2)');
-    fonts.set(page, font.load().then(loaded => { document.fonts.add(loaded); return loaded; }).catch(error => { fonts.delete(page); throw error; }));
-  }
-  return fonts.get(page)!;
-}
-function PageContent({ page, highlight }: { page: number; highlight: string | null }) {
-  const [verses, setVerses] = useState<Verse[] | null>(null);
+function PageContent({ page, highlight, onSelect, onTap }: { page: number; highlight: string | null; onSelect: (key: string) => void; onTap: () => void }) {
+  const [data, setData] = useState<PageData | null>(null);
+  const [imageReady, setImageReady] = useState(false);
   const [error, setError] = useState(false);
   const [retry, setRetry] = useState(0);
-  const [fontSize, setFontSize] = useState(24);
   const surface = useRef<HTMLDivElement>(null);
+  const hold = useRef<{ id: number; x: number; y: number; timer: number; moved: boolean; selected: boolean } | null>(null);
+  function cancelHold() { if (hold.current) window.clearTimeout(hold.current.timer); hold.current = null; }
+  useEffect(() => cancelHold, []);
+  function selectAt(x: number, y: number) {
+    if (!surface.current) return;
+    if (!data || !imageReady) return;
+    const bounds = surface.current.getBoundingClientRect();
+    const point = imagePoint(x, y, bounds, data.width, data.height);
+    const boxes = data.regions.map(([surah, ayah, , x1, y1, x2, y2]) => ({ key: surah + ':' + ayah, left: x1, right: x2, top: y1, bottom: y2 }));
+    const key = nearestAyah(point.x, point.y, boxes);
+    if (key) onSelect(key);
+  }
   useEffect(() => {
     const controller = new AbortController();
-    setError(false); setVerses(null);
-    Promise.all([getPage(page, controller.signal), loadFont(page)]).then(([data]) => { if (!controller.signal.aborted) setVerses(data); }).catch(() => { if (!controller.signal.aborted) setError(true); });
+    setError(false); setData(null); setImageReady(false);
+    getPage(page, controller.signal).then(value => { if (!controller.signal.aborted) setData(value); }).catch(() => { if (!controller.signal.aborted) setError(true); });
     return () => controller.abort();
   }, [page, retry]);
-  const { lines, headings } = useMemo(() => {
-    const lines: { word: Word; key: string }[][] = Array.from({ length: page <= 2 ? 8 : 15 }, () => []);
-    const headings = new Map<number, { type: 'surah' | 'basmala'; surah: number }>();
-    for (const verse of verses || []) {
-      for (const word of verse.words) if (word.page_number === page) lines[word.line_number - 1]?.push({ word, key: verse.verse_key });
-      const [surah, ayah] = verse.verse_key.split(':').map(Number);
-      const first = verse.words.find(w => w.page_number === page && w.position === 1);
-      if (ayah === 1 && first) {
-        if (surah === 1 || surah === 9) headings.set(first.line_number - 1, { type: 'surah', surah });
-        else { headings.set(first.line_number - 2, { type: 'surah', surah }); headings.set(first.line_number - 1, { type: 'basmala', surah }); }
-      }
-    }
-    return { lines, headings };
-  }, [verses, page]);
-  useLayoutEffect(() => {
-    if (!verses || !surface.current) return;
-    const canvas = document.createElement('canvas'); const context = canvas.getContext('2d');
-    const fit = () => {
-      if (!surface.current || !context) return;
-      context.font = '100px madinah-' + page;
-      const widest = Math.max(...lines.map(line => context.measureText(line.map(x => x.word.code_v2).join(' ')).width), 1);
-      const width = surface.current.clientWidth;
-      const height = surface.current.clientHeight;
-      setFontSize(Math.min(width * 100 / widest, height / lines.length * .72));
-    };
-    fit(); const observer = new ResizeObserver(fit); observer.observe(surface.current);
-    return () => observer.disconnect();
-  }, [verses, lines, page]);
+  const regions = useMemo(() => data?.regions || [], [data]);
   if (error) return <div className="page-message" role="alert"><p>Couldn’t load page {page}.</p><button onClick={() => setRetry(n => n + 1)}>Try again</button></div>;
-  if (!verses) return <div className="page-message" role="status">Loading page {page}…</div>;
-  return <div className={'mushaf-sheet' + (page <= 2 ? ' opening-sheet' : '')}>
-    <div ref={surface} className="page-lines" style={{ gridTemplateRows: 'repeat(' + lines.length + ', 1fr)', fontSize, fontFamily: 'madinah-' + page }}>
-      {lines.map((line, i) => { const heading = headings.get(i + 1); return <div key={i} className="quran-line" dir="rtl" lang="ar">
-        {line.length ? line.map(({ word, key }) => <span key={word.id} className={key === highlight ? 'ayah-mark' : undefined}>{word.code_v2}{' '}</span>) : heading?.type === 'surah' ? <span className="surah-heading">{chapters[heading.surah - 1].arabic}</span> : heading?.type === 'basmala' ? <span className="page-basmala">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</span> : null}
-      </div>; })}
+  if (!data) return <div className="page-message"><Spinner colorClassName="reader-spinner" /></div>;
+  return <div className="mushaf-sheet"
+    onPointerDown={event => {
+      cancelHold();
+      if (!event.isPrimary || event.button !== 0) return;
+      const point = { id: event.pointerId, x: event.clientX, y: event.clientY, timer: 0, moved: false, selected: false };
+      point.timer = window.setTimeout(() => { if (hold.current === point && !point.moved) { point.selected = true; selectAt(point.x, point.y); } }, 450);
+      hold.current = point;
+    }}
+    onPointerMove={event => { const point = hold.current; if (point && point.id === event.pointerId && Math.hypot(event.clientX - point.x, event.clientY - point.y) > 10) { point.moved = true; window.clearTimeout(point.timer); } }}
+    onPointerUp={event => { const point = hold.current; if (!point || point.id !== event.pointerId) return; window.clearTimeout(point.timer); if (!point.moved && !point.selected) onTap(); hold.current = null; }}
+    onPointerCancel={cancelHold} onPointerLeave={cancelHold} onContextMenu={event => event.preventDefault()}>
+    <div ref={surface} className="mushaf-artwork">
+      <img key={page + ':' + retry} className="mushaf-page-image" src={artworkPath(page) + '.png'} alt={'Quran, page ' + page} draggable={false} onLoad={() => setImageReady(true)} onError={() => setError(true)} style={{ opacity: imageReady ? 1 : 0 }} />
+      {imageReady ? <svg className="mushaf-regions" viewBox={'0 0 ' + data.width + ' ' + data.height} aria-label={'Select an ayah on page ' + page}>
+        {regions.map(([surah, ayah, line, x1, y1, x2, y2], index) => {
+          const key = surah + ':' + ayah;
+          const first = regions.findIndex(r => r[0] === surah && r[1] === ayah) === index;
+          return <rect key={key + ':' + line} x={x1} y={y1} width={x2 - x1} height={y2 - y1} rx={4} className={key === highlight ? 'selected-region' : undefined} role={first ? 'button' : undefined} tabIndex={first ? 0 : undefined} aria-label={first ? 'Select ayah ' + key : undefined} aria-hidden={!first || undefined} aria-pressed={first ? key === highlight : undefined} onKeyDown={event => { if (first && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); event.stopPropagation(); onSelect(key); } }} />;
+        })}
+      </svg> : <div className="page-image-loading"><Spinner colorClassName="reader-spinner" /></div>}
     </div>
   </div>;
 }
@@ -88,6 +80,9 @@ function ReadingStream({ initial, target }: { initial: number; target: string | 
   const current = useRef(initial);
   const [active, setActive] = useState(initial);
   const [highlight, setHighlight] = useState(target);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [chromeOpen, setChromeOpen] = useState(true);
+  function clearSelection() { setSelected(null); setHighlight(null); }
   const location = useLocation();
   const fromMemoBuddy = location.state?.from === 'memobuddy';
   useLayoutEffect(() => {
@@ -106,10 +101,10 @@ function ReadingStream({ initial, target }: { initial: number; target: string | 
   }
   useEffect(() => { try { localStorage.setItem('ayahvault-last-page', String(initial)); } catch { /* Optional history. */ } }, [initial]);
   const chapter = [...chapters].reverse().find(c => c.page <= active);
-  return <div className="reading-view">
+  return <div className={'reading-view' + (chromeOpen ? '' : ' chrome-hidden') + (selected ? ' has-ayah-selection' : '')} onKeyDown={event => { if (event.key === 'Escape') { clearSelection(); setChromeOpen(true); } }}>
     <Seo title={chapter?.name || 'Mushaf'} />
-    <header className="reader-toolbar"><Link to={fromMemoBuddy ? '/memobuddy' : '/'} className="reader-index-link" aria-label={fromMemoBuddy ? 'Back to MemoBuddy' : 'Back to surah index'}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m14 5-7 7 7 7" stroke="currentColor" strokeWidth="1.6"/></svg><span>{fromMemoBuddy ? 'MemoBuddy' : 'Surahs'}</span></Link><span className="reader-title">{chapter?.name}</span>
-      <div className="reader-actions">{highlight && <button onClick={() => setHighlight(null)} className="clear-highlight" aria-label="Clear ayah highlight">×</button>}<label className="page-selector"><select aria-label="Mushaf page" value={active} onChange={event => {
+    <header className="reader-toolbar" aria-hidden={!chromeOpen} inert={!chromeOpen}><Link to={fromMemoBuddy ? '/memobuddy' : '/'} className="reader-index-link" aria-label={fromMemoBuddy ? 'Back to MemoBuddy' : 'Back to surah index'}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m14 5-7 7 7 7" stroke="currentColor" strokeWidth="1.6"/></svg><span>{fromMemoBuddy ? 'MemoBuddy' : 'Surahs'}</span></Link><span className="reader-title">{chapter?.name}</span>
+      <div className="reader-actions">{highlight && <button onClick={clearSelection} className="clear-highlight" aria-label="Clear ayah highlight">×</button>}<label className="page-selector"><select aria-label="Mushaf page" value={active} onChange={event => {
         const n = Number(event.target.value);
         if (!validPage(n) || !scroll.current) return;
         current.current = n; setActive(n);
@@ -117,9 +112,11 @@ function ReadingStream({ initial, target }: { initial: number; target: string | 
         try { localStorage.setItem('ayahvault-last-page', String(n)); } catch { /* Optional history. */ }
       }}>{Array.from({ length: 604 }, (_, i) => <option key={i + 1} value={i + 1}>Page {i + 1}</option>)}</select><span className="folio-total">/ 604</span></label></div>
     </header>
-    <div ref={scroll} className="reading-stream" onScroll={onScroll} tabIndex={0} aria-label="Quran pages. Scroll horizontally; Al-Fatiha is at the right end.">
-      {pages.map(n => <section key={n} className="reading-page" aria-label={'Page ' + n}>{Math.abs(n - active) <= 2 && <PageContent page={n} highlight={highlight} />}</section>)}
-    </div>
+    <div className="reader-frame"><div ref={scroll} className="reading-stream" onScroll={onScroll} tabIndex={0} aria-label="Quran pages. Scroll horizontally; Al-Fatiha is at the right end.">
+      {pages.map(n => <section key={n} className="reading-page" aria-label={'Page ' + n}>{Math.abs(n - active) <= 2 && <PageContent page={n} highlight={highlight} onSelect={key => { setSelected(key); setHighlight(key); }} onTap={() => setChromeOpen(value => !value)} />}</section>)}
+    </div></div>
+    <button type="button" className="reader-controls-toggle" onClick={() => setChromeOpen(value => !value)}>{chromeOpen ? 'Hide reader controls' : 'Show reader controls'}</button>
+    {selected && <aside className="ayah-action-bar" aria-label={'Actions for ayah ' + selected}><span className="ayah-action-key">{selected}</span><span className="sr-only">Actions coming soon</span><div className="ayah-action-buttons">{[{ name: 'Translation', Icon: Languages }, { name: 'Tafsir', Icon: BookOpen }, { name: 'Bookmark', Icon: Bookmark }, { name: 'Comment', Icon: MessageSquare }].map(({ name, Icon }) => <button type="button" key={name} disabled title={name + ' — coming soon'}><Icon size={17} strokeWidth={1.6} /><span className="sr-only">{name} — coming soon</span></button>)}<button type="button" className="dismiss-ayah" onClick={clearSelection} aria-label="Clear selected ayah and close actions"><X size={18} strokeWidth={1.8} /></button></div></aside>}
   </div>;
 }
 export default function Mushaf() {
@@ -129,19 +126,9 @@ export default function Mushaf() {
   const surah = Number(params.get('surah'));
   const page = Number(params.get('page'));
   const initial = chapters.find(c => c.id === surah)?.page || (validPage(page) ? page : savedPage());
-  const [resolved, setResolved] = useState<{ key: string; page: number } | null>(null);
-  const [error, setError] = useState(false);
-  const [retry, setRetry] = useState(0);
-  useEffect(() => {
-    if (!target) return;
-    setError(false);
-    const controller = new AbortController();
-    const [chapter, verse] = target.split(':').map(Number);
-    if (!chapters[chapter - 1] || !Number.isInteger(verse) || verse < 1 || verse > chapters[chapter - 1].verses) { setError(true); return; }
-    const url = supported ? '/api/mushaf?ayah=' + encodeURIComponent(target) : API + '/by_key/' + target + '?mushaf=1&words=true&word_fields=code_v2,line_number';
-    fetch(url, { signal: controller.signal }).then(r => { if (!r.ok) throw new Error(); return r.json(); }).then(data => { const n = data.verse?.words?.[0]?.page_number; if (!validPage(n)) throw new Error(); if (!controller.signal.aborted) setResolved({ key: target, page: n }); }).catch(() => { if (!controller.signal.aborted) setError(true); });
-    return () => controller.abort();
-  }, [target, retry]);
-  if (target && resolved?.key !== target) return <div className="reader-resolving"><Link to={location.state?.from === 'memobuddy' ? '/memobuddy' : '/'}>{location.state?.from === 'memobuddy' ? 'MemoBuddy' : 'Surahs'}</Link>{error ? <div role="alert"><p>Couldn’t open this ayah.</p><button onClick={() => setRetry(n => n + 1)}>Try again</button></div> : <p role="status">Opening ayah…</p>}</div>;
-  return <ReadingStream key={target || String(initial)} initial={target ? resolved!.page : initial} target={target} />;
+  const [chapter, verse] = (target || '').split(':').map(Number);
+  const targetPage = target && /^\d+:\d+$/.test(target) ? ayahPages[chapter - 1]?.[verse - 1] : undefined;
+  if (target && !validPage(targetPage || 0)) return <div className="reader-resolving"><Link to={location.state?.from === 'memobuddy' ? '/memobuddy' : '/'}>{location.state?.from === 'memobuddy' ? 'MemoBuddy' : 'Surahs'}</Link><div className="page-message" role="alert">Couldn’t open this ayah.</div></div>;
+  const start = targetPage || (surah ? ayahPages[surah - 1]?.[0] : undefined) || initial;
+  return <ReadingStream key={target || String(start)} initial={start} target={target} />;
 }
