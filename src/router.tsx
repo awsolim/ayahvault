@@ -18,7 +18,7 @@ const EntryEditor = lazy(() => import("./library/EntryEditor"));
 const LibraryAccount = lazy(() => import("./library/Account"));
 function appRoute(id: AppId, element: ReactNode) {
   return apps.find((app) => app.id === id)?.enabled ? (
-    <Suspense fallback={<Spinner />}>{element}</Suspense>
+    <Suspense fallback={<Spinner fullscreen />}>{element}</Suspense>
   ) : (
     <Unavailable message="This app is currently unavailable." />
   );
@@ -33,7 +33,7 @@ export const router = createBrowserRouter([
       {
         path: "library",
         element: (
-          <Suspense fallback={<Spinner />}>
+          <Suspense fallback={<Spinner fullscreen />}>
             <Library />
           </Suspense>
         ),
@@ -41,7 +41,7 @@ export const router = createBrowserRouter([
       {
         path: "library/new",
         element: (
-          <Suspense fallback={<Spinner />}>
+          <Suspense fallback={<Spinner fullscreen />}>
             <EntryEditor />
           </Suspense>
         ),
@@ -49,7 +49,7 @@ export const router = createBrowserRouter([
       {
         path: "library/account",
         element: (
-          <Suspense fallback={<Spinner />}>
+          <Suspense fallback={<Spinner fullscreen />}>
             <LibraryAccount />
           </Suspense>
         ),
@@ -57,7 +57,7 @@ export const router = createBrowserRouter([
       {
         path: "library/:id",
         element: (
-          <Suspense fallback={<Spinner />}>
+          <Suspense fallback={<Spinner fullscreen />}>
             <EntryPage />
           </Suspense>
         ),
@@ -65,7 +65,7 @@ export const router = createBrowserRouter([
       {
         path: "library/:id/edit",
         element: (
-          <Suspense fallback={<Spinner />}>
+          <Suspense fallback={<Spinner fullscreen />}>
             <EntryEditor />
           </Suspense>
         ),
@@ -73,7 +73,7 @@ export const router = createBrowserRouter([
       {
         path: "mushaf",
         element: (
-          <Suspense fallback={<Spinner />}>
+          <Suspense fallback={<Spinner fullscreen />}>
             <Mushaf />
           </Suspense>
         ),

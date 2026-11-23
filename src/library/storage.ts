@@ -38,25 +38,33 @@ export async function readRows(scope: string): Promise<RecordRow[]> {
     req.onerror = () => reject(req.error);
   });
 }
-export async function changeRow(
+export function changeRow(
   key: string,
+  update: (current: RecordRow | undefined) => RecordRow | undefined,
+): Promise<void> {
+  return changeRows([key], update);
+}
+export async function changeRows(
+  keys: string[],
   update: (current: RecordRow | undefined) => RecordRow | undefined,
 ): Promise<void> {
   const db = await database();
   return new Promise((resolve, reject) => {
     const tx = db.transaction("entries", "readwrite");
     const store = tx.objectStore("entries");
-    const req = store.get(key);
-    req.onsuccess = () => {
-      try {
-        const next = update(req.result);
-        if (next) store.put(next);
-        else store.delete(key);
-      } catch (error) {
-        tx.abort();
-        reject(error);
-      }
-    };
+    for (const key of keys) {
+      const req = store.get(key);
+      req.onsuccess = () => {
+        try {
+          const next = update(req.result);
+          if (next) store.put(next);
+          else store.delete(key);
+        } catch (error) {
+          tx.abort();
+          reject(error);
+        }
+      };
+    }
     tx.oncomplete = () => resolve();
     tx.onerror = () => reject(tx.error);
     tx.onabort = () =>

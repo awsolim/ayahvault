@@ -9,7 +9,7 @@ import {
 } from "react";
 import type { User } from "@supabase/supabase-js";
 import { cloud } from "./cloud";
-import { readRows, changeRow, claimGuest, resolveConflict } from "./storage";
+import { readRows, changeRow, changeRows, claimGuest, resolveConflict } from "./storage";
 import { acknowledge, acceptRemote, type RemoteRow } from "./sync";
 import { rowKey, validateEntry, type Entry, type RecordRow } from "./model";
 import chapters from "../assets/chapters.json";
@@ -23,7 +23,7 @@ type LibraryState = {
   syncing: boolean;
   error: string;
   save: (entry: Entry, scope: string) => Promise<void>;
-  remove: (id: string) => Promise<void>;
+  remove: (ids: string | string[]) => Promise<void>;
   sync: () => Promise<void>;
   refresh: () => Promise<void>;
 };
@@ -207,8 +207,9 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
     [scope, refresh, authReady],
   );
   const remove = useCallback(
-    async (id: string) => {
-      await changeRow(rowKey(scope, id), (previous) =>
+    async (ids: string | string[]) => {
+      const keys = (typeof ids === "string" ? [ids] : ids).map((id) => rowKey(scope, id));
+      await changeRows(keys, (previous) =>
         previous ? { ...previous, dirty: true, deleted: true } : undefined,
       );
       await refresh();

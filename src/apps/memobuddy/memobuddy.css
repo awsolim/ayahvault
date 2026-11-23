@@ -5,7 +5,7 @@
   --memo-button-blue: linear-gradient(135deg, #4265d6, #3455c3 60%, #2c48ad);
 }
 .practice .memo-primary-button,
-.practice .setting-segments button[aria-pressed="true"],
+.practice .setting-segments .active-setting,
 .practice .memo-audio-play {
   color: #fff;
   background: var(--memo-button-sheen), var(--memo-button-blue);
@@ -17,14 +17,14 @@
 .practice .memo-primary-button,
 .practice .verse-navigation > button,
 .practice .verse-mushaf-link,
-.practice .setting-segments button,
+.practice .setting-segments > span,
 .practice .memo-audio-play,
 .practice .memo-audio-pause {
   transition: box-shadow 140ms ease, filter 140ms ease, transform 100ms ease;
 }
 .practice .memo-primary-button:active:not(:disabled),
 .practice .verse-navigation > button:active:not(:disabled),
-.practice .setting-segments button[aria-pressed="true"]:active,
+.practice .memo-setting-toggle:active .active-setting,
 .practice .memo-audio-play:active {
   transform: translateY(1px);
   box-shadow: inset 0 1px 2px #14296520;
@@ -56,8 +56,8 @@
   background: linear-gradient(180deg, #f1f4fa, #fff);
   box-shadow: inset 0 1px 2px #253e7810;
 }
-.practice .setting-segments button { border-radius: 6px; }
-.practice .setting-segments button[aria-pressed="true"] {
+
+.practice .setting-segments .active-setting {
   border-radius: 6px;
   box-shadow: inset 0 1px 0 #ffffff30, 0 1px 2px #263f9a18;
 }
@@ -111,7 +111,7 @@
   .practice .memo-primary-button,
   .practice .verse-navigation > button,
   .practice .verse-mushaf-link,
-  .practice .setting-segments button,
+  .practice .setting-segments > span,
   .practice .memo-audio-play,
   .practice .memo-audio-pause { transition: none; }
 }

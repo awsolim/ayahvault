@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, ArrowUpRight, Pencil, Trash2 } from "lucide-react";
 import { useLibrary } from "./LibraryProvider";
-import { reference, verseWords } from "./quran";
+import { reference } from "./quran";
+import ComparisonText from "./ComparisonText";
 import { entryTitle, SyncStatus } from "./Library";
 import Seo from "../lib/Seo";
 export default function EntryPage() {
@@ -11,6 +12,7 @@ export default function EntryPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const [error, setError] = useState("");
+  const [deleting, setDeleting] = useState(false);
   const entry = rows.find((r) => r.id === id)?.entry;
   if (!ready) return <p className="library-empty">Loading</p>;
   if (!entry)
@@ -71,33 +73,7 @@ export default function EntryPage() {
                 <ArrowUpRight size={19} />
               </Link>
             </header>
-            <p className="comparison-arabic" dir="rtl" lang="ar">
-              {verseWords(p.verse).map((word, i) => {
-                const m = entry.marks.find((m) =>
-                  m.spans.some(
-                    (s) =>
-                      s.verse === p.verse && s.start <= i + 1 && s.end >= i + 1,
-                  ),
-                );
-                return (
-                  <span
-                    key={i}
-                    style={
-                      m
-                        ? {
-                            textDecorationColor: m.color,
-                            backgroundColor: m.color + "26",
-                          }
-                        : undefined
-                    }
-                    className={m ? "marked-word" : undefined}
-                    title={m?.label}
-                  >
-                    {word}{" "}
-                  </span>
-                );
-              })}
-            </p>
+            <ComparisonText verse={p.verse} marks={entry.marks} />
             {p.note && (
               <p className="passage-note" dir="auto">
                 {p.note}
@@ -115,14 +91,17 @@ export default function EntryPage() {
       <footer className="library-backup">
         <button
           className="library-delete"
+          disabled={deleting}
           onClick={async () => {
             if (!window.confirm("Delete this entry and its comparison marks?"))
               return;
+            setDeleting(true);
             try {
               await remove(entry.id);
               navigate("/library");
             } catch {
               setError("Couldn’t delete this entry. Try again.");
+              setDeleting(false);
             }
           }}
         >

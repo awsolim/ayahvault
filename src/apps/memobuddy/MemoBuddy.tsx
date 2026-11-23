@@ -11,21 +11,12 @@ import { RangeInput } from './components/RangeInput';
 import { VerseCard } from './components/VerseCard';
 import { PreviewControls } from './components/PreviewControls';
 import { InfoToggle } from './components/InfoToggle';
+import { SettingToggle } from './components/SettingToggle';
 import { CustomSelection } from './components/CustomSelection';
 import { SurahReference } from './components/SurahReference';
 import Seo from '../../lib/Seo';
 
 type PreviewMode = 'text' | 'audio';
-
-function PreviewModeToggle({
-  previewMode,
-  setPreviewMode,
-}: {
-  previewMode: PreviewMode;
-  setPreviewMode: (mode: PreviewMode) => void;
-}) {
-  return <div className="setting-segments" role="group" aria-label="Preview format"><button type="button" aria-pressed={previewMode === 'text'} onClick={() => setPreviewMode('text')}>Text</button><button type="button" aria-pressed={previewMode === 'audio'} onClick={() => setPreviewMode('audio')}>Audio</button></div>;
-}
 
 export default function MemoBuddy() {
   const [mode, setMode] = useSessionState<'surah' | 'juz' | 'full' | 'custom' | null>('mode', null);
@@ -62,7 +53,7 @@ export default function MemoBuddy() {
     if (previewMode === 'audio') {
       setAudioPlayRequest(v => v + 1);
     }
-  }, [mode, rangeStart, rangeEnd, useMultiRange, customConfig, generateRandomVerse, previewMode]);
+  }, [mode, rangeStart, rangeEnd, useMultiRange, customConfig, generateRandomVerse, previewMode, setHasInteracted]);
 
   useKeyboardNav(randomVerse, partialMode, handleGo, () => setPartialMode(v => !v), 
     (delta) => {
@@ -76,9 +67,6 @@ export default function MemoBuddy() {
   );
 
   const goBtnClass = "memo-primary-button px-6 py-2 rounded-lg text-white bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 font-bold shadow-md hover:brightness-110 active:scale-95 transition-all text-sm";
-  const previewModeToggle = (
-    <PreviewModeToggle previewMode={previewMode} setPreviewMode={setPreviewMode} />
-  );
 
   return (
     <div className="practice flex flex-col items-center" onPointerDownCapture={event => { event.currentTarget.dataset.keyboardFocus = 'false'; }} onKeyDownCapture={event => { if (event.key === 'Tab') event.currentTarget.dataset.keyboardFocus = 'true'; }}>
@@ -133,9 +121,9 @@ export default function MemoBuddy() {
 
 
       <div className="memo-settings">
-        <section><h2>Ayah information</h2><InfoToggle showInfo={showInfo} setShowInfo={setShowInfo} /></section>
-        <section className="memo-preview-row"><h2>Preview</h2><PreviewControls previewMode={previewMode} partialMode={partialMode} setPartialMode={setPartialMode} partialWordCount={partialWordCount} setPartialWordCount={setPartialWordCount} audioPartialSeconds={audioPartialSeconds} setAudioPartialSeconds={setAudioPartialSeconds} /></section>
-        <section><h2>Text / Audio</h2>{previewModeToggle}</section>
+        <section className="memo-toggle-row"><InfoToggle showInfo={showInfo} setShowInfo={setShowInfo} /></section>
+        <section className="memo-toggle-row memo-preview-row"><PreviewControls previewMode={previewMode} partialMode={partialMode} setPartialMode={setPartialMode} partialWordCount={partialWordCount} setPartialWordCount={setPartialWordCount} audioPartialSeconds={audioPartialSeconds} setAudioPartialSeconds={setAudioPartialSeconds} /></section>
+        <section className="memo-toggle-row"><SettingToggle label="Text / Audio" options={['Text', 'Audio']} on={previewMode === 'audio'} toggle={() => setPreviewMode(previewMode === 'audio' ? 'text' : 'audio')} /></section>
         <section><h2>Ayah text size</h2><AyahSizeControl /></section>
       </div>
 

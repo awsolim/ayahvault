@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowUpRight, Plus, Search, X, Download, Upload } from "lucide-react";
+import { ArrowUpRight, Plus, Search, X, Download, Upload, ListChecks, Trash2 } from "lucide-react";
 import Seo from "../lib/Seo";
 import { useLibrary } from "./LibraryProvider";
 import { normalizeSearch, validateEntry, type Entry } from "./model";
@@ -34,9 +34,18 @@ export function SyncStatus() {
   );
 }
 export default function Library() {
-  const { rows, ready, save, scope } = useLibrary();
+  const { scope } = useLibrary();
+  return <LibraryContents key={scope} />;
+}
+
+function LibraryContents() {
+  const { rows, ready, save, remove, scope } = useLibrary();
   const [query, setQuery] = useState("");
   const [notice, setNotice] = useState("");
+  const [selecting, setSelecting] = useState(false);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
   const upload = useRef<HTMLInputElement>(null);
   const [importing, setImporting] = useState(false);
   const visible = rows
@@ -59,6 +68,26 @@ export default function Library() {
       ).includes(normalizeSearch(query)),
     )
     .sort((a, b) => b.entry.updatedAt.localeCompare(a.entry.updatedAt));
+  const selectedIds = selected.filter((id) => rows.some((r) => r.id === id));
+  const Summary = selecting ? "span" : "div";
+  const Title = selecting ? "span" : "h2";
+  const References = selecting ? "span" : "p";
+  async function deleteSelected() {
+    const count = selectedIds.length;
+    if (!count || !window.confirm(count === 1 ? "Delete 1 entry?" : `Delete ${count} entries?`)) return;
+    setDeleting(true);
+    setDeleteError("");
+    try {
+      await remove(selectedIds);
+      setSelected([]);
+      setSelecting(false);
+      setNotice(count === 1 ? "Deleted 1 entry." : `Deleted ${count} entries.`);
+    } catch {
+      setDeleteError("Couldn’t delete the selected entries. Try again.");
+    } finally {
+      setDeleting(false);
+    }
+  }
   function backup() {
     const blob = new Blob(
       [
@@ -95,9 +124,9 @@ export default function Library() {
           New Entry
         </Link>
       </header>
-      <SyncStatus />
       <div className="library-tools">
-        <label>
+        <SyncStatus />
+        <div className="library-search">
           <Search size={18} />
           <input
             aria-label="Search Library"
@@ -114,45 +143,77 @@ export default function Library() {
               <X size={17} />
             </button>
           )}
-        </label>
+        </div>
       </div>
+      <div className="library-list-tools">
+        <button
+          type="button"
+          className="library-text-button"
+          aria-pressed={selecting}
+          disabled={deleting || (!selecting && !rows.length)}
+          onClick={() => {
+            setSelecting(!selecting);
+            setSelected([]);
+            setDeleteError("");
+          }}
+        >
+          {selecting ? <X size={17} /> : <ListChecks size={17} />}
+          {selecting ? "Cancel selection" : "Select entries"}
+        </button>
+        {selecting && (
+          <button type="button" className="library-delete" disabled={!selectedIds.length || deleting} onClick={() => void deleteSelected()}>
+            <Trash2 size={16} />
+            {deleting ? "Deleting…" : `Delete selected (${selectedIds.length})`}
+          </button>
+        )}
+      </div>
+      {deleteError && <p role="alert" className="library-error">{deleteError}</p>}
       {!ready ? (
         <p className="library-empty">Loading</p>
       ) : visible.length ? (
         <ol className="library-list">
-          {visible.map((r, i) => (
-            <li key={r.id}>
-              <Link to={"/library/" + r.id}>
+          {visible.map((r, i) => {
+            const checked = selected.includes(r.id);
+            const contents = <>
                 <span className="library-ordinal">
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <div>
-                  <h2 dir="auto">{entryTitle(r.entry)}</h2>
-                  <p>
+                <Summary>
+                  <Title className="library-entry-title" dir="auto">{entryTitle(r.entry)}</Title>
+                  <References className="library-entry-refs">
                     {r.entry.passages
                       .map((p) => reference(p.verse))
                       .join(" · ")}
-                  </p>
-                </div>
-                <ArrowUpRight size={21} />
-              </Link>
-            </li>
-          ))}
+                  </References>
+                </Summary>
+            </>;
+            return (
+              <li key={r.id}>
+                {selecting ? (
+                  <label className="library-select-row">
+                    <input
+                      type="checkbox"
+                      aria-label={entryTitle(r.entry)}
+                      checked={checked}
+                      disabled={deleting}
+                      onChange={() => setSelected((ids) =>
+                        checked ? ids.filter((id) => id !== r.id) : [...ids, r.id],
+                      )}
+                    />
+                    {contents}
+                  </label>
+                ) : (
+                  <Link to={"/library/" + r.id}>
+                    {contents}
+                    <ArrowUpRight size={21} />
+                  </Link>
+                )}
+              </li>
+            );
+          })}
         </ol>
       ) : (
-        <div className="library-empty">
-          <h2>
-            {query
-              ? "No matching entries"
-              : "Keep the distinctions that help you remember."}
-          </h2>
-          <p>
-            {query
-              ? "Try another phrase or ayah reference."
-              : "Collect similar ayahs, mark what changes, and keep your memory notes together."}
-          </p>
-          {!query && <Link to="/library/new">Create your first entry →</Link>}
-        </div>
+        <p className="library-empty">{query ? "No matching entries." : "No entries yet."}</p>
       )}
       <footer className="library-backup">
         <button disabled={!ready} onClick={backup}>

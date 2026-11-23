@@ -28,6 +28,7 @@ import { findVerses, reference, verseWords } from "./quran";
 import chapters from "../assets/chapters.json";
 import Dialog from "./Dialog";
 import Seo from "../lib/Seo";
+import ComparisonText from "./ComparisonText";
 export default function EntryEditor() {
   const { id } = useParams();
   const library = useLibrary();
@@ -40,13 +41,16 @@ export default function EntryEditor() {
         Entry not found. <Link to="/library">Library</Link>
       </div>
     );
-  const verse = params.get("ayah") || undefined;
+  const requested = params.get("ayah");
+  const verse = !initial && requested && verseWords(requested).length ? requested : undefined;
+  const draftId = id || (verse ? "new:" + verse : "new");
   return (
     <Editor
-      key={library.scope + ":" + (id || "new")}
+      key={library.scope + ":" + draftId}
+      draftKey={"ayahvault-draft:" + library.scope + ":" + draftId}
       scope={library.scope}
       initial={initial}
-      verse={verse && verseWords(verse).length ? verse : undefined}
+      verse={verse}
     />
   );
 }
@@ -54,15 +58,16 @@ function Editor({
   initial,
   verse,
   scope,
+  draftKey,
 }: {
   initial?: Entry;
   verse?: string;
   scope: string;
+  draftKey: string;
 }) {
   const { save } = useLibrary();
   const navigate = useNavigate();
   const location = useLocation();
-  const draftKey = "ayahvault-draft:" + scope + ":" + (initial?.id || "new");
   const [entry, setEntry] = useState<Entry>(() => {
     try {
       const cached = JSON.parse(sessionStorage.getItem(draftKey) || "null");
@@ -72,8 +77,12 @@ function Editor({
           chapters.map((c) => c.verses),
           (key) => verseWords(key).length,
         )
-      )
+      ) {
+        if (verse && cached.passages.length < 100 && !cached.passages.some((p) => p.verse === verse)) {
+          return { ...cached, passages: [{ verse, note: "" }, ...cached.passages] };
+        }
         return cached;
+      }
     } catch {
       /* Start a new draft. */
     }
@@ -139,12 +148,7 @@ function Editor({
     setError("");
     try {
       await save(entry, scope);
-      finished.current = true;
-      sessionStorage.removeItem(draftKey);
-      navigate("/library/" + entry.id, {
-        replace: true,
-        state: location.state,
-      });
+      finishSave(entry.id);
     } catch (e) {
       setError(
         e instanceof Error
@@ -155,6 +159,17 @@ function Editor({
       setSaving(false);
     }
   }
+  const back = initial ? "/library/" + initial.id : location.state?.returnTo || "/library";
+  const backState = initial ? location.state : location.state?.returnState;
+  function finishSave(id: string) {
+    finished.current = true;
+    try { sessionStorage.removeItem(draftKey); } catch { /* The entry is already saved. */ }
+    if (!initial && location.state?.returnAfterSave && location.state?.returnTo) {
+      navigate(back, { replace: true, state: { ...backState, readerSelected: null, readerHighlight: null } });
+    } else {
+      navigate("/library/" + id, { replace: true, state: location.state });
+    }
+  }
   const results = findVerses(query);
   return (
     <div className="library-page editor-page">
@@ -162,20 +177,13 @@ function Editor({
       <div className="editor-top">
         <Link
           className="library-back"
-          to={initial ? "/library/" + initial.id : "/library"}
-          state={location.state}
+          to={back}
+          state={backState}
         >
           <ArrowLeft size={17} />
           Back
         </Link>
         <span>{dirty ? "Unsaved draft" : "Mutashabihat"}</span>
-        <button
-          className="library-primary"
-          disabled={!entry.passages.length || saving}
-          onClick={() => void submit()}
-        >
-          {saving ? "Saving…" : "Save Entry"}
-        </button>
       </div>
       <label className="entry-title-input">
         <span>
@@ -203,15 +211,7 @@ function Editor({
         </button>
       </div>
       {!entry.passages.length && (
-        <div className="library-empty">
-          <p>Add the ayahs you want to compare.</p>
-          <button
-            className="library-text-button"
-            onClick={() => setPicker(true)}
-          >
-            Find an ayah →
-          </button>
-        </div>
+        <p className="library-empty">Add the ayahs you want to compare.</p>
       )}
       {entry.passages.length > 0 && (
         <div className="comparison-edit-tools">
@@ -296,75 +296,27 @@ function Editor({
                 </button>
               </div>
             </header>
-            <p className="comparison-arabic" dir="rtl" lang="ar">
-              {verseWords(p.verse).map((word, i) => {
-                const position = i + 1;
-                const mark = entry.marks.find((m) =>
-                  m.spans.some(
-                    (s) =>
-                      s.verse === p.verse &&
-                      s.start <= position &&
-                      s.end >= position,
+            <ComparisonText
+              verse={p.verse}
+              marks={entry.marks}
+              selection={range || (anchor && { verse: anchor.verse, start: anchor.word, end: anchor.word })}
+              onWord={(word) => wordClick(p.verse, word)}
+            />
+            <OptionalNote
+              className="passage-note-input"
+              label="Ayah comment"
+              value={p.note}
+              rows={2}
+              maxLength={10000}
+              onChange={(note) =>
+                update({
+                  ...entry,
+                  passages: entry.passages.map((v) =>
+                    v.verse === p.verse ? { ...v, note } : v,
                   ),
-                );
-                const selected =
-                  (range?.verse === p.verse &&
-                    range.start <= position &&
-                    range.end >= position) ||
-                  (anchor?.verse === p.verse && anchor.word === position);
-                return (
-                  <span key={i}>
-                    <button
-                      type="button"
-                      aria-label={
-                        word +
-                        ", word " +
-                        position +
-                        ", " +
-                        p.verse +
-                        (mark ? ", " + mark.label : "")
-                      }
-                      aria-pressed={!!selected}
-                      title={mark?.label}
-                      className={
-                        (selected ? "word-select " : "") +
-                        (mark ? "marked-word" : "")
-                      }
-                      style={
-                        mark
-                          ? {
-                              textDecorationColor: mark.color,
-                              backgroundColor: mark.color + "26",
-                            }
-                          : undefined
-                      }
-                      onClick={() => wordClick(p.verse, position)}
-                    >
-                      {word}
-                    </button>{" "}
-                  </span>
-                );
-              })}
-            </p>
-            <label className="passage-note-input">
-              <span>
-                Note for this ayah <small>optional</small>
-              </span>
-              <textarea
-                rows={1}
-                dir="auto"
-                maxLength={10000}
-                value={p.note}
-                onChange={(e) =>
-                  update({
-                    ...entry,
-                    passages: entry.passages.map((v) =>
-                      v.verse === p.verse ? { ...v, note: e.target.value } : v,
-                    ),
-                  })
-                }
-              />
-            </label>
+                })
+              }
+            />
           </article>
         ))}
       </div>
@@ -442,16 +394,14 @@ function Editor({
           </div>
         </section>
       )}
-      <label className="memory-notes entry-notes">
-        <h2>Memory Notes</h2>
-        <textarea
-          rows={4}
-          dir="auto"
-          maxLength={20000}
-          value={entry.notes}
-          onChange={(e) => update({ ...entry, notes: e.target.value })}
-        />
-      </label>
+      <OptionalNote
+        className="memory-notes entry-notes"
+        label="Memory note"
+        value={entry.notes}
+        rows={4}
+        maxLength={20000}
+        onChange={(notes) => update({ ...entry, notes })}
+      />
       {error && (
         <div>
           <p role="alert" className="library-error">
@@ -470,12 +420,7 @@ function Editor({
                     (entry.title.slice(0, 180) || "Comparison") + " — copy",
                 };
                 await save(copy, scope);
-                finished.current = true;
-                sessionStorage.removeItem(draftKey);
-                navigate("/library/" + copy.id, {
-                  replace: true,
-                  state: location.state,
-                });
+                finishSave(copy.id);
               } catch (e) {
                 setError(
                   e instanceof Error ? e.message : "Couldn’t save copy.",
@@ -491,21 +436,27 @@ function Editor({
       )}
       <footer className="editor-footer">
         <p>Saved entries stay on this device. Sign in from Library to sync.</p>
-        {dirty && (
+        <div className="editor-footer-actions">
           <button
             className="library-text-button"
+            disabled={saving}
             onClick={() => {
-              if (!window.confirm("Discard this unsaved draft?")) return;
+              if (dirty && !window.confirm("Discard this unsaved draft?")) return;
               finished.current = true;
               sessionStorage.removeItem(draftKey);
-              navigate(initial ? "/library/" + initial.id : "/library", {
-                state: location.state,
-              });
+              navigate(back, { replace: true, state: backState });
             }}
           >
-            Discard Draft
+            Discard
           </button>
-        )}
+          <button
+            className="library-primary"
+            disabled={!entry.passages.length || saving}
+            onClick={() => void submit()}
+          >
+            {saving ? "Saving…" : "Save Entry"}
+          </button>
+        </div>
       </footer>
       {picker && (
         <Dialog title="Add Ayah" close={() => setPicker(false)}>
@@ -589,6 +540,40 @@ function Editor({
           close={() => setRange(null)}
         />
       )}
+    </div>
+  );
+}
+function OptionalNote({ className, label, value, rows, maxLength, onChange }: {
+  className: string;
+  label: string;
+  value: string;
+  rows: number;
+  maxLength: number;
+  onChange: (value: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className={className}>
+      <button
+        type="button"
+        className="library-text-button"
+        aria-expanded={open}
+        onClick={() => setOpen(!open)}
+      >
+        {!value && !open && <Plus size={15} />}
+        {open ? "Done editing" : value ? "Edit " + label.toLowerCase() : "Add " + label.toLowerCase()}
+      </button>
+      {open ? (
+        <textarea
+          autoFocus
+          rows={rows}
+          dir="auto"
+          aria-label={label}
+          maxLength={maxLength}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+        />
+      ) : value && <p className="passage-note" dir="auto">{value}</p>}
     </div>
   );
 }

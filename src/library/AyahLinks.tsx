@@ -1,24 +1,20 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useLibrary } from "./LibraryProvider";
 import Dialog from "./Dialog";
 export default function AyahLinks({
   verse,
   close,
-  page,
-  readerState,
+  navigation,
 }: {
   verse: string;
   close: () => void;
-  page: number;
-  readerState: {
-    chromeOpen: boolean;
-    selected: string | null;
-    highlight: string | null;
+  navigation: {
+    returnTo: string;
+    returnState: unknown;
   };
 }) {
   const { rows, save, scope, ready } = useLibrary();
-  const location = useLocation();
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const linked = rows.filter((r) =>
@@ -27,15 +23,6 @@ export default function AyahLinks({
   const others = rows.filter(
     (r) => !r.entry.passages.some((p) => p.verse === verse),
   );
-  const state = {
-    returnTo: "/mushaf?page=" + page,
-    returnState: {
-      ...location.state,
-      readerChromeOpen: readerState.chromeOpen,
-      readerSelected: readerState.selected,
-      readerHighlight: readerState.highlight,
-    },
-  };
   return (
     <Dialog title={"Mutashabihat · " + verse} close={close}>
       {error && <p role="alert">{error}</p>}
@@ -45,7 +32,7 @@ export default function AyahLinks({
           <ul className="entry-picker">
             {linked.map((r) => (
               <li key={r.id}>
-                <Link to={"/library/" + r.id} state={state}>
+                <Link to={"/library/" + r.id} state={navigation}>
                   {r.entry.title ||
                     r.entry.passages.map((p) => p.verse).join(" · ")}
                   <span>Open entry →</span>
@@ -58,7 +45,7 @@ export default function AyahLinks({
       <Link
         className="library-primary full-button"
         to={"/library/new?ayah=" + verse}
-        state={state}
+        state={navigation}
       >
         New Entry
       </Link>

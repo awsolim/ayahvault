@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { SettingToggle } from './SettingToggle';
 interface InfoToggleProps { showInfo: boolean; setShowInfo: (v: boolean | ((prev: boolean) => boolean)) => void; }
 export function InfoToggle({ showInfo, setShowInfo }: InfoToggleProps) {
  useEffect(() => {
@@ -9,5 +10,5 @@ export function InfoToggle({ showInfo, setShowInfo }: InfoToggleProps) {
   };
   window.addEventListener('keydown', onKey); return () => window.removeEventListener('keydown', onKey);
  }, [setShowInfo]);
- return <div className="setting-segments" role="group" aria-label="Ayah information"><button type="button" aria-pressed={!showInfo} onClick={() => setShowInfo(false)}>Hidden</button><button type="button" aria-pressed={showInfo} onClick={() => setShowInfo(true)}>Shown</button></div>;
+ return <SettingToggle label="Ayah information" options={['Hidden', 'Shown']} on={showInfo} toggle={() => setShowInfo(value => !value)} />;
 }

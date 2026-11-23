@@ -8,6 +8,7 @@ type SpinnerProps = {
   colorClassName?: string; // optional explicit override
   message?: string;
   className?: string;
+  fullscreen?: boolean;
 };
 
 export default function Spinner({
@@ -16,6 +17,7 @@ export default function Spinner({
   colorClassName,
   message,
   className = "",
+  fullscreen = false,
 }: SpinnerProps) {
   const { pathname } = useLocation(); // NEW: get current route
 
@@ -37,10 +39,11 @@ export default function Spinner({
   // NEW: dynamic size/thickness while using Tailwind for color/animation
   const spinnerStyle: React.CSSProperties = { width: size, height: size, borderWidth: thickness };
 
-  return (
+  const spinner = (
     <div role="status" className={`inline-flex items-center gap-3 ${finalColor} ${className}`} aria-live="polite" aria-busy="true">
       <div className="rounded-full animate-spin border-solid border-current border-t-transparent" style={spinnerStyle} aria-hidden="true" />
       {message ? <span className="text-sm font-medium text-slate-700">{message}</span> : <span className="sr-only">Loading…</span>}
     </div>
   );
+  return fullscreen ? <div className="screen-spinner">{spinner}</div> : spinner;
 }

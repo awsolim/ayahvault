@@ -1,3 +1,5 @@
+import { cachedAyahTranslation, getAyahTranslation } from "../../../lib/ayahTranslation";
+import { getMinshawiMurattalUrl } from "../../../lib/ayahAudio";
 import { previewSegments } from '../previewText';
 import { Link } from 'react-router-dom';
 import { usePreferences } from '../../../preferences/Preferences';
@@ -21,12 +23,6 @@ interface VerseCardProps {
   showInfo: boolean;
   onPrev?: () => void;
   onNext?: () => void;
-}
-
-function getMinshawiMurattalUrl(verse: Verse) {
-  const surah = String(verse.surah).padStart(3, '0');
-  const ayah = String(verse.ayah).padStart(3, '0');
-  return `https://everyayah.com/data/Minshawy_Murattal_128kbps/${surah}${ayah}.mp3`;
 }
 
 function formatTime(seconds: number) {
@@ -56,7 +52,7 @@ function AudioVersePreview({
   const [duration, setDuration] = useState(0);
   const [audioError, setAudioError] = useState('');
 
-  const audioUrl = useMemo(() => getMinshawiMurattalUrl(verse), [verse]);
+  const audioUrl = useMemo(() => getMinshawiMurattalUrl(verse.surah, verse.ayah), [verse]);
   const targetDuration = partialMode ? audioPartialSeconds : duration;
   const progressMax = targetDuration > 0 ? targetDuration : 1;
   const progress = Math.min(currentTime, progressMax);
@@ -145,21 +141,17 @@ function AudioVersePreview({
         </p>
       </div>
 
-      <div className={['w-full max-w-sm transition-all duration-300', showInfo ? 'opacity-100' : 'opacity-0'].join(' ')}>
+      <div className={'w-full max-w-sm' + (showInfo ? '' : ' invisible')} aria-hidden={!showInfo}>
         <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
-          {showInfo && (
-            <div
-              className="memo-audio-progress h-full rounded-full bg-gradient-to-r from-emerald-500 to-cyan-500 transition-[width] duration-150"
-              style={{ width: `${Math.min(100, (progress / progressMax) * 100)}%` }}
-            />
-          )}
+          <div
+            className="memo-audio-progress h-full rounded-full bg-gradient-to-r from-emerald-500 to-cyan-500 transition-[width] duration-150"
+            style={{ width: `${Math.min(100, (progress / progressMax) * 100)}%` }}
+          />
         </div>
-        {showInfo && (
-          <div className="mt-2 flex justify-between text-[10px] font-bold text-slate-400 tabular-nums">
-            <span>{formatTime(progress)}</span>
-            <span>{formatTime(progressMax)}</span>
-          </div>
-        )}
+        <div className="mt-2 flex justify-between text-[10px] font-bold text-slate-400 tabular-nums">
+          <span>{formatTime(progress)}</span>
+          <span>{formatTime(progressMax)}</span>
+        </div>
       </div>
 
       <div className="flex items-center gap-3">
@@ -189,12 +181,11 @@ function AudioVersePreview({
   );
 }
 
-const translationCache = new Map<string, string>();
 export function VerseCard(props: VerseCardProps) {
   const key = props.verse ? props.verse.surah + ':' + props.verse.ayah : 'empty';
   return <div className="verse-preview">
     <VerseContent key={key + props.previewMode} {...props} />
-    <nav className="verse-navigation" aria-label="Adjacent ayahs"><button type="button" disabled={!props.verse || !!props.errorMessage} onClick={props.onPrev}>Prev</button>{props.verse && !props.errorMessage ? <Link className="verse-mushaf-link" to={'/mushaf?ayah=' + key} state={{ from: 'memobuddy' }}>Mushaf</Link> : <span />}<button type="button" disabled={!props.verse || !!props.errorMessage} onClick={props.onNext}>Next</button></nav>
+    <nav className="verse-navigation" aria-label="Adjacent ayahs"><button type="button" disabled={!props.verse || !!props.errorMessage} onClick={props.onPrev}>Prev</button>{props.verse && !props.errorMessage ? <Link className="verse-mushaf-link" to={'/mushaf?ayah=' + key} state={{ from: 'memobuddy' }}>Open in Mushaf</Link> : <span />}<button type="button" disabled={!props.verse || !!props.errorMessage} onClick={props.onNext}>Next</button></nav>
   </div>;
 }
 function VerseContent({ verse, errorMessage, hasInteracted, previewMode, partialMode, partialWordCount, audioPartialSeconds, audioPlayRequest, showInfo }: VerseCardProps) {
@@ -202,21 +193,18 @@ function VerseContent({ verse, errorMessage, hasInteracted, previewMode, partial
   const verseKey = verse ? verse.surah + ':' + verse.ayah : '';
   const [showTranslation, setShowTranslation] = useState(false);
   const [requested, setRequested] = useState(false);
-  const [translation, setTranslation] = useState(() => translationCache.get(verseKey) || '');
+  const [translation, setTranslation] = useState(() => cachedAyahTranslation(verseKey) || '');
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   useEffect(() => {
     if (!requested || !verse) return;
-    const cached = translationCache.get(verseKey);
+    const cached = cachedAyahTranslation(verseKey);
     if (cached) { setTranslation(cached); setShowTranslation(true); setRequested(false); return; }
     const controller = new AbortController();
     setStatus('loading');
-    fetch('https://api.alquran.cloud/v1/ayah/' + verseKey + '/en.sahih', { signal: controller.signal })
-      .then(response => { if (!response.ok) throw new Error(); return response.json(); })
-      .then(payload => {
-        const text = payload?.data?.text;
-        if (typeof text !== 'string' || !text.trim()) throw new Error();
+    getAyahTranslation(verseKey, controller.signal)
+      .then(text => {
         if (controller.signal.aborted) return;
-        translationCache.set(verseKey, text); setTranslation(text); setStatus('idle'); setShowTranslation(true); setRequested(false);
+        setTranslation(text); setStatus('idle'); setShowTranslation(true); setRequested(false);
       }).catch(() => { if (!controller.signal.aborted) { setStatus('error'); setRequested(false); } });
     return () => controller.abort();
   }, [requested, verseKey, verse]);
@@ -230,7 +218,9 @@ function VerseContent({ verse, errorMessage, hasInteracted, previewMode, partial
   if (!hasInteracted || !verse) return <p className="verse-message">Choose a selection and press Go.</p>;
   const segments = previewSegments(verse.text, partialMode ? partialWordCount : Infinity);
   return <div className="verse-content">
-    {showInfo && <div className="verse-reference">{verse.surahName} · Surah {verse.surah} · Ayah {verse.ayah} · Juz {verse.juz}</div>}
+    <div className={'verse-reference' + (showInfo ? '' : ' invisible')} aria-hidden={!showInfo}>
+      {verse.surahName} · Surah {verse.surah} · Ayah {verse.ayah} · Juz {verse.juz}
+    </div>
     {previewMode === 'audio' ? <AudioVersePreview verse={verse} partialMode={partialMode} audioPartialSeconds={audioPartialSeconds} audioPlayRequest={audioPlayRequest} showInfo={showInfo} /> : <>
       <div className="verse-flip" role="button" tabIndex={0} aria-label={showTranslation ? 'Show Arabic ayah' : requested ? 'Cancel loading translation' : 'Show English translation'} aria-pressed={showTranslation} onClick={flip} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); flip(); } }}>
         <div className={'verse-flip-inner' + (showTranslation ? ' is-translated' : '')}>

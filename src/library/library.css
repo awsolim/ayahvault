@@ -83,18 +83,42 @@
   color: #9a342f;
 }
 .library-tools {
-  padding: 16px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0 14px;
+}
+.library-tools .library-status {
+  min-height: 0;
+}
+.library-list-tools {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 0;
   border-top: 2px solid var(--ink);
   border-bottom: 1px solid var(--rule);
-  margin-top: 15px;
 }
-.library-tools label,
+.library-search {
+  flex: 0 1 245px;
+  min-width: 0;
+  min-height: 38px;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 0 9px;
+}
+.library-search svg {
+  flex-shrink: 0;
+}
+.library-search,
 .verse-picker-search {
   display: flex;
   align-items: center;
   gap: 12px;
 }
-.library-tools input,
+.library-search input,
 .verse-picker-search input {
   width: 100%;
   min-width: 0;
@@ -128,24 +152,39 @@
 .library-list li {
   border-bottom: 1px solid var(--rule);
 }
-.library-list li > a {
+.library-list li > a,
+.library-select-row {
   display: grid;
   grid-template-columns: 32px minmax(0, 1fr) 22px;
   align-items: center;
   gap: 18px;
   padding: 24px 0;
 }
-.library-list li > a:hover h2 {
+.library-select-row {
+  grid-template-columns: 20px 32px minmax(0, 1fr);
+  cursor: pointer;
+}
+.library-select-row input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--ink);
+}
+.library-select-row:has(input:checked) {
+  background: #eef1f8;
+}
+.library-list li > a:hover .library-entry-title {
   color: var(--blue);
 }
-.library-list h2 {
+.library-entry-title {
+  display: block;
   font-size: 22px;
   font-weight: 500;
   line-height: 1.6;
   margin: 0;
   overflow-wrap: anywhere;
 }
-.library-list p {
+.library-entry-refs {
+  display: block;
   font-size: 13px;
   color: var(--muted);
   line-height: 1.8;
@@ -183,8 +222,27 @@
 .library-backup button {
   color: var(--muted);
 }
+.library-delete,
 .library-backup .library-delete {
-  color: #8c4340;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 7px 12px;
+  border: 1px solid #edc8c4;
+  border-radius: 6px;
+  background: #fff1f0;
+  color: #9b2d28;
+  font-size: 14px;
+}
+.library-delete:hover:not(:disabled) {
+  background: #fce0de;
+}
+.library-delete:disabled,
+.library-text-button:disabled {
+  opacity: 0.45;
+  cursor: default;
 }
 .comparison-passages article {
   padding: 24px 0 26px;
@@ -214,13 +272,13 @@
   margin: 20px 0 12px;
   overflow-wrap: break-word;
 }
-.comparison-arabic .marked-word {
-  text-decoration-line: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 9px;
-  border-radius: 2px;
+.comparison-arabic :is(.marked-phrase, .selected-phrase-range) {
+  border-radius: 4px;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
+}
+.selected-phrase-range {
+  background: #dce5fb;
 }
 .comparison-arabic button {
   font: inherit;
@@ -232,11 +290,6 @@
   padding: 0 2px;
   margin: 0 -2px;
   border-radius: 2px;
-}
-.comparison-arabic button.word-select {
-  outline: 2px solid var(--blue);
-  outline-offset: 2px;
-  background: #edf0fa !important;
 }
 .comparison-legend {
   display: flex;
@@ -495,6 +548,11 @@
   justify-content: space-between;
   gap: 18px;
 }
+.editor-footer-actions {
+  display: flex;
+  gap: 18px;
+  justify-content: flex-end;
+}
 .verse-picker-search {
   padding-bottom: 14px;
   border-bottom: 1px solid var(--rule);
@@ -579,19 +637,13 @@
 }
 .mushaf-library-marker {
   cursor: pointer;
-  color: #a47e20;
 }
-.mushaf-regions .mushaf-library-marker rect {
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 4px;
-}
-.mushaf-library-marker:focus-visible {
+.mushaf-library-marker:focus {
   outline: none;
-  stroke: var(--blue);
 }
-.ayah-action-buttons {
-  grid-template-columns: repeat(5, minmax(0, 1fr)) 36px;
+.reading-view[data-keyboard-focus=true] .mushaf-library-marker:focus-visible rect {
+  stroke: #057359;
+  stroke-width: 4px;
 }
 @media (max-width: 640px) {
   .primary-nav {
@@ -622,10 +674,11 @@
     line-height: 1.5;
     letter-spacing: -0.6px;
   }
-  .library-list li > a {
+  .library-list li > a,
+  .library-select-row {
     gap: 12px;
   }
-  .library-list h2 {
+  .library-entry-title {
     font-size: 20px;
   }
   .comparison-arabic {

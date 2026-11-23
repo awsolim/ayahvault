@@ -1,6 +1,7 @@
 """Import a matched Dar al-Marefa image/coordinate archive for local hosting.
 
 Usage: python scripts/import-mushaf.py path/to/images_1280.zip
+Then run scripts/mushaf-marker-bounds.py and scripts/mushaf-banner-bounds.py.
 The publisher's data terms apply separately from this application's code.
 """
 import json
