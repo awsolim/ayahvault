@@ -17,7 +17,7 @@ export default defineConfig({
         // Page artwork is cached on demand, never in the app-shell download.
         globIgnores: ['**/mushaf/**'],
         runtimeCaching: [{
-          urlPattern: /\/mushaf\/dar-al-marefa\/\d+\.(png|json)$/,
+          urlPattern: /\/mushaf\/dar-al-marefa\/\d+\.(png|json)(\?.*)?$/,
           handler: 'CacheFirst',
           options: {
             cacheName: 'dar-al-marefa-pages-v1',

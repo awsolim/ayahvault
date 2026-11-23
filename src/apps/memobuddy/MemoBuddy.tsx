@@ -75,13 +75,13 @@ export default function MemoBuddy() {
     (offset) => navigateToAdjacentVerse(offset)
   );
 
-  const goBtnClass = "px-6 py-2 rounded-lg text-white bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 font-bold shadow-md hover:brightness-110 active:scale-95 transition-all text-sm";
+  const goBtnClass = "memo-primary-button px-6 py-2 rounded-lg text-white bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 font-bold shadow-md hover:brightness-110 active:scale-95 transition-all text-sm";
   const previewModeToggle = (
     <PreviewModeToggle previewMode={previewMode} setPreviewMode={setPreviewMode} />
   );
 
   return (
-    <div className="practice flex flex-col items-center">
+    <div className="practice flex flex-col items-center" onPointerDownCapture={event => { event.currentTarget.dataset.keyboardFocus = 'false'; }} onKeyDownCapture={event => { if (event.key === 'Tab') event.currentTarget.dataset.keyboardFocus = 'true'; }}>
       <Seo title="MemoBuddy" />
       <SurahReference isOpen={isRefOpen} onClose={() => setIsRefOpen(false)} />
       
@@ -133,8 +133,8 @@ export default function MemoBuddy() {
 
 
       <div className="memo-settings">
-        <section className="memo-preview-row"><h2>Preview</h2><PreviewControls previewMode={previewMode} partialMode={partialMode} setPartialMode={setPartialMode} partialWordCount={partialWordCount} setPartialWordCount={setPartialWordCount} audioPartialSeconds={audioPartialSeconds} setAudioPartialSeconds={setAudioPartialSeconds} /></section>
         <section><h2>Ayah information</h2><InfoToggle showInfo={showInfo} setShowInfo={setShowInfo} /></section>
+        <section className="memo-preview-row"><h2>Preview</h2><PreviewControls previewMode={previewMode} partialMode={partialMode} setPartialMode={setPartialMode} partialWordCount={partialWordCount} setPartialWordCount={setPartialWordCount} audioPartialSeconds={audioPartialSeconds} setAudioPartialSeconds={setAudioPartialSeconds} /></section>
         <section><h2>Text / Audio</h2>{previewModeToggle}</section>
         <section><h2>Ayah text size</h2><AyahSizeControl /></section>
       </div>

@@ -45,7 +45,7 @@ export function RangeInput({
             </>
           )}
         </div>
-        <button type="submit" className="px-5 py-2 rounded-lg text-white bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 font-bold shadow-md text-sm whitespace-nowrap">
+        <button type="submit" className="memo-primary-button px-5 py-2 rounded-lg text-white bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 font-bold shadow-md text-sm whitespace-nowrap">
           Go
         </button>
         {actionSlot}

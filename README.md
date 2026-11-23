@@ -1,6 +1,6 @@
 # AyahVault
 
-Quran learning miniapps built with React, TypeScript, Vite, and Tailwind. The app runs as a static site with no database, account, or Supabase environment variables.
+Quran companion built with React, TypeScript, Vite, and Tailwind. Mushaf and MemoBuddy need no account. The personal Library saves on the device, with optional Supabase accounts and cloud sync.
 
 ## Development
 
@@ -9,8 +9,25 @@ Quran learning miniapps built with React, TypeScript, Vite, and Tailwind. The ap
 - Build: `npm run build`
 - Preview production: `npm run preview`
 - Lint: `npm run lint` (existing typing issues in older components still need cleanup)
+- Browser integration tests: `npm run test:e2e` (install Chromium once with `npx playwright install chromium`)
 
 Deploy the `dist` folder. Vercel SPA rewrites are already configured.
+
+## Mutashabihat Library
+
+The Library groups ayahs into comparison entries with connected word-range marks,
+an editable color legend, entry notes, and individual ayah notes. Create entries
+from Library or the mushaf's Mutashabihat action. Linked verse endings have a small
+gold association marker; opening an entry and returning restores the reader page,
+selection, and toolbar visibility. Passages display selectable Unicode Quran text;
+the mushaf itself keeps the printed page artwork.
+
+Entries save in IndexedDB without sign-in. Export/import backups from Library.
+Optional cloud sync uses a **separate new AyahVault Supabase project**; see
+[setup and sync behavior](docs/library-sync.md). The migration and `.env.example`
+are included. No cloud project or credentials are configured by this checkout.
+Word-range selections are tied to `ayahvault-uthmani-1`; do not change the source
+tokenization under that version without migrating existing annotations.
 
 ## Enable or disable miniapps
 

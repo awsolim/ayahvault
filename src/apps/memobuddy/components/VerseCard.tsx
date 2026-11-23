@@ -149,7 +149,7 @@ function AudioVersePreview({
         <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
           {showInfo && (
             <div
-              className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-cyan-500 transition-[width] duration-150"
+              className="memo-audio-progress h-full rounded-full bg-gradient-to-r from-emerald-500 to-cyan-500 transition-[width] duration-150"
               style={{ width: `${Math.min(100, (progress / progressMax) * 100)}%` }}
             />
           )}
@@ -166,7 +166,7 @@ function AudioVersePreview({
         <button
           type="button"
           onClick={playFromStart}
-          className="w-14 h-14 rounded-full bg-emerald-600 text-white shadow-lg shadow-emerald-600/20 flex items-center justify-center active:scale-95 transition-all hover:bg-emerald-500"
+          className="memo-audio-play w-14 h-14 rounded-full bg-emerald-600 text-white shadow-lg shadow-emerald-600/20 flex items-center justify-center active:scale-95 transition-all hover:bg-emerald-500"
           aria-label={isPlaying ? 'Restart audio' : 'Play audio'}
         >
           {isPlaying ? <RotateCcw size={22} /> : <Play size={24} className="ml-0.5" />}
@@ -174,7 +174,7 @@ function AudioVersePreview({
         <button
           type="button"
           onClick={stopPlayback}
-          className="w-11 h-11 rounded-full bg-white text-slate-600 border border-slate-200 shadow-sm flex items-center justify-center active:scale-95 transition-all disabled:opacity-40"
+          className="memo-audio-pause w-11 h-11 rounded-full bg-white text-slate-600 border border-slate-200 shadow-sm flex items-center justify-center active:scale-95 transition-all disabled:opacity-40"
           aria-label="Pause audio"
           disabled={!isPlaying}
         >

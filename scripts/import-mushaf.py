@@ -28,12 +28,15 @@ with zipfile.ZipFile(sys.argv[1]) as archive, tempfile.TemporaryDirectory() as t
             where page_number=? group by sura_number, ayah_number, line_number
             order by line_number, min(min_x) desc''', (page,)).fetchall()
         assert rows
+        endings = connection.execute('''select sura_number, ayah_number, min_x, min_y, max_x, max_y from glyphs g
+            where page_number=? and position=(select max(position) from glyphs e
+            where e.sura_number=g.sura_number and e.ayah_number=g.ayah_number)''', (page,)).fetchall()
         for surah, ayah, line, x1, y1, x2, y2 in rows:
             assert 0 <= x1 < x2 <= width and 0 <= y1 < y2 <= height
             ayah_pages.setdefault(f'{surah}:{ayah}', page)
         (destination / f'{page}.png').write_bytes(png)
         (destination / f'{page}.json').write_text(json.dumps(
-            dict(width=width, height=height, regions=rows), separators=(',', ':')))
+            dict(width=width, height=height, regions=rows, endings=endings), separators=(',', ':')))
     chapters = json.loads((root / 'src/assets/chapters.json').read_text(encoding='utf-8'))
     index = [[ayah_pages[f'{c["id"]}:{ayah}'] for ayah in range(1, c['verses'] + 1)] for c in chapters]
     (root / 'src/assets/mushaf-pages.json').write_text(json.dumps(index, separators=(',', ':')))

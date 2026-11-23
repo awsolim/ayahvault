@@ -1,0 +1,117 @@
+/* A restrained sheen and shallow depth keep controls tactile. */
+.practice {
+  --memo-blue: #3159cf;
+  --memo-button-sheen: linear-gradient(174deg, #ffffff16, #ffffff00 51%);
+  --memo-button-blue: linear-gradient(135deg, #4265d6, #3455c3 60%, #2c48ad);
+}
+.practice .memo-primary-button,
+.practice .setting-segments button[aria-pressed="true"],
+.practice .memo-audio-play {
+  color: #fff;
+  background: var(--memo-button-sheen), var(--memo-button-blue);
+  border: 1px solid #2948b4;
+  border-radius: 8px;
+  box-shadow: inset 0 1px 0 #ffffff30, 0 1px 2px #263f9a20;
+  text-shadow: none;
+}
+.practice .memo-primary-button,
+.practice .verse-navigation > button,
+.practice .verse-mushaf-link,
+.practice .setting-segments button,
+.practice .memo-audio-play,
+.practice .memo-audio-pause {
+  transition: box-shadow 140ms ease, filter 140ms ease, transform 100ms ease;
+}
+.practice .memo-primary-button:active:not(:disabled),
+.practice .verse-navigation > button:active:not(:disabled),
+.practice .setting-segments button[aria-pressed="true"]:active,
+.practice .memo-audio-play:active {
+  transform: translateY(1px);
+  box-shadow: inset 0 1px 2px #14296520;
+  filter: brightness(.98);
+}
+.practice .verse-navigation > button {
+  background: var(--memo-button-sheen), linear-gradient(135deg, #344a7b, #293d68 60%, #253559);
+  color: #fff;
+  border: 1px solid #20335d;
+  border-radius: 8px;
+  box-shadow: inset 0 1px 0 #ffffff25, 0 1px 2px #1b2b4820;
+  text-shadow: none;
+}
+.practice .verse-navigation > button:disabled {
+  box-shadow: inset 0 1px 0 #ffffff25;
+  opacity: .4;
+}
+.practice .verse-mushaf-link {
+  border-color: #c6a659;
+  border-radius: 7px;
+  background: linear-gradient(170deg, #ffffff30, transparent 55%), linear-gradient(110deg, #f0d68d, #e5c16b 65%, #edd18a);
+  color: #48391c;
+  box-shadow: inset 0 1px 0 #ffffff65, 0 1px 2px #8b67201a;
+}
+.practice .verse-mushaf-link:active { transform: translateY(1px); }
+.practice .setting-segments {
+  border-color: #c0cae0;
+  border-radius: 9px;
+  background: linear-gradient(180deg, #f1f4fa, #fff);
+  box-shadow: inset 0 1px 2px #253e7810;
+}
+.practice .setting-segments button { border-radius: 6px; }
+.practice .setting-segments button[aria-pressed="true"] {
+  border-radius: 6px;
+  box-shadow: inset 0 1px 0 #ffffff30, 0 1px 2px #263f9a18;
+}
+.practice .size-control,
+.practice .partial-amount {
+  border-color: #c0cae0;
+  border-radius: 8px;
+  background: linear-gradient(175deg, #fff, #f3f6fd);
+  box-shadow: inset 0 1px 0 #fff, 0 1px 2px #263f9a0b;
+}
+.practice .size-control button,
+.practice .partial-amount button { color: #3153ae; }
+.practice .size-control button:disabled,
+.practice .partial-amount button:disabled { color: #b9bec8; }
+.practice .memo-selection input {
+  border-color: #b9c6e1;
+  border-radius: 7px;
+  background: linear-gradient(180deg, #f8faff, #fff 55%);
+  box-shadow: inset 0 1px 2px #253e7810, 0 1px 0 #fff;
+}
+.practice .practice-modes button[aria-pressed="true"] {
+  color: #2c50ba;
+  border-bottom-color: #4267da;
+  background: linear-gradient(0deg, #4267da0d, transparent 75%);
+}
+.practice .memo-audio-play,
+.practice .memo-audio-pause { border-radius: 50%; }
+.practice .memo-audio-pause {
+  background: linear-gradient(160deg, #fff, #edf2ff);
+  border-color: #c0cae0;
+  box-shadow: inset 0 1px 0 #fff, 0 1px 0 #b5c1dc;
+}
+.practice .memo-audio-progress { background: linear-gradient(90deg, #3155ce, #6890ff); }
+/* Touch never draws a focus rectangle around the ayah. Tab focus stays visible. */
+.practice .verse-flip:focus { outline: none; }
+.practice[data-keyboard-focus="true"] .verse-flip:focus-visible {
+  outline: 2px solid var(--memo-blue);
+  outline-offset: 5px;
+  border-radius: 5px;
+}
+@media (hover: hover) {
+  .practice .memo-primary-button:hover:not(:disabled),
+  .practice .verse-navigation > button:hover:not(:disabled),
+  .practice .memo-audio-play:hover { filter: brightness(1.04); }
+  .practice .verse-navigation > button:hover:not(:disabled) {
+    background: var(--memo-button-sheen), linear-gradient(135deg, #344a7b, #293d68 60%, #253559);
+  }
+  .practice .verse-mushaf-link:hover { border-color: #b49348; background: linear-gradient(110deg, #f3dc9e, #ebca7b 65%, #f1d898); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .practice .memo-primary-button,
+  .practice .verse-navigation > button,
+  .practice .verse-mushaf-link,
+  .practice .setting-segments button,
+  .practice .memo-audio-play,
+  .practice .memo-audio-pause { transition: none; }
+}
