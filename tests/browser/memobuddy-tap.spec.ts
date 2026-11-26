@@ -1,5 +1,30 @@
 import { test, expect } from '@playwright/test';
 
+test('settings share control edges at phone and desktop widths without shifting partial preview', async ({ page }) => {
+ await page.goto('/memobuddy');
+ await expect(page.getByLabel('Tap on Ayah',{exact:true})).toBeVisible();
+ for (const width of [320, 390, 1000]) {
+  await page.setViewportSize({width, height:800});
+  const controls=page.locator('.memo-settings .setting-segments, .memo-settings select, .memo-settings .size-control');
+  const bounds=await controls.evaluateAll(els=>els.map(el=>{const r=el.getBoundingClientRect();return {left:r.left,right:r.right};}));
+  expect(bounds.length).toBeGreaterThanOrEqual(6);
+  for(const boundsItem of bounds){
+   expect(Math.abs(boundsItem.left-bounds[0].left)).toBeLessThan(1);
+   expect(Math.abs(boundsItem.right-bounds[0].right)).toBeLessThan(1);
+  }
+  const row=page.locator('.memo-preview-row');
+  const height=await row.evaluate(el=>el.getBoundingClientRect().height);
+  await page.getByRole('button',{name:'Preview',exact:true}).locator('.memo-setting-label').click();
+  expect(await row.evaluate(el=>el.getBoundingClientRect().height)).toBe(height);
+  const counter=await page.getByRole('group',{name:'Partial preview words'}).boundingBox();
+  expect(counter!.x).toBeGreaterThanOrEqual(bounds[0].left);
+  expect(counter!.x+counter!.width).toBeLessThan(bounds[0].right);
+  await page.getByRole('button',{name:'Increase preview words',exact:true}).click();
+  await page.screenshot({path:`test-results/settings-aligned-${width}.png`,fullPage:true});
+  await page.getByRole('button',{name:'Preview',exact:true}).locator('.memo-setting-label').click();
+ }
+});
+
 test('ayah tap defaults to translation, toggles information, navigates halves, and generates within the selection', async ({ page }) => {
  let translations=0;
  await page.addInitScript(()=>{Math.random=()=>0.2;});

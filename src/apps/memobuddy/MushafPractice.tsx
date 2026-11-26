@@ -1,5 +1,5 @@
 import { useLayoutEffect, useMemo, useState, type ReactNode } from "react";
-import { ChevronUp, Eye, RotateCcw } from "lucide-react";
+import { ChevronUp, ChevronRight, Eye, EyeOff, RotateCcw } from "lucide-react";
 import { useMemoSession } from "./hooks/useMemoSession";
 import { useSessionState } from "./hooks/useSessionState";
 import { usePreferences } from "../../preferences/Preferences";
@@ -86,6 +86,12 @@ export default function MushafPractice({
   const visible = (key: string) =>
     visibleInPractice(key, progress, mushafVisibility, ayahIndex);
   const hasHiddenFollowing = mushafVisibility !== "all" && !progress.showAll;
+  const effectiveVisibility = progress.showAll ? 'all' : mushafVisibility;
+  const followingVisibility: MushafVisibility = effectiveVisibility === 'all' ? 'following' : effectiveVisibility === 'following' ? 'others' : 'all';
+  function cycleVisibility() {
+    setMushafVisibility(followingVisibility);
+    setSaved({...progress,showAll:false});
+  }
   function newAyah() {
     const result = memo.generate(true);
     if (!result) {
@@ -104,6 +110,7 @@ export default function MushafPractice({
     anchor: progress.anchor,
     questionId: progress.questionId,
     partialWords,
+    concealHeadings: effectiveVisibility !== 'all' || partialWords !== null,
     visible,
     resumePage: progress.page,
     recordPage: (page) =>
@@ -118,47 +125,57 @@ export default function MushafPractice({
           >
             <button
               className="memo-practice-config"
+              aria-label="MemoBuddy Settings"
               onClick={() => setSettings(true)}
               aria-haspopup="dialog"
               aria-expanded={settings}
             >
-              MemoBuddy
+              <span>MemoBuddy</span>
               <ChevronUp size={15} />
+            </button>
+            <button type="button" className="memo-practice-visibility" data-visibility={effectiveVisibility}
+              aria-label={'Visibility: ' + visibilityLabels[effectiveVisibility] + '. Change to ' + visibilityLabels[followingVisibility]}
+              title={visibilityLabels[effectiveVisibility] + ' · Tap for ' + visibilityLabels[followingVisibility]}
+              onClick={cycleVisibility}>
+              {effectiveVisibility === 'others' ? <EyeOff size={20}/> : <Eye size={20}/>}
+              {effectiveVisibility === 'following' && <ChevronRight className="memo-visibility-next" size={12}/>}
+              <span className="sr-only" aria-live="polite">{visibilityLabels[effectiveVisibility]}</span>
+            </button>
+            <button className="memo-practice-new" onClick={newAyah}>
+              New Ayah
             </button>
             {partial ? (
               <button
+                className="memo-practice-reveal"
                 onClick={() => setSaved({ ...progress, promptRevealed: true })}
               >
                 Reveal Prompt
               </button>
-            ) : hasHiddenFollowing ? (
+            ) : !progress.showAll ? (
               <button
-                disabled={!next}
+                className="memo-practice-reveal"
+                disabled={!hasHiddenFollowing || !next}
                 onClick={() => {
                   if (!next) return;
                   setSaved({ ...progress, through: next });
                   jump(next);
                 }}
               >
-                {next ? "Reveal Next" : "End of Range"}
+                {hasHiddenFollowing && !next ? "End of Range" : "Reveal Next"}
               </button>
             ) : (
               <button
+                className="memo-practice-reveal"
                 aria-label={
-                  progress.showAll ? "Hide again" : "Change visibility"
+                  "Hide again"
                 }
                 onClick={() =>
-                  progress.showAll
-                    ? setSaved({ ...progress, showAll: false })
-                    : setSettings(true)
+                  setSaved({ ...progress, showAll: false })
                 }
               >
-                {progress.showAll ? "Hide Again" : "Visibility"}
+                Hide Again
               </button>
             )}
-            <button className="memo-practice-new" onClick={newAyah}>
-              New Ayah
-            </button>
           </div>
           {message && (
             <p className="memo-practice-status" role="alert">
@@ -287,7 +304,7 @@ function PracticeSettings({
     apply(config, visibilityDraft, partialDraft, countDraft);
   }
   return (
-    <Dialog title="MemoBuddy" close={close}>
+    <Dialog title="MemoBuddy Settings" close={close}>
       <div className="practice memo-practice-settings">
         <ModeSelector
           mode={config.mode}

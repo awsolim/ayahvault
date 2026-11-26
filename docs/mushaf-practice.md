@@ -3,7 +3,16 @@
 Opening **Open in Mushaf** from a MemoBuddy ayah starts a practice session. Normal
 mushaf navigation does not inherit concealed content. The compact bottom strip
 provides **Reveal Prompt** (for a partial prompt), **Reveal Next**, and **New Ayah**.
-Tap **MemoBuddy** to configure the generator and visibility or end practice.
+It floats above the bottom edge in a faintly tinted pill, with reserved space
+between it and the page so it cannot cover the final line of Quran text.
+Tap **MemoBuddy** to open settings, configure the generator and visibility, or end practice.
+The eye button beside **New Ayah** cycles immediately through Show All (blue eye),
+Hide Following Ayahs (amber eye with a forward chevron), and Hide All Other Ayahs
+(purple crossed-out eye). It does not open a menu or reset the reveal cursor.
+Concealment also masks surah banners and unnumbered opening basmallahs, including
+multiple chapter openings on one page. Show All restores them; a partial prompt
+keeps headings concealed until the prompt is revealed. Numbered basmallahs follow
+the visibility rules for their ayah.
 
 ## Visibility and reveals
 

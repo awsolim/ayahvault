@@ -77,6 +77,34 @@ const selected = (page: Page, verse: string) =>
   page
     .locator(".reading-page:not([inert])")
     .getByRole("button", { name: "Select ayah " + verse, exact: true });
+test("visibility cycles directly without a menu and retains the fixed reading frame", async ({ page }) => {
+  await seed(page);
+  const frame = await page.locator('.reader-frame').boundingBox();
+  const control = page.locator('.memo-practice-visibility');
+  await expect(control).toHaveAttribute('data-visibility', 'others');
+  await control.click();
+  await expect(control).toHaveAttribute('data-visibility', 'all');
+  await expect(selected(page, '8:51')).toBeVisible();
+  await expect(page.getByRole('button', {name:'Reveal Next', exact:true})).toBeDisabled();
+  await control.click();
+  await expect(control).toHaveAttribute('data-visibility', 'following');
+  await expect(selected(page, '8:51')).toBeVisible();
+  await page.getByLabel('Mushaf page').selectOption('184');
+  await expect(selected(page, '8:53')).toHaveCount(0);
+  await control.click();
+  await expect(control).toHaveAttribute('data-visibility', 'others');
+  await page.getByRole('button', {name:'Reveal Next', exact:true}).click();
+  await expect(selected(page, '8:53')).toBeVisible();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  expect(await page.locator('.reader-frame').boundingBox()).toEqual(frame);
+  await page.reload();
+  await expect(control).toHaveAttribute('data-visibility', 'others');
+  await page.getByLabel('Mushaf page').selectOption('604');
+  // This page contains three banners and three unnumbered basmallahs.
+  await expect.poll(() => ink(page)).toBeLessThan(15);
+  await control.click();
+  await expect.poll(() => ink(page)).toBeGreaterThan(1000);
+});
 async function ink(page: Page) {
   const screenshot = await page
     .locator(".reading-page:not([inert]) .mushaf-fitted-image")
@@ -105,6 +133,14 @@ test("concealment persists through page turns, reveals cross-page continuations,
   await seed(page);
   await expect(selected(page, "8:52")).toBeVisible();
   await expect(selected(page, "8:51")).toHaveCount(0);
+  const panel = await page.getByRole('region',{name:'In-mushaf MemoBuddy'}).boundingBox();
+  const artworkBottom = await page.locator('.reading-page:not([inert]) .mushaf-fitted-image').evaluate((element:SVGSVGElement)=>{
+    const bounds=element.getBoundingClientRect(),view=element.viewBox.baseVal;
+    const height=Math.min(bounds.height,bounds.width*view.height/view.width);
+    return bounds.top+(bounds.height+height)/2;
+  });
+  expect(panel!.y).toBeGreaterThanOrEqual(artworkBottom);
+  expect(panel!.x).toBeGreaterThanOrEqual(12);
   await page.screenshot({ path: "test-results/practice-only-prompt.png" });
   const frame = await page.locator(".reader-frame").boundingBox();
   await page.getByLabel("Mushaf page").selectOption("184");
@@ -116,7 +152,7 @@ test("concealment persists through page turns, reveals cross-page continuations,
   await expect(selected(page, "8:54")).toHaveCount(0);
   expect(await page.locator(".reader-frame").boundingBox()).toEqual(frame);
   await page.screenshot({ path: "test-results/practice-revealed-next.png" });
-  await page.getByRole("button", { name: "MemoBuddy", exact: true }).click();
+  await page.getByRole("button", { name: "MemoBuddy Settings", exact: true }).click();
   await page.getByRole("button", { name: "Reveal All", exact: true }).click();
   await expect(selected(page, "8:54")).toBeVisible();
   await page.getByRole("button", { name: "Hide again", exact: true }).click();
@@ -134,7 +170,7 @@ test("concealment persists through page turns, reveals cross-page continuations,
   await page.getByRole("link", { name: "Back to MemoBuddy" }).click();
   await expect(page.locator(".verse-reference")).toContainText("Ayah 54");
   await page.getByRole("link", { name: "Open in Mushaf", exact: true }).click();
-  await page.getByRole("button", { name: "MemoBuddy", exact: true }).click();
+  await page.getByRole("button", { name: "MemoBuddy Settings", exact: true }).click();
   await page.getByRole("button", { name: "End Practice", exact: true }).click();
   await expect(
     page.getByRole("region", { name: "In-mushaf MemoBuddy" }),
@@ -174,8 +210,8 @@ test("settings apply deliberately, reset keeps the page stable, and disjoint ran
   ).toBeDisabled();
   await expect(selected(page, "8:51")).toBeVisible();
   const frame = await page.locator(".reader-frame").boundingBox();
-  await page.getByRole("button", { name: "MemoBuddy", exact: true }).click();
-  const dialog = page.getByRole("dialog", { name: "MemoBuddy", exact: true });
+  await page.getByRole("button", { name: "MemoBuddy Settings", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "MemoBuddy Settings", exact: true });
   await expect(dialog.getByLabel('Start surah',{exact:true})).toHaveValue('8');
   await expect(dialog.getByLabel('Start ayah',{exact:true})).toHaveValue('52');
   await expect(dialog.getByLabel('End ayah',{exact:true})).toHaveValue('54');
@@ -185,7 +221,7 @@ test("settings apply deliberately, reset keeps the page stable, and disjoint ran
     .selectOption("others");
   await dialog.getByRole("button", { name: "Close", exact: true }).click();
   await expect(selected(page, "8:51")).toBeVisible();
-  await page.getByRole("button", { name: "MemoBuddy", exact: true }).click();
+  await page.getByRole("button", { name: "MemoBuddy Settings", exact: true }).click();
   await dialog
     .getByLabel("Mushaf Visibility", { exact: true })
     .selectOption("others");
@@ -200,7 +236,7 @@ test("an unsupported partial boundary never exposes the full prompt implicitly",
 }) => {
   await seed(page, { anchor: "95:1", pool: ["95:1", "95:2"], partial: true });
   await expect(selected(page, "95:1")).toHaveCount(0);
-  await page.getByRole("button", { name: "MemoBuddy", exact: true }).click();
+  await page.getByRole("button", { name: "MemoBuddy Settings", exact: true }).click();
   await expect(
     page.getByText("This ayah’s word boundaries differ between editions.", {
       exact: false,

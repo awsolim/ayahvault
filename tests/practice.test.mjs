@@ -145,6 +145,15 @@ test("masks cover line edges, keep visible neighbours, and fail closed when word
     [[50, 0, 100, 46]],
   );
 });
+test("concealed headings cover opening and mid-page banners without covering visible ayahs", async () => {
+  const data = JSON.parse(await readFile(new URL('../public/mushaf/dar-al-marefa/604.json', import.meta.url), 'utf8'));
+  const headings = artwork.concealmentBounds(data, () => true, '112:1', null, true);
+  assert.deepEqual(headings, [[0, 0, 1340, 254], [0, 504, 1340, 753], [0, 1130, 1340, 1379]]);
+  for (const [, , , , top, , bottom] of data.regions)
+    assert.ok(headings.every(([, hiddenTop, , hiddenBottom]) => hiddenBottom <= top || hiddenTop >= bottom));
+  assert.deepEqual(artwork.concealmentBounds(data, () => true, '112:1', null, false), []);
+});
+
 test("native glyph bounds cover the full corpus with a single canonical position per supported word", async () => {
   const unsupported = new Set(
     JSON.parse(

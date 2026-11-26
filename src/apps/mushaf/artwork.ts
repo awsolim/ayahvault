@@ -80,8 +80,29 @@ export function concealmentBounds(
   visible: (key: string) => boolean,
   anchor: string,
   partialWords: number | null,
+  concealHeadings = false,
 ): ConcealedBounds[] {
   const hidden: ConcealedBounds[] = [];
+  if (concealHeadings) {
+    // Non-ayah lines contain the printed surah banners and opening basmallahs.
+    // Use the neighbouring full line bands so the artwork stays in place.
+    const lines = new Map<number, { top: number; bottom: number }>();
+    for (const [, , line, , top, , bottom] of data.regions) {
+      const previous = lines.get(line);
+      lines.set(line, {
+        top: Math.min(previous?.top ?? top, top),
+        bottom: Math.max(previous?.bottom ?? bottom, bottom),
+      });
+    }
+    let previousLine = 0;
+    let previousBottom = 0;
+    for (const [line, bounds] of [...lines].sort(([a], [b]) => a - b)) {
+      if (line > previousLine + 1 && bounds.top > previousBottom)
+        hidden.push([0, previousBottom, data.width, bounds.top]);
+      previousLine = line;
+      previousBottom = bounds.bottom;
+    }
+  }
   const cells = concealmentCells(
     data.regions.map(([s, a, line, left, top, right, bottom]) => ({
       key: s + ":" + a,

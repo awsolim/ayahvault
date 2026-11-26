@@ -62,7 +62,7 @@ function PageContent({ page, highlight, selected, picking, rangeStart, onSelect,
   const visible=(key:string)=>!inPractice||practice!.visible(key);
   const promptWords=inPractice?practice!.partialWords:null;
   const canInteract=(key:string)=>visible(key)&&!(inPractice&&key===practice!.anchor&&promptWords===0);
-  const concealed=data&&inPractice?concealmentBounds(data,visible,practice!.anchor,promptWords):[];
+  const concealed=data&&inPractice?concealmentBounds(data,visible,practice!.anchor,promptWords,practice!.concealHeadings):[];
   const interactiveRegions=artwork?.regions.flatMap(region=>{
     const [s,a,line]=region;const key=s+':'+a;
     if(!canInteract(key))return [];

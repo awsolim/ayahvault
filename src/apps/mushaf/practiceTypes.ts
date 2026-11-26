@@ -4,6 +4,7 @@ export type PracticeBinding = {
   anchor: string;
   questionId: string;
   partialWords: number | null;
+  concealHeadings: boolean;
   resumePage?: number;
   recordPage: (page: number) => void;
   visible: (key: string) => boolean;
