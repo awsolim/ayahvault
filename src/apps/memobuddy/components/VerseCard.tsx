@@ -4,7 +4,8 @@ import { previewSegments } from '../previewText';
 import { Link } from 'react-router-dom';
 import { usePreferences } from '../../../preferences/Preferences';
 // src/apps/memobuddy/components/VerseCard.tsx
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type MouseEvent, type KeyboardEvent } from 'react';
+import type { AyahTapAction } from '../tapAction';
 import { Pause, Play, RotateCcw, Volume2 } from 'lucide-react';
 import type { Verse } from '../../../assets/types';
 
@@ -21,6 +22,9 @@ interface VerseCardProps {
   audioPartialSeconds: number;
   audioPlayRequest: number;
   showInfo: boolean;
+  tapAction: AyahTapAction;
+  onToggleInfo: () => void;
+  onGenerate: () => void;
   onPrev?: () => void;
   onNext?: () => void;
 }
@@ -38,12 +42,14 @@ function AudioVersePreview({
   audioPartialSeconds,
   audioPlayRequest,
   showInfo,
+  tapSurface,
 }: {
   verse: Verse;
   partialMode: boolean;
   audioPartialSeconds: number;
   audioPlayRequest: number;
   showInfo: boolean;
+  tapSurface: { label: string; click: (event: MouseEvent<HTMLElement>) => void; keyDown: (event: KeyboardEvent<HTMLElement>) => void };
 }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const stopTimerRef = useRef<number | null>(null);
@@ -128,6 +134,7 @@ function AudioVersePreview({
         }}
       />
 
+      <div className="memo-audio-tap-surface" role="button" tabIndex={0} aria-label={tapSurface.label} onClick={tapSurface.click} onKeyDown={tapSurface.keyDown}>
       <div className="w-24 h-24 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shadow-inner">
         <Volume2 size={42} strokeWidth={1.7} />
       </div>
@@ -139,6 +146,8 @@ function AudioVersePreview({
         <p className="mt-1 text-sm font-semibold text-slate-700">
           {partialMode ? `First ${audioPartialSeconds} seconds` : 'Full ayah'}
         </p>
+      </div>
+
       </div>
 
       <div className={'w-full max-w-sm' + (showInfo ? '' : ' invisible')} aria-hidden={!showInfo}>
@@ -184,11 +193,11 @@ function AudioVersePreview({
 export function VerseCard(props: VerseCardProps) {
   const key = props.verse ? props.verse.surah + ':' + props.verse.ayah : 'empty';
   return <div className="verse-preview">
-    <VerseContent key={key + props.previewMode} {...props} />
+    <VerseContent key={key + props.previewMode + props.tapAction} {...props} />
     <nav className="verse-navigation" aria-label="Adjacent ayahs"><button type="button" disabled={!props.verse || !!props.errorMessage} onClick={props.onPrev}>Prev</button>{props.verse && !props.errorMessage ? <Link className="verse-mushaf-link" to={'/mushaf?ayah=' + key} state={{ from: 'memobuddy' }}>Open in Mushaf</Link> : <span />}<button type="button" disabled={!props.verse || !!props.errorMessage} onClick={props.onNext}>Next</button></nav>
   </div>;
 }
-function VerseContent({ verse, errorMessage, hasInteracted, previewMode, partialMode, partialWordCount, audioPartialSeconds, audioPlayRequest, showInfo }: VerseCardProps) {
+function VerseContent({ verse, errorMessage, hasInteracted, previewMode, partialMode, partialWordCount, audioPartialSeconds, audioPlayRequest, showInfo, tapAction, onToggleInfo, onGenerate, onPrev, onNext }: VerseCardProps) {
   const { ayahSize } = usePreferences();
   const verseKey = verse ? verse.surah + ':' + verse.ayah : '';
   const [showTranslation, setShowTranslation] = useState(false);
@@ -214,6 +223,25 @@ function VerseContent({ verse, errorMessage, hasInteracted, previewMode, partial
     if (translation) { setShowTranslation(true); return; }
     setRequested(true);
   }
+  function activate(offset: -1 | 1 = 1) {
+    if (tapAction === 'translation') flip();
+    else if (tapAction === 'information') onToggleInfo();
+    else if (tapAction === 'generate') onGenerate();
+    else if (offset === -1) onPrev?.();
+    else onNext?.();
+  }
+  function tap(event: MouseEvent<HTMLElement>) {
+    const bounds = event.currentTarget.getBoundingClientRect();
+    activate(event.detail !== 0 && event.clientX < bounds.left + bounds.width / 2 ? -1 : 1);
+  }
+  function keyDown(event: KeyboardEvent<HTMLElement>) {
+    if (tapAction === 'adjacent' && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
+      event.preventDefault(); event.stopPropagation(); activate(event.key === 'ArrowLeft' ? -1 : 1);
+    } else if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault(); event.stopPropagation(); activate();
+    }
+  }
+  const label = tapAction === 'translation' ? (showTranslation ? 'Show Arabic ayah' : requested ? 'Cancel loading translation' : 'Show English translation') : tapAction === 'information' ? 'Toggle ayah information' : tapAction === 'generate' ? 'Generate new ayah' : 'Previous or next ayah. Left: previous. Right: next.';
   if (errorMessage) return <p className="verse-message" role="alert">{errorMessage}</p>;
   if (!hasInteracted || !verse) return <p className="verse-message">Choose a selection and press Go.</p>;
   const segments = previewSegments(verse.text, partialMode ? partialWordCount : Infinity);
@@ -221,15 +249,15 @@ function VerseContent({ verse, errorMessage, hasInteracted, previewMode, partial
     <div className={'verse-reference' + (showInfo ? '' : ' invisible')} aria-hidden={!showInfo}>
       {verse.surahName} · Surah {verse.surah} · Ayah {verse.ayah} · Juz {verse.juz}
     </div>
-    {previewMode === 'audio' ? <AudioVersePreview verse={verse} partialMode={partialMode} audioPartialSeconds={audioPartialSeconds} audioPlayRequest={audioPlayRequest} showInfo={showInfo} /> : <>
-      <div className="verse-flip" role="button" tabIndex={0} aria-label={showTranslation ? 'Show Arabic ayah' : requested ? 'Cancel loading translation' : 'Show English translation'} aria-pressed={showTranslation} onClick={flip} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); flip(); } }}>
+    {previewMode === 'audio' && !showTranslation ? <AudioVersePreview verse={verse} partialMode={partialMode} audioPartialSeconds={audioPartialSeconds} audioPlayRequest={audioPlayRequest} showInfo={showInfo} tapSurface={{label,click:tap,keyDown}} /> : <>
+      <div className="verse-flip" role="button" tabIndex={0} aria-label={label} aria-pressed={tapAction === 'translation' ? showTranslation : undefined} onClick={tap} onKeyDown={keyDown}>
         <div className={'verse-flip-inner' + (showTranslation ? ' is-translated' : '')}>
           <div className="verse-face verse-arabic" aria-hidden={showTranslation}><p dir="rtl" lang="ar" style={{ fontSize: ayahSize }}>{segments.map((segment, index) => /\S/u.test(segment.text) ? <span key={index} style={{ visibility: segment.hidden ? 'hidden' : 'visible', opacity: segment.hidden ? 0 : 1 }} aria-hidden={segment.hidden || undefined}>{segment.text}</span> : segment.text)}</p></div>
           <div className="verse-face verse-translation" aria-hidden={!showTranslation}><p>{translation}</p><span>Sahih International</span></div>
         </div>
       </div>
-      <div className="translation-feedback" aria-live="polite">{status === 'loading' ? 'Loading translation…' : status === 'error' ? <button type="button" onClick={() => setRequested(true)}>Translation unavailable. Try again</button> : ''}</div>
     </>}
+    <div className="translation-feedback" aria-live="polite">{status === 'loading' ? 'Loading translation…' : status === 'error' ? <button type="button" onClick={() => setRequested(true)}>Translation unavailable. Try again</button> : ''}</div>
   </div>;
 }
 export default VerseCard;

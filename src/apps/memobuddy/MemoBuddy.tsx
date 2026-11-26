@@ -1,10 +1,11 @@
-import { useSessionState } from './hooks/useSessionState';
-import { AyahSizeControl } from '../../preferences/Preferences';
+import { useMemoSession } from './hooks/useMemoSession';
+import { visibilityLabels, validVisibility } from './practiceModel';
+import { AyahSizeControl, usePreferences } from '../../preferences/Preferences';
+import { validAyahTapAction } from './tapAction';
 // src/apps/memobuddy/MemoBuddy.tsx
 
 import { useState, useCallback } from 'react';
 
-import { useRandomVerse } from './hooks/useRandomVerse';
 import { useKeyboardNav } from './hooks/useKeyboardNav';
 import { ModeSelector } from './components/ModeSelector';
 import { RangeInput } from './components/RangeInput';
@@ -16,44 +17,13 @@ import { CustomSelection } from './components/CustomSelection';
 import { SurahReference } from './components/SurahReference';
 import Seo from '../../lib/Seo';
 
-type PreviewMode = 'text' | 'audio';
 
 export default function MemoBuddy() {
-  const [mode, setMode] = useSessionState<'surah' | 'juz' | 'full' | 'custom' | null>('mode', null);
-  const [rangeStart, setRangeStart] = useSessionState<string>('rangeStart', '');
-  const [rangeEnd, setRangeEnd] = useSessionState<string>('rangeEnd', '');
-  const [useMultiRange, setUseMultiRange] = useSessionState('useMultiRange', false);
-  const [isRefOpen, setIsRefOpen] = useState(false);
-
-  const [customConfig, setCustomConfig] = useSessionState('customConfig', {
-    type: 'include' as 'include' | 'exclude' | 'exact',
-    items: [] as {type: 'surah' | 'juz', val: number}[],
-    exact: { startSurah: 1, startAyah: 1, endSurah: 1, endAyah: 7 }
-  });
-
-  const [partialMode, setPartialMode] = useSessionState('partialMode', false);
-  const [partialWordCount, setPartialWordCount] = useSessionState('partialWordCount', 1);
-  const [previewMode, setPreviewMode] = useSessionState<PreviewMode>('previewMode', 'text');
-  const [audioPartialSeconds, setAudioPartialSeconds] = useSessionState('audioPartialSeconds', 5);
-  const [audioPlayRequest, setAudioPlayRequest] = useState(0);
-  const [showInfo, setShowInfo] = useSessionState('showInfo', false); // Off by default
-  const [hasInteracted, setHasInteracted] = useSessionState('hasInteracted', false);
-
-
-
-  const { randomVerse, errorMessage, generateRandomVerse, navigateToAdjacentVerse } = useRandomVerse();
-
-  const handleGo = useCallback(() => {
-    if (!mode) return;
-    setHasInteracted(true);
-    const config = mode === 'surah' || mode === 'juz' 
-      ? { start: rangeStart, end: useMultiRange ? rangeEnd : rangeStart }
-      : mode === 'custom' ? customConfig : {};
-    generateRandomVerse(mode, config);
-    if (previewMode === 'audio') {
-      setAudioPlayRequest(v => v + 1);
-    }
-  }, [mode, rangeStart, rangeEnd, useMultiRange, customConfig, generateRandomVerse, previewMode, setHasInteracted]);
+  const { ayahTapAction, setAyahTapAction, mushafVisibility, setMushafVisibility } = usePreferences();
+  const { mode,setMode,rangeStart,setRangeStart,rangeEnd,setRangeEnd,useMultiRange,setUseMultiRange,customConfig,setCustomConfig,partialMode,setPartialMode,partialWordCount,setPartialWordCount,previewMode,setPreviewMode,audioPartialSeconds,setAudioPartialSeconds,showInfo,setShowInfo,hasInteracted,randomVerse,errorMessage,navigateToAdjacentVerse,generate } = useMemoSession();
+  const [isRefOpen,setIsRefOpen]=useState(false);
+  const [audioPlayRequest,setAudioPlayRequest]=useState(0);
+  const handleGo=useCallback(()=>{const result=generate();if(result&&previewMode==='audio')setAudioPlayRequest(v=>v+1);},[generate,previewMode]);
 
   useKeyboardNav(randomVerse, partialMode, handleGo, () => setPartialMode(v => !v), 
     (delta) => {
@@ -116,12 +86,15 @@ export default function MemoBuddy() {
         partialWordCount={partialWordCount} audioPartialSeconds={audioPartialSeconds}
         audioPlayRequest={audioPlayRequest}
         showInfo={showInfo} 
+        tapAction={ayahTapAction} onToggleInfo={() => setShowInfo(value => !value)} onGenerate={handleGo}
         onPrev={() => navigateToAdjacentVerse(-1)} onNext={() => navigateToAdjacentVerse(1)} 
       />
 
 
       <div className="memo-settings">
         <section className="memo-toggle-row"><InfoToggle showInfo={showInfo} setShowInfo={setShowInfo} /></section>
+        <section className="memo-tap-row"><h2><label htmlFor="ayah-tap-action">Tap on Ayah</label></h2><div className="memo-tap-control"><select id="ayah-tap-action" value={ayahTapAction} onChange={event => { if (validAyahTapAction(event.target.value)) setAyahTapAction(event.target.value); }} aria-describedby={ayahTapAction === 'adjacent' ? 'ayah-tap-navigation-hint' : undefined}><option value="translation">Translation</option><option value="information">Toggle Ayah Information</option><option value="adjacent">Previous / Next Ayah</option><option value="generate">Generate New Ayah</option></select>{ayahTapAction === 'adjacent' && <p id="ayah-tap-navigation-hint">Left: Previous · Right: Next</p>}</div></section>
+        <section className="memo-tap-row"><h2><label htmlFor="mushaf-visibility">Mushaf Visibility</label></h2><div className="memo-tap-control"><select id="mushaf-visibility" value={mushafVisibility} onChange={event=>{if(validVisibility(event.target.value))setMushafVisibility(event.target.value);}}>{Object.entries(visibilityLabels).map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></div></section>
         <section className="memo-toggle-row memo-preview-row"><PreviewControls previewMode={previewMode} partialMode={partialMode} setPartialMode={setPartialMode} partialWordCount={partialWordCount} setPartialWordCount={setPartialWordCount} audioPartialSeconds={audioPartialSeconds} setAudioPartialSeconds={setAudioPartialSeconds} /></section>
         <section className="memo-toggle-row"><SettingToggle label="Text / Audio" options={['Text', 'Audio']} on={previewMode === 'audio'} toggle={() => setPreviewMode(previewMode === 'audio' ? 'text' : 'audio')} /></section>
         <section><h2>Ayah text size</h2><AyahSizeControl /></section>

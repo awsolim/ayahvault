@@ -91,6 +91,49 @@
   box-shadow: inset 0 1px 0 #fff, 0 1px 0 #b5c1dc;
 }
 .practice .memo-audio-progress { background: linear-gradient(90deg, #3155ce, #6890ff); }
+.practice .memo-settings > .memo-tap-row { grid-template-columns: minmax(0, 1fr) minmax(0, 220px); }
+.memo-tap-control { min-width: 0; }
+.practice .memo-tap-control select {
+  appearance: none;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 30px 10px 12px;
+  border: 1px solid #c0cae0;
+  border-radius: 8px;
+  color: var(--ink);
+  font-size: 13px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='m1 1 5 5 5-5' fill='none' stroke='%233153ae' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 11px center, linear-gradient(175deg, #fff, #f3f6fd);
+  box-shadow: inset 0 1px 0 #fff, 0 1px 2px #263f9a0b;
+  cursor: pointer;
+}
+.memo-tap-control p { margin: 7px 0 0; font-size: 11px; color: var(--muted); text-align: right; }
+.memo-reader { --reader-bottom-space: 48px; }
+.memo-reader:has(.memo-practice-bar) .reader-folio { visibility: hidden; }
+.memo-practice-bar { position: absolute; inset: auto 0 env(safe-area-inset-bottom, 0px); height: 48px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; align-items: center; padding: 3px 10px; border-top: 1px solid var(--rule); background: #fff; color: var(--ink); z-index: 18; }
+.memo-practice-bar button { min-height: 42px; padding: 6px 8px; border: 0; border-radius: 6px; background: transparent; color: inherit; font-size: 13px; white-space: nowrap; }
+.memo-practice-bar .memo-practice-config { display: flex; align-items: center; justify-content: flex-start; gap: 5px; font-weight: 600; }
+.memo-practice-bar .memo-practice-new { background: linear-gradient(155deg, #3e5dbc, #2c469a); box-shadow: inset 0 1px 0 #ffffff38; color: #fff; min-height: 36px; }
+.memo-practice-bar button:disabled { color: var(--muted); cursor: default; }
+.memo-practice-eye { display: grid; place-items: center; }
+.memo-practice-status { position: absolute; left: 12px; right: 12px; bottom: calc(54px + env(safe-area-inset-bottom, 0px)); z-index: 19; padding: 10px; margin: 0; border: 1px solid var(--rule); border-radius: 5px; background: white; color: #983b34; font-size: 13px; }
+.memo-practice-settings.practice { padding: 0; width: 100%; max-width: none; }
+.memo-practice-settings .practice-modes { margin-bottom: 20px; }
+.memo-custom-types { display: flex; gap: 3px; padding: 3px; border: 1px solid #c0cae0; border-radius: 8px; background: linear-gradient(180deg, #f1f4fa, #fff); }
+.practice .memo-custom-types button { flex: 1; min-width: 0; min-height: 36px; padding: 6px 4px; border: 0; border-radius: 6px; background: transparent; color: var(--muted); font-size: 13px; }
+.practice .memo-custom-types button[aria-pressed=true] { background: var(--memo-button-sheen), var(--memo-button-blue); color: #fff; box-shadow: inset 0 1px 0 #ffffff30; }
+.memo-practice-range { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.memo-practice-range label { font-size: 13px; display: grid; gap: 8px; }
+.memo-practice-range input, .memo-practice-settings .library-field select { min-height: 44px; width: 100%; padding: 8px 12px; border: 1px solid #c0cae0; border-radius: 7px; background: white; color: var(--ink); }
+.memo-practice-partial { display: flex; align-items: center; gap: 10px; min-height: 44px; font-size: 14px; }
+.memo-practice-partial input { accent-color: var(--blue); width: 18px; height: 18px; }
+.memo-practice-tools { display: flex; justify-content: space-between; align-items: center; gap: 14px; border-block: 1px solid var(--rule); padding: 10px 0; margin-bottom: 12px; }
+.memo-practice-tools button { display: flex; align-items: center; gap: 7px; min-height: 40px; border: 0; background: none; color: var(--ink); font-size: 14px; }
+.memo-audio-tap-surface { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; cursor: pointer; }
+.practice .memo-audio-tap-surface:focus { outline: none; }
+.practice[data-keyboard-focus="true"] .memo-audio-tap-surface:focus-visible { outline: 2px solid var(--memo-blue); outline-offset: 5px; border-radius: 5px; }
+@media (max-width: 640px) {
+  .practice .memo-settings > .memo-tap-row { grid-template-columns: minmax(0, 1fr) minmax(0, 190px); }
+}
 /* Touch never draws a focus rectangle around the ayah. Tab focus stays visible. */
 .practice .verse-flip:focus { outline: none; }
 .practice[data-keyboard-focus="true"] .verse-flip:focus-visible {

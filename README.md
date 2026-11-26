@@ -13,6 +13,13 @@ Quran companion built with React, TypeScript, Vite, and Tailwind. Mushaf and Mem
 
 Deploy the `dist` folder. Vercel SPA rewrites are already configured.
 
+## MemoBuddy practice
+
+MemoBuddy also supports a [practice session inside the mushaf](docs/mushaf-practice.md)
+with configurable concealment, cumulative reveals, partial prompts, and a shared
+generator. Its visibility preference persists on the device; practice progress
+stays in the current tab/session.
+
 ## Mutashabihat Library
 
 The Library groups ayahs into comparison entries with connected word-range marks,

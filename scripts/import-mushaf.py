@@ -9,6 +9,7 @@ from pathlib import Path
 import sqlite3
 import struct
 import sys
+import subprocess
 import tempfile
 import zipfile
 
@@ -43,3 +44,4 @@ with zipfile.ZipFile(sys.argv[1]) as archive, tempfile.TemporaryDirectory() as t
     (root / 'src/assets/mushaf-pages.json').write_text(json.dumps(index, separators=(',', ':')))
     connection.close()
 print('Imported 604 pages, matched regions, and all 6,236 ayah page references.')
+subprocess.run([sys.executable, str(root/'scripts/mushaf-practice-words.py'), sys.argv[1]], check=True)

@@ -1,7 +1,7 @@
 import Spinner from '../../components/ui/Spinner';
 import { imagePoint, nearestAyah } from './selection';
 import { ChevronDown } from 'lucide-react';
-import { fitArtworkLines, fitMarkerBounds, type ArtworkOverlay, type PageData } from './artwork';
+import { concealmentBounds, fitArtworkLines, fitMarkerBounds, type ArtworkOverlay, type PageData } from './artwork';
 import MushafArtwork from './MushafArtwork';
 import AyahActions from './AyahActions';
 import PlaybackSettings from './PlaybackSettings';
@@ -18,6 +18,8 @@ import Seo from '../../lib/Seo';
 import { useLibrary } from '../../library/LibraryProvider';
 const AyahLinks = lazy(() => import('../../library/AyahLinks'));
 const TranslationDrawer = lazy(() => import('./TranslationDrawer'));
+const MushafPractice = lazy(() => import('../memobuddy/MushafPractice'));
+import type { PracticeBinding } from './practiceTypes';
 
 const AYAH_HOLD_MS = 340;
 const pages = Array.from({ length: 604 }, (_, i) => 604 - i);
@@ -25,7 +27,7 @@ const cache = new Map<number, PageData>();
 const artworkPath = (page: number) => '/mushaf/dar-al-marefa/' + page;
 async function getPage(page: number, signal: AbortSignal): Promise<PageData> {
   if (cache.has(page)) return cache.get(page)!;
-  const response = await fetch(artworkPath(page) + '.json?layout=2', { signal });
+  const response = await fetch(artworkPath(page) + '.json?layout=3', { signal });
   if (!response.ok) throw new Error('Page unavailable');
   const data: PageData = await response.json();
   if (!(data.width > 0 && data.height > 0 && data.regions?.length)) throw new Error('Invalid page data');
@@ -33,8 +35,9 @@ async function getPage(page: number, signal: AbortSignal): Promise<PageData> {
   if (cache.size > 14) cache.delete(cache.keys().next().value!);
   return data;
 }
-function PageContent({ page, highlight, selected, picking, rangeStart, onSelect, onTap, onEntry, renderActions }: {
+function PageContent({ page, highlight, selected, picking, rangeStart, onSelect, onTap, onEntry, renderActions, practice }: {
   page: number;
+  practice?: PracticeBinding;
   highlight: string | null;
   selected: string | null;
   picking: boolean;
@@ -55,6 +58,17 @@ function PageContent({ page, highlight, selected, picking, rangeStart, onSelect,
   const hold = useRef<{ id: number; x: number; y: number; timer: number; moved: boolean; selected: boolean } | null>(null);
   const rangeTap = useRef(false);
   const artwork = useMemo(() => data && fitArtworkLines(data), [data]);
+  const inPractice=!!practice?.active;
+  const visible=(key:string)=>!inPractice||practice!.visible(key);
+  const promptWords=inPractice?practice!.partialWords:null;
+  const canInteract=(key:string)=>visible(key)&&!(inPractice&&key===practice!.anchor&&promptWords===0);
+  const concealed=data&&inPractice?concealmentBounds(data,visible,practice!.anchor,promptWords):[];
+  const interactiveRegions=artwork?.regions.flatMap(region=>{
+    const [s,a,line]=region;const key=s+':'+a;
+    if(!canInteract(key))return [];
+    if(inPractice&&key===practice!.anchor&&promptWords!==null) return (data?.glyphs||[]).filter(([gs,ga,w,l])=>gs===s&&ga===a&&l===line&&w>0&&w<=promptWords).map(([gs,ga,,l,x1,y1,x2,y2])=>{const [left,top,right,bottom]=fitMarkerBounds([x1,y1,x2,y2],artwork.fits);return [gs,ga,l,left,top,right,bottom] as typeof region;});
+    return [region];
+  })||[];
 
   function cancelHold() {
     if (hold.current) window.clearTimeout(hold.current.timer);
@@ -76,10 +90,17 @@ function PageContent({ page, highlight, selected, picking, rangeStart, onSelect,
     if (picking && (point.x < 0 || point.x > data.width || point.y < 0 || point.y > data.height)) return;
     const boxes = artwork.regions.map(([surah, ayah, , left, top, right, bottom]) => ({ key: surah + ':' + ayah, left, right, top, bottom }));
     const key = nearestAyah(point.x, point.y, boxes);
-    if (key) onSelect(key);
+    if (key && canInteract(key)) {
+      if(inPractice && key===practice!.anchor && promptWords!==null) {
+        const glyphs=(data.glyphs||[]).filter(([s,a])=>s+':'+a===key);
+        const word=nearestAyah(point.x,point.y,glyphs.map(([, ,w,,x1,y1,x2,y2])=>{const [left,top,right,bottom]=fitMarkerBounds([x1,y1,x2,y2],artwork.fits);return {key:String(w),left,top,right,bottom};}));
+        if(!word||Number(word)<1||Number(word)>promptWords)return;
+      }
+      onSelect(key);
+    }
   }
 
-  const lastRegion = selected && artwork?.regions.filter(([surah, ayah]) => surah + ':' + ayah === selected).at(-1);
+  const lastRegion = selected && interactiveRegions.filter(([surah, ayah]) => surah + ':' + ayah === selected).at(-1);
   useLayoutEffect(() => {
     const element = surface.current;
     if (!element || !data || !imageReady || !lastRegion) return;
@@ -90,10 +111,11 @@ function PageContent({ page, highlight, selected, picking, rangeStart, onSelect,
       const x = (width - data.width * scale) / 2 + (x1 + x2) / 2 * scale;
       const y = (height - data.height * scale) / 2;
       const below = y + y2 * scale + 5;
-      setPosition({
+      const next = {
         left: Math.max(91, Math.min(width - 91, x)),
         top: below + 44 <= height ? below : Math.max(4, y + y1 * scale - 49),
-      });
+      };
+      setPosition(previous=>previous?.left===next.left&&previous?.top===next.top?previous:next);
     };
     updatePosition();
     const observer = new ResizeObserver(updatePosition);
@@ -103,10 +125,12 @@ function PageContent({ page, highlight, selected, picking, rangeStart, onSelect,
 
   if (error) return <div className="page-message" role="alert"><p>Couldn’t load page {page}.</p><button onClick={() => { setError(false); setData(null); setImageReady(false); setRetry(n => n + 1); }}>Try again</button></div>;
   if (!data || !artwork) return <div className="page-message"><Spinner colorClassName="reader-spinner" /></div>;
-  const { regions, fits } = artwork;
+  const { fits } = artwork;
+  const regions = interactiveRegions;
   const markers: ArtworkOverlay[] = (data.endings ?? []).flatMap(([surah, ayah]) => {
     const key = surah + ':' + ayah;
     const hasEntry = linked.has(key);
+    if(!visible(key)||(inPractice&&key===practice!.anchor&&promptWords!==null))return [];
     if (page > 2 && !hasEntry) return [];
     const bounds = markerBounds[ayahIndex(key)];
     return bounds ? [{ key, bounds: [bounds[0], bounds[1], bounds[2], bounds[3]], linked: hasEntry }] : [];
@@ -116,7 +140,7 @@ function PageContent({ page, highlight, selected, picking, rangeStart, onSelect,
   }));
   const overlays = [...banners, ...markers];
   const source = artworkPath(page) + '.png';
-  const customArtwork = fits.length > 0 || overlays.length > 0;
+  const customArtwork = fits.length > 0 || overlays.length > 0 || concealed.length > 0;
   return (
     <div className="mushaf-sheet"
       onPointerDown={event => {
@@ -162,14 +186,14 @@ function PageContent({ page, highlight, selected, picking, rangeStart, onSelect,
     >
       <div ref={surface} className="mushaf-artwork">
         <img key={retry} className="mushaf-page-image" src={source} alt={'Quran, page ' + page} draggable={false} onLoad={() => setImageReady(true)} onError={() => setError(true)} style={{ opacity: imageReady && !customArtwork ? 1 : 0 }} />
-        {imageReady && customArtwork && <MushafArtwork source={source} width={data.width} height={data.height} fits={fits} overlays={overlays} />}
+        {imageReady && customArtwork && <MushafArtwork source={source} width={data.width} height={data.height} fits={fits} overlays={overlays} concealed={concealed} />}
         {imageReady ? (
           <svg className="mushaf-regions" viewBox={'0 0 ' + data.width + ' ' + data.height} aria-label={'Select an ayah on page ' + page}>
             {regions.map(([surah, ayah, line, x1, y1, x2, y2], index) => {
               const key = surah + ':' + ayah;
               const first = index === 0 || regions[index - 1][0] !== surah || regions[index - 1][1] !== ayah;
               const marked = key === highlight || key === rangeStart;
-              return <rect key={key + ':' + line} x={x1} y={y1} width={x2 - x1} height={y2 - y1} rx={4} className={key === rangeStart ? 'range-start-region' : marked ? 'selected-region' : undefined} role={first ? 'button' : undefined} tabIndex={first ? 0 : undefined} aria-label={first ? 'Select ayah ' + key : undefined} aria-hidden={!first || undefined} aria-pressed={first ? marked : undefined} onKeyDown={event => { if (first && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); event.stopPropagation(); onSelect(key); } }} />;
+              return <rect key={key + ':' + line + ':' + index} x={x1} y={y1} width={x2 - x1} height={y2 - y1} rx={4} className={key === rangeStart ? 'range-start-region' : marked ? 'selected-region' : undefined} role={first ? 'button' : undefined} tabIndex={first ? 0 : undefined} aria-label={first ? 'Select ayah ' + key : undefined} aria-hidden={!first || undefined} aria-pressed={first ? marked : undefined} onKeyDown={event => { if (first && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); event.stopPropagation(); onSelect(key); } }} />;
             })}
             {!picking && markers.filter(marker => marker.linked).map(({ key, bounds }) => {
               const [left, top, right, bottom] = fitMarkerBounds(bounds, fits);
@@ -201,7 +225,7 @@ function PageContent({ page, highlight, selected, picking, rangeStart, onSelect,
     </div>
   );
 }
-function ReadingStream({ initial, target, initialSurah }: { initial: number; target: string | null; initialSurah: number | null }) {
+function ReadingStream({ initial, target, initialSurah, practice }: { initial: number; target: string | null; initialSurah: number | null; practice?: PracticeBinding }) {
   const location = useLocation();
   const navigate = useNavigate();
   const reader = useRef<HTMLDivElement>(null);
@@ -263,6 +287,7 @@ function ReadingStream({ initial, target, initialSurah }: { initial: number; tar
       element.scrollTo({ left: pageOffset(page, element.clientWidth), behavior: slide ? 'smooth' : 'instant' });
     }
     rememberPage(page);
+    practice?.recordPage(page);
   }
 
   function showAyah(key: string, animate = false) {
@@ -276,6 +301,18 @@ function ReadingStream({ initial, target, initialSurah }: { initial: number; tar
     setHighlight(key);
   }
 
+  function practiceJump(key:string) {
+    playback.stop();setBookVerse(null);setSelected(null);setHighlight(key);
+    movePage(firstAyahPage(key) || active,Number(key.split(':')[0]),true);
+  }
+  useLayoutEffect(()=>{
+    if(practice?.active){
+      if(validPage(practice.resumePage??0))movePage(practice.resumePage!,null);
+      else practiceJump(practice.anchor);
+    }
+    // Moving the page is tied to a new question, never to a reveal or settings edit.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[practice?.questionId]);
   function openBook(key: string) {
     playback.stop();
     setBookVerse(key);
@@ -323,7 +360,7 @@ function ReadingStream({ initial, target, initialSurah }: { initial: number; tar
 
   useLayoutEffect(() => {
     const element = scroll.current!;
-    element.scrollLeft = pageOffset(initial, element.clientWidth);
+    element.scrollLeft = pageOffset(current.current, element.clientWidth);
     const observer = new ResizeObserver(() => { element.scrollLeft = pageOffset(current.current, element.clientWidth); });
     observer.observe(element);
     return () => observer.disconnect();
@@ -383,19 +420,20 @@ function ReadingStream({ initial, target, initialSurah }: { initial: number; tar
     setChapterOverride(null);
     clearSelection();
     rememberPage(page);
+    practice?.recordPage(page);
   }
 
-  useEffect(() => rememberPage(initial), [initial]);
+  useEffect(() => rememberPage(current.current), [initial]);
 
   const chapter = chapters.find(c => c.id === chapterOverride)
     || chapters.filter(c => ayahPages[c.id - 1][0] <= active).at(-1);
   const bookIndex = bookVerse ? ayahIndex(bookVerse) : -1;
   return (
-    <div ref={reader} className={'reading-view' + (chromeOpen ? '' : ' chrome-hidden') + (pick ? ' reader-picking' : '')}
+    <div ref={reader} className={'reading-view' + (practice ? ' memo-reader' : '') + (chromeOpen ? '' : ' chrome-hidden') + (pick ? ' reader-picking' : '')}
       onPointerDownCapture={event => { event.currentTarget.dataset.keyboardFocus = 'false'; }}
       onKeyDownCapture={event => { if (event.key === 'Tab') event.currentTarget.dataset.keyboardFocus = 'true'; }}
       onClick={event => {
-        if (event.target instanceof Element && !event.target.closest('.mushaf-sheet, a, button, label, dialog')) tapReader();
+        if (event.target instanceof Element && !event.target.closest('.mushaf-sheet, .memo-practice-bar, .memo-practice-status, a, button, label, dialog')) tapReader();
       }}
       onKeyDown={event => {
         if (event.key !== 'Escape' || event.defaultPrevented || (event.target instanceof Element && event.target.closest('dialog'))) return;
@@ -438,7 +476,7 @@ function ReadingStream({ initial, target, initialSurah }: { initial: number; tar
           {pages.map(n => (
             <section key={n} className="reading-page" aria-label={'Page ' + n} inert={n !== active}>
               {Math.abs(n - active) <= 2 && <PageContent
-                page={n} onEntry={setEntryVerse} highlight={pick ? null : highlight}
+                page={n} practice={practice} onEntry={setEntryVerse} highlight={pick ? null : highlight}
                 selected={n === active ? selected : null} picking={!!pick} rangeStart={pick?.start ?? null}
                 onSelect={selectAyah} onTap={tapReader}
                 renderActions={(key, page, position) => <AyahActions
@@ -463,6 +501,7 @@ function ReadingStream({ initial, target, initialSurah }: { initial: number; tar
       {bookVerse && <Suspense fallback={<Spinner fullscreen />}><TranslationDrawer verse={bookVerse}
         previous={ayahKeys[bookIndex - 1]} next={ayahKeys[bookIndex + 1]} go={browseTranslation}
         close={() => setBookVerse(null)} /></Suspense>}
+      {practice?.renderControls(practiceJump)}
       <div className="reader-folio" aria-hidden="true">{active}</div>
       {entryVerse && <Suspense fallback={<Spinner fullscreen />}><AyahLinks verse={entryVerse} navigation={entryNavigation} close={() => setEntryVerse(null)} /></Suspense>}
       <button type="button" className="reader-controls-toggle" onClick={() => setChromeOpen(value => !value)}>{chromeOpen ? 'Hide reader controls' : 'Show reader controls'}</button>
@@ -481,5 +520,6 @@ export default function Mushaf() {
   if (target && !validPage(targetPage || 0)) return <div className="reader-resolving"><Link to={location.state?.from === 'memobuddy' ? '/memobuddy' : '/'}>{location.state?.from === 'memobuddy' ? 'MemoBuddy' : 'Surahs'}</Link><div className="page-message" role="alert">Couldn’t open this ayah.</div></div>;
   const start = targetPage || (surah ? ayahPages[surah - 1]?.[0] : undefined) || initial;
   const initialSurah = target ? chapter : (chapters[surah - 1]?.id ?? null);
+  if(location.state?.from==='memobuddy')return <Suspense fallback={<Spinner fullscreen/>}><MushafPractice key={location.key} target={target} entryKey={location.key}>{practice=><ReadingStream initial={start} target={target} initialSurah={initialSurah} practice={practice}/>}</MushafPractice></Suspense>;
   return <ReadingStream key={(target || surah) + ':' + start} initial={start} target={target} initialSurah={initialSurah} />;
 }
